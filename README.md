@@ -26,6 +26,11 @@ DB_PASSWORD=your_database_password
 After setting up the environment file, install all required dependencies using Composer:
 composer install
 
+### Install Dependencies
+Run the following command to install all required dependencies:
+```bash
+npm install
+
 If this project uses Laravel or a similar framework, you must generate a new application key by running:
 php artisan key:generate
 
