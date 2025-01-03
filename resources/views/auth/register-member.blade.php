@@ -108,7 +108,7 @@
                                 <select id="gender" name="gender" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                                     <option value="">Pilih Jantina</option>
                                     <option value="Lelaki">Lelaki</option>
-                                    <option value="Perempuan">Perempuan</option>
+                                    <option value="Perempuan">Perempuan </option>
                                 </select>
                                 <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                             </div>
