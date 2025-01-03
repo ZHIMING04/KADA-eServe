@@ -13,16 +13,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\MemberController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register-member', [MemberController::class, 'create'])
-        ->name('register-member.create');
-    Route::post('register-member', [MemberController::class, 'store'])
-        ->name('register-member.store');
-
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');  // Add this line
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
-
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

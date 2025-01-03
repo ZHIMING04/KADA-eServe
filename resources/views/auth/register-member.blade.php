@@ -141,7 +141,7 @@
                     
                         <div class="flex items-center justify-end mt-6">
                             <x-secondary-button type="reset" class="mr-3">
-                                {{ __('Reset') }}
+                                {{ __('Set Semula') }}
                             </x-secondary-button>
                             <x-primary-button>
                                 {{ __('Hantar') }}
