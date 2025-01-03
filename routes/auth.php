@@ -10,16 +10,10 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\MemberController;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register-member', [MemberController::class, 'create'])
-        ->name('register-member.create');
-    Route::post('register-member', [MemberController::class, 'store'])
-        ->name('register-member.store');
-
     Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');  // Add this line
+        ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
