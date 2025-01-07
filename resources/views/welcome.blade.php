@@ -31,8 +31,8 @@
                     </li>
                 </ul>
                 <div class="navbar-nav">
-                    <a class="nav-link" href="/login">Log Masuk</a>
-                    <a class="nav-link" href="/register">Daftar</a>
+                    <a class="nav-link" href="{{ route('login') }}">Log Masuk</a>
+                    <a class="nav-link" href="{{ route('register') }}">Daftar</a>
                 </div>
             </div>
         </div>
