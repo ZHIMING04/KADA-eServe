@@ -19,7 +19,7 @@
             background-color: #f3f4f6;
         }
         .stat-card {
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
         }
         .stat-card:hover {
             transform: translateY(-5px);
@@ -31,7 +31,7 @@
             -webkit-text-fill-color: transparent;
         }
         .chart-container {
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
         }
         .chart-container:hover {
             transform: scale(1.02);
@@ -76,14 +76,6 @@
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
                     <p class="text-gray-600">Selamat datang ke panel kawalan KADA</p>
-                </div>
-                <div class="flex space-x-3">
-                    <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200">
-                        <i class="fas fa-file-excel mr-2"></i> Export Excel
-                    </button>
-                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200">
-                        <i class="fas fa-file-pdf mr-2"></i> Export PDF
-                    </button>
                 </div>
             </div>
 
