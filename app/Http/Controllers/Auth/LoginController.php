@@ -15,5 +15,6 @@ class LoginController extends Controller
         }
 
         return redirect('/home'); // default redirect for non-admin users
+      
     }
 } 

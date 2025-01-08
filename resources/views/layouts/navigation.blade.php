@@ -38,6 +38,11 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
+                        <x-dropdown-link :href="route('report.display')">
+                        {{ __('Individual Report') }}
+                        </x-dropdown-link>
+                    
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
