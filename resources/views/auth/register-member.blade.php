@@ -143,18 +143,261 @@
                                         </div>
                                         
                                         <div class="grid grid-cols-2 gap-4">
+                                            <!-- Jawatan -->
                                             <div>
-                                                <x-input-label for="gred" value="Jawatan dan Gred" />
+                                                <x-input-label for="jawatan" value="Jawatan" />
+                                                <x-text-input id="jawatan" name="jawatan" type="text" class="mt-1 block w-full" required />
+                                                <x-input-error :messages="$errors->get('jawatan')" class="mt-2" />
+                                            </div>
+
+                                            <!-- Gred -->
+                                            <div>
+                                                <x-input-label for="gred" value="Gred" />
                                                 <x-text-input id="gred" name="gred" type="text" class="mt-1 block w-full" required />
                                                 <x-input-error :messages="$errors->get('gred')" class="mt-2" />
                                             </div>
 
+                                            <!-- Salary (keeping it in the same grid) -->
                                             <div>
                                                 <x-input-label for="salary" value="Gaji Bulanan" />
                                                 <x-text-input id="salary" name="salary" type="text" class="mt-1 block w-full" required />
                                                 <x-input-error :messages="$errors->get('salary')" class="mt-2" />
                                             </div>
                                         </div>
+
+                                        <!-- Maklumat Keluarga dan Pewaris -->
+                                            <div class="mt-8">
+                                                <div class="bg-white shadow-md rounded-lg mb-4">
+                                                    <div class="border-b border-gray-200">
+                                                        <h3 class="text-lg font-medium text-gray-900 p-4">
+                                                            Maklumat Keluarga dan Pewaris
+                                                        </h3>
+                                                    </div>
+                                                    
+                                                    <div class="p-4">
+                                                        <div class="mb-4">
+                                                            <table class="min-w-full divide-y divide-gray-200">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bil</th>
+                                                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hubungan</th>
+                                                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No K/P</th>
+                                                                        <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tindakan</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="bg-white divide-y divide-gray-200" id="familyTableBody">
+                                                                    <!-- Table rows will be dynamically added here -->
+                                                                </tbody>
+                                                            </table>
+
+                                                            <div class="mt-4">
+                                                                <x-secondary-button type="button" onclick="addFamilyMember()" class="bg-green-500 text-white hover:bg-green-600">
+                                                                    + Tambah Ahli Keluarga
+                                                                </x-secondary-button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        <!-- Add this JavaScript before the closing body tag -->
+                                        <script>
+                                            let rowCount = 0;
+
+                                            function addFamilyMember() {
+                                                rowCount++;
+                                                const tbody = document.getElementById('familyTableBody');
+                                                const newRow = document.createElement('tr');
+                                                
+                                                newRow.innerHTML = `
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${rowCount}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <select name="family[${rowCount}][relationship]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                                            <option value="">Pilih Hubungan</option>
+                                                            <option value="Isteri">Isteri</option>
+                                                            <option value="Suami">Suami</option>
+                                                            <option value="Anak">Anak</option>
+                                                            <option value="Ibu">Ibu</option>
+                                                            <option value="Bapa">Bapa</option>
+                                                            <option value="Adik-beradik">Adik-beradik</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <input type="text" name="family[${rowCount}][name]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <input type="text" name="family[${rowCount}][ic]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <button type="button" onclick="this.closest('tr').remove(); updateRowNumbers();" class="text-red-600 hover:text-red-900">
+                                                            Buang
+                                                        </button>
+                                                    </td>
+                                                `;
+                                                
+                                                tbody.appendChild(newRow);
+                                            }
+
+                                            function updateRowNumbers() {
+                                                const rows = document.getElementById('familyTableBody').getElementsByTagName('tr');
+                                                for (let i = 0; i < rows.length; i++) {
+                                                    rows[i].cells[0].textContent = i + 1;
+                                                }
+                                                rowCount = rows.length;
+                                            }
+                                        </script>
+
+                                        <!-- Yuran dan Sumbangan -->
+                                        <div class="mt-8">
+                                            <div class="bg-white shadow-md rounded-lg mb-4">
+                                                <div class="border-b border-gray-200">
+                                                    <h3 class="text-lg font-medium text-gray-900 p-4">
+                                                        Yuran dan Sumbangan
+                                                    </h3>
+                                                </div>
+                                                
+                                                <div class="p-4">
+                                                    <table class="min-w-full divide-y divide-gray-200">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Bil</th>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perkara</th>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">RM</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="bg-white divide-y divide-gray-200">
+                                                            <!-- Yuran Masuk -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Yuran Masuk</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[entrance]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            
+                                                            <!-- Modal Syer -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Modal Syer</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[share_capital]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Modal Yuran -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Modal Yuran</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[subscription_capital]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Wang Deposit Anggota -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Wang Deposit Anggota</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[member_deposit]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Sumbangan Tabung Kebajikan -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">5</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Sumbangan Tabung Kebajikan (Al-Abrar)</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[welfare_fund]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Simpanan Tetap -->
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">6</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Simpanan Tetap</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" name="fees[fixed_savings]" 
+                                                                            class="pl-12 block w-full" required />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <!-- Jumlah -->
+                                                            <tr class="bg-gray-50 font-bold">
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">7</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">JUMLAH</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" id="total_amount" 
+                                                                            class="pl-12 block w-full bg-gray-100" readonly />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Add this JavaScript for auto-calculation -->
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const feeInputs = document.querySelectorAll('input[name^="fees["]');
+                                                const totalInput = document.getElementById('total_amount');
+
+                                                function calculateTotal() {
+                                                    let total = 0;
+                                                    feeInputs.forEach(input => {
+                                                        total += parseFloat(input.value || 0);
+                                                    });
+                                                    totalInput.value = total.toFixed(2);
+                                                }
+
+                                                feeInputs.forEach(input => {
+                                                    input.addEventListener('input', calculateTotal);
+                                                });
+                                            });
+                                        </script>
+
                                         
                                         <div class="flex items-center justify-end mt-6">
                                             <x-secondary-button type="reset" class="mr-3">
