@@ -38,14 +38,6 @@
         </div>
     </nav>
 
-    <!-- After nav section -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
     <!-- Hero Section -->
     <div class="container-fluid bg-light py-5">
         <div class="container">
@@ -93,14 +85,15 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-3">
+    <footer class="bg-dark text-light py-4">
         <div class="container">
-            <div class="row align-items-center">
+            <div class="row">
                 <div class="col-md-6">
-                    <h6 class="mb-1">Lembaga Kemajuan Pertanian Kemubu (KADA)</h6>
+                    <h5>Lembaga Kemajuan Pertanian Kemubu (KADA)</h5>
+                    <p>Membangunkan sektor pertanian untuk masa depan yang lebih baik.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <small>© 2024 KADA. Hak Cipta Terpelihara.</small>
+                    <p>© 2024 KADA. Hak Cipta Terpelihara.</p>
                 </div>
             </div>
         </div>
