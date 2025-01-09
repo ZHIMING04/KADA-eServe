@@ -56,7 +56,7 @@
                     <a href="#" class="btn btn-success btn-lg">Ketahui Lebih Lanjut</a>
                 </div>
                 <div class="col-md-6">
-                    <img src="{{ asset('image/paddy.jpg') }}" alt="KADA" class="img-fluid rounded">
+                    <img src="{{ asset('images/paddy.jpg') }}" alt="KADA" class="img-fluid rounded">
                 </div>
             </div>
         </div>
