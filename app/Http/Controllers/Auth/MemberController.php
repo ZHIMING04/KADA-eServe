@@ -20,12 +20,12 @@ class MemberController extends Controller
 {
     public function index()
     {
-        return view('auth/register-member');
+        return view('guest/register');
     }
 
     public function create()
     {
-        return view('auth/register-member');
+        return view('guest/register');
     }
 
     public function store(Request $request)

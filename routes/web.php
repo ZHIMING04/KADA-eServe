@@ -6,6 +6,8 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\IndividualReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\MemberController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
 require __DIR__.'/auth.php';
 
 Route::get('/', function () {
@@ -23,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
+    Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
+    Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
 });
 
 Route::get('/loan', [LoanController::class, 'create'])->name('loan.create');

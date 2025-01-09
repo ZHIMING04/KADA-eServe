@@ -41,6 +41,10 @@
                         <x-dropdown-link :href="route('report.display')">
                         {{ __('Individual Report') }}
                         </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('guest.register')">
+                        {{ __('Member Registration') }}
+                        </x-dropdown-link>
                     
 
                         <!-- Authentication -->
