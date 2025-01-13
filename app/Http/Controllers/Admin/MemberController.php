@@ -4,37 +4,75 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Models\Member;
+use App\Models\WorkingInfo;
+use App\Models\Savings;
+use App\Models\Family;
+use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MemberController extends Controller
 {
     public function index()
     {
-        $members = DB::table('member_register')
-            ->select('id', 'no_anggota', 'name', 'email', 'ic', 'phone')
-            ->get();
-
+        $members = Member::all();
         return view('admin.members', compact('members'));
     }
 
     public function show($id)
     {
-        $member = DB::table('member_register')
-            ->where('id', $id)
-            ->first();
+        $member = Member::findOrFail($id);
+        $workingInfo = WorkingInfo::where('no_anggota', $member->id)->first();
+        $savings = Savings::where('no_anggota', $member->id)->first();
+        $familyMembers = Family::where('no_anggota', $member->id)->get();
 
-        // Get related information
-        $workingInfo = DB::table('working_info')
-            ->where('no_anggota', $member->id)
-            ->first();
+        return view('admin.member-details', compact('member', 'workingInfo', 'savings', 'familyMembers'));
+    }
 
-        $family = DB::table('family')
-            ->where('no_anggota', $member->id)
-            ->get();
+    public function batchDelete(Request $request)
+    {
+        try {
+            $ids = explode(',', $request->selected_ids);
+            Member::whereIn('id', $ids)->delete();
+            
+            return redirect()->back()->with('success', 'Members deleted successfully');
+        } catch (\Exception $e) {
+            \Log::error('Batch Delete Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error deleting members: ' . $e->getMessage());
+        }
+    }
 
-        $savings = DB::table('savings')
-            ->where('no_anggota', $member->id)
-            ->first();
+    public function export(Request $request)
+    {
+        try {
+            $ids = explode(',', $request->selected_ids);
+            $fields = $request->fields ?? ['no_anggota', 'name', 'email']; // Default fields if none selected
+            
+            $membersData = Member::whereIn('id', $ids)->get();
+            
+            if ($membersData->isEmpty()) {
+                return back()->with('error', 'No members selected for export');
+            }
 
-        return view('admin.members.show', compact('member', 'workingInfo', 'family', 'savings'));
+            $pdf = PDF::loadView('admin.exports.members-pdf', [
+                'membersData' => $membersData,
+                'fields' => $fields
+            ])->setPaper('a4', 'landscape');
+
+            return $pdf->download('members-export-' . now()->format('Y-m-d-His') . '.pdf');
+
+        } catch (\Exception $e) {
+            \Log::error('Export Error: ' . $e->getMessage());
+            return back()->with('error', 'Error generating PDF: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        $member = Member::findOrFail($id);
+        $member->delete();
+        
+        return redirect()->route('admin.members.index')
+                        ->with('success', 'Member deleted successfully');
     }
 } 
