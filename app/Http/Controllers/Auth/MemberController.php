@@ -2,19 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
-use App\Models\Member;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules;
-use Illuminate\View\View;
-
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\Member;
 
 class MemberController extends Controller
 {
@@ -25,54 +17,97 @@ class MemberController extends Controller
 
     public function create()
     {
-        return view('guest/register');
+        return view('guest.register');
     }
 
     public function store(Request $request)
     {
-        // Validate the request data
-        $validatedData = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8'],
-            'ic' => ['required', 'string', 'max:14'],
-            'phone' => ['required', 'string', 'max:15'],
-            'address' => ['required', 'string'],
-            'city' => ['required', 'string'],
-            'poskod' => ['required', 'string'],
-            'DOB' => ['required', 'date'],
-            'state' => ['required', 'string'],
-            'gender' => ['required', 'string'],
-            'gred' => ['required', 'string'],
-            'salary' => ['required', 'numeric'],
-        ]);
+        // Add this line at the start to debug incoming data
+        Log::info('Form data:', $request->all());
 
-        // Insert data into the 'users' table and get the ID
-        $userId = DB::table('users')->insertGetId([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'ic' => $validatedData['ic'],
-            'phone' => $validatedData['phone'],
-            'address' => $validatedData['address'],
-            'city' => $validatedData['city'],
-            'poskod' => $validatedData['poskod'],
-            'DOB' => $validatedData['DOB'],
-            'state' => $validatedData['state'],
-            'gender' => $validatedData['gender'],
-            'gred' => $validatedData['gred'],
-            'salary' => $validatedData['salary'],
-        ]);
+        try {
+            DB::transaction(function () use ($request) {
+                // 1. Insert member data
+                $member = Member::create([
+                    'no_anggota' => $request->no_anggota,
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'ic' => $request->ic,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'postcode' => $request->postcode,
+                    'state' => $request->state,
+                    'gender' => $request->gender,
+                    'DOB' => $request->DOB,
+                    'agama' => $request->agama,
+                    'bangsa' => $request->bangsa,
+                    'no_pf' => $request->no_pf,
+                    'salary' => $request->salary,
+                    'office_address' => $request->office_address,
+                    'office_city' => $request->office_city,
+                    'office_postcode' => $request->office_postcode,
+                    'office_state' => $request->office_state,
+                ]);
 
-        // Insert login credentials
-        DB::table('login_sessions')->insert([
-            'user_id' => $userId,
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => 'member',
-        ]);
+                // 2. Insert working info
+                DB::table('working_info')->insert([
+                    'jawatan' => $request->jawatan,
+                    'gred' => $request->gred,
+                    'no_pf' => $request->no_pf,
+                    'salary' => $request->salary,
+                    'no_anggota' => $member->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-        return redirect()->route('welcome')->with('success', 'Member registered successfully');
+                // 3. Insert savings/fees
+                DB::table('savings')->insert([
+                    'entrance_fee' => $request->input('fees.entrance'),
+                    'share_capital' => $request->input('fees.share_capital'),
+                    'subscription_capital' => $request->input('fees.subscription_capital'),
+                    'member_deposit' => $request->input('fees.member_deposit'),
+                    'welfare_fund' => $request->input('fees.welfare_fund'),
+                    'fixed_savings' => $request->input('fees.fixed_savings'),
+                    'total_amount' => array_sum([
+                        $request->input('fees.entrance'),
+                        $request->input('fees.share_capital'),
+                        $request->input('fees.subscription_capital'),
+                        $request->input('fees.member_deposit'),
+                        $request->input('fees.welfare_fund'),
+                        $request->input('fees.fixed_savings'),
+                    ]),
+                    'no_anggota' => $member->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // 4. Insert family members if any
+                if ($request->has('family')) {
+                    foreach ($request->family as $familyMember) {
+                        DB::table('family')->insert([
+                            'relationship' => $familyMember['relationship'],
+                            'name' => $familyMember['name'],
+                            'ic' => $familyMember['ic'],
+                            'no_anggota' => $member->id,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
+                }
+            });
+
+            return redirect()->route('guest.success')
+                ->with('success', 'Pendaftaran anda telah berjaya dihantar!');
+
+        } catch (\Exception $e) {
+            Log::error('Registration Error: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Registration error: ' . $e->getMessage()]);
+        }
     }
+
+   
 }
 
