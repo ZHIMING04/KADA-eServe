@@ -4,9 +4,6 @@
             {{ __('Permohonan Pinjaman') }}
         </h2>
     </x-slot>
-
-
-
     <div class="py-6">
     <div class="flex gap-4 mx-4">
         <!-- Butir-butir Pembiayaan Card -->
@@ -131,6 +128,7 @@
                      required 
                      autofocus>
                   <x-input-error :messages="$errors->get('name')" class="mt-2" />
+
                 </div>
                  <!-- IC and DOB in same row -->
                  <div class="grid grid-cols-2 gap-4 mb-4">
@@ -142,9 +140,9 @@
                             <input type="text" 
                                 name="ic" 
                                 id="ic" 
+
                                 class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required 
-                                placeholder="000000-00-0000">
+                                required >
                             <x-input-error :messages="$errors->get('ic')" class="mt-2" />
                         </div>
 
@@ -384,28 +382,105 @@
                             </td>
                         </tr>
                     </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </div> 
         </div>
     </div>
 
        
 
-                    <div class="flex items-center justify-end mt-6">
+                   
+</div>
+
+<!-- Penjamin Section -->
+<div class="flex-1 bg-white shadow-sm rounded-lg mt-4 mx-4">
+    <div class="border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900 p-4">
+            Maklumat Penjamin
+        </h3>
+    </div>
+    <div class="p-4">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bil</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. PF</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. K/P</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Telefon</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody id="penjaminTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Rows will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <button type="button" onclick="addPenjamin()" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 focus:outline-none focus:border-green-800 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
+                + Tambah Penjamin
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let penjaminCount = 0;
+    function addPenjamin() {
+        penjaminCount++;
+        const tbody = document.getElementById('penjaminTableBody');
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${penjaminCount}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" 
+                    name="penjamin[${penjaminCount}][no_pf]" 
+                    class="mt-1 block w-full rounded-md border-green-500 shadow-sm focus:border-green-600 focus:ring-green-600" 
+                    required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" 
+                    name="penjamin[${penjaminCount}][name]" 
+                    class="mt-1 block w-full rounded-md border-green-500 shadow-sm focus:border-green-600 focus:ring-green-600" 
+                    required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" 
+                    name="penjamin[${penjaminCount}][ic]" 
+                    class="mt-1 block w-full rounded-md border-green-500 shadow-sm focus:border-green-600 focus:ring-green-600" 
+                    required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" 
+                    name="penjamin[${penjaminCount}][phone]" 
+                    class="mt-1 block w-full rounded-md border-green-500 shadow-sm focus:border-green-600 focus:ring-green-600" 
+                    required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <button type="button" 
+                    onclick="this.closest('tr').remove(); updatePenjaminNumbers();" 
+                    class="text-red-600 hover:text-red-900">
+                    Buang
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(newRow);
+    }
+
+    function updatePenjaminNumbers() {
+        const rows = document.getElementById('penjaminTableBody').getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].cells[0].textContent = i + 1;
+        }
+        penjaminCount = rows.length;
+    }
+</script>
+</x-app-layout>
+
+<div class="flex items-center justify-end mt-6">
                     <x-secondary-button type="reset" class="mr-3">
                         {{ __('Reset') }}
                     </x-secondary-button>
@@ -413,9 +488,6 @@
                         {{ __('Hantar') }}
                     </x-primary-button>
                     </div>
-</div>
-
-</x-app-layout>
 
 
 

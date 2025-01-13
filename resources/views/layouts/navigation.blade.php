@@ -45,6 +45,10 @@
                         <x-dropdown-link :href="route('guest.register')">
                         {{ __('Member Registration') }}
                         </x-dropdown-link>
+
+                        <x-dropdown-link :href="route('loan.create')">
+                            {{ __('Loan Application') }}
+                        </x-dropdown-link>
                     
 
                         <!-- Authentication -->
