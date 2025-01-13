@@ -25,11 +25,17 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
-    Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
-    Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
+    
 });
 
+
+Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
+Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
 Route::get('/loan', [LoanController::class, 'create'])->name('loan.create');
 Route::post('/loan', [LoanController::class, 'store'])->name('loan.store');
 Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+Route::get('/guest/success', function () {
+    return view('guest.success');
+})->name('guest.success');
 
