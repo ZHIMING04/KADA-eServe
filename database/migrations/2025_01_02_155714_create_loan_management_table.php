@@ -54,6 +54,7 @@ class CreateLoanManagementTable extends Migration
             $table->double('monthly_gross_salary', 10, 2);
             $table->double('monthly_net_salary', 10, 2);
             $table->integer('loan_period');
+            $table->string('status')->default('pending');
             $table->timestamps();
 
             // Foreign Key Constraints

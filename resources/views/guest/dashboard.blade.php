@@ -52,37 +52,65 @@
 
 
         .display-4:hover {
-            background-size: 200% auto;
+            background-size: 300% auto;
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: gradientText 6s linear infinite;
+            animation: gradientText 8s ease infinite;
+            transition: all 0.3s ease;
         }
 
         @keyframes gradientText {
             0% {
-                background-image: linear-gradient(45deg, #007BFF, #00BCD4);
+                background-image: linear-gradient(45deg, 
+                    #007BFF 0%, 
+                    #00BCD4 50%, 
+                    #007BFF 100%
+                );
             }
-            25% {
-                background-image: linear-gradient(45deg, #00BCD4, #28a745);
+            20% {
+                background-image: linear-gradient(45deg,
+                    #00BCD4 0%,
+                    #28a745 50%,
+                    #00BCD4 100%
+                );
             }
-            50% {
-                background-image: linear-gradient(45deg, #28a745, #9C27B0);
+            40% {
+                background-image: linear-gradient(45deg,
+                    #28a745 0%,
+                    #9C27B0 50%,
+                    #28a745 100%
+                );
             }
-            75% {
-                background-image: linear-gradient(45deg, #9C27B0, #007BFF);
+            60% {
+                background-image: linear-gradient(45deg,
+                    #9C27B0 0%,
+                    #FF5722 50%,
+                    #9C27B0 100%
+                );
+            }
+            80% {
+                background-image: linear-gradient(45deg,
+                    #FF5722 0%,
+                    #007BFF 50%,
+                    #FF5722 100%
+                );
             }
             100% {
-                background-image: linear-gradient(45deg, #007BFF, #007BFF);
+                background-image: linear-gradient(45deg,
+                    #007BFF 0%,
+                    #00BCD4 50%,
+                    #007BFF 100%
+                );
             }
         }
 
         @keyframes smoothUnderlineColorChange {
-            0% { background-color: #007BFF; }
-            25% { background-color: #00BCD4; }
-            50% { background-color: #28a745; }
-            75% { background-color: #9C27B0; }
-            90% { background-color: #007BFF; }
+            0%, 100% { background-color: #007BFF; }
+            20% { background-color: #00BCD4; }
+            40% { background-color: #28a745; }
+            60% { background-color: #9C27B0; }
+            80% { background-color: #FF5722; }
         }
 
         .display-4:hover::after {
@@ -94,7 +122,7 @@
             width: 150px;
             height: 4px;
             border-radius: 2px;
-            animation: smoothUnderlineColorChange 6s linear infinite;
+            animation: smoothUnderlineColorChange 8s ease infinite;
         }
     </style>
 </head>
