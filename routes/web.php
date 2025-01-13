@@ -7,6 +7,8 @@ use App\Http\Controllers\IndividualReportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+use App\Http\Controllers\Admin\FinanceController;
 
 require __DIR__.'/auth.php';
 
@@ -38,4 +40,12 @@ Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('adm
 Route::get('/guest/success', function () {
     return view('guest.success');
 })->name('guest.success');
+
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/members', [AdminMemberController::class, 'index'])->name('members.index');
+    Route::get('/members/{member}', [AdminMemberController::class, 'show'])->name('members.show');
+    Route::get('/members/{member}/edit', [AdminMemberController::class, 'edit'])->name('members.edit');
+    Route::delete('/members/{member}', [AdminMemberController::class, 'destroy'])->name('members.destroy');
+});
 
