@@ -1,51 +1,66 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\IndividualReportController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Auth\MemberController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
+use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
+// Public routes
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+// Guest routes
+Route::prefix('guest')->name('guest.')->group(function () {
+    Route::get('/register', [MemberController::class, 'create'])->name('register');
+    Route::post('/register', [MemberController::class, 'store'])->name('register.store');
+    Route::get('/success', function () {
+        return view('guest.success');
+    })->name('success');
+});
 
+// Authenticated user routes
 Route::middleware(['auth'])->group(function () {
+    // Dashboard
     Route::get('guest/dashboard', function () {
         return view('guest.dashboard');
     })->name('dashboard');
-    // ... other authenticated routes
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Profile routes
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::patch('/profile', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
+    });
+
+    // Loans and reports
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
-    
 });
 
-
-Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
-Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
-Route::get('/loan', [LoanController::class, 'create'])->name('loan.create');
-Route::post('/loan', [LoanController::class, 'store'])->name('loan.store');
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-
-Route::get('/guest/success', function () {
-    return view('guest.success');
-})->name('guest.success');
-
+// Admin routes
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/members', [AdminMemberController::class, 'index'])->name('members.index');
-    Route::get('/members/{member}', [AdminMemberController::class, 'show'])->name('members.show');
-    Route::get('/members/{member}/edit', [AdminMemberController::class, 'edit'])->name('members.edit');
-    Route::delete('/members/{member}', [AdminMemberController::class, 'destroy'])->name('members.destroy');
+
+    // Member management
+    Route::controller(AdminMemberController::class)->group(function () {
+        Route::get('/members', 'index')->name('members.index');
+        Route::get('/members/create', 'create')->name('members.create');
+        Route::post('/members', 'store')->name('members.store');
+        Route::delete('/members/batch-delete', 'batchDelete')->name('members.batch-delete');
+        Route::get('/members/export', 'export')->name('members.export');
+        Route::get('/members/{member}', 'show')->name('members.show');
+        Route::get('/members/{member}/edit', 'edit')->name('members.edit');
+        Route::put('/members/{member}', 'update')->name('members.update');
+        Route::delete('/members/{member}', 'destroy')->name('members.destroy');
+    });
 });
+
 
