@@ -27,7 +27,7 @@ class MemberController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                // 1. Insert member data
+                // 1. Insert member data with guest_id
                 $member = Member::create([
                     'no_anggota' => $request->no_anggota,
                     'name' => $request->name,
@@ -48,6 +48,7 @@ class MemberController extends Controller
                     'office_city' => $request->office_city,
                     'office_postcode' => $request->office_postcode,
                     'office_state' => $request->office_state,
+                    'guest_id' => auth()->id()
                 ]);
 
                 // 2. Insert working info

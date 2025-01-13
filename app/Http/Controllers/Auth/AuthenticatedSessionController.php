@@ -36,4 +36,22 @@ class AuthenticatedSessionController extends Controller
     }
 
 
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        try {
+            $request->authenticate();
+
+            $request->session()->regenerate();
+
+            return redirect('guest/dashboard');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors([
+                'email' => 'ID Pengguna atau Kata Laluan tidak sah.',
+            ])->withInput($request->only('email'));
+        }
+    }
+
 }

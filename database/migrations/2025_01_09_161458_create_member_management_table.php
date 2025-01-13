@@ -35,6 +35,8 @@ class CreateMemberManagementTable extends Migration
         $table->string('office_city');
         $table->string('office_postcode');
         $table->string('office_state');
+        $table->unsignedBigInteger('guest_id');
+        $table->foreign('guest_id')->references('id')->on('users')->onDelete('cascade');
     });
 
     Schema::create('working_info', function (Blueprint $table) {
