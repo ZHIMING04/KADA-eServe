@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnnualReportController;
 
 require __DIR__.'/auth.php';
 
@@ -17,15 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// Guest routes (for authenticated users with guest role)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/guest/dashboard', function () {
-        return view('guest.dashboard');
-    })->name('guest.dashboard');
 
-    Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
-    Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
-    Route::get('/guest/success', function () {
         return view('guest.success');
     })->name('guest.success');
 });
@@ -54,6 +47,9 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
     Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
+
+    //AnnualReport
+    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report.private');
 });
 
 // Admin routes
@@ -109,5 +105,3 @@ Route::middleware(['auth', 'can:approve-member-registration'])->group(function (
     Route::post('/admin/registrations/{id}/reject', [AdminMemberController::class, 'reject'])
         ->name('admin.registrations.reject');
 });
-
-
