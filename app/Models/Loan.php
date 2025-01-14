@@ -28,4 +28,25 @@ class Loan extends Model
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
+
+    // Define relationships
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id', 'id')->where('status', 'pending');
+    }
+
+    public function loanType()
+    {
+        return $this->belongsTo(LoanType::class, 'loan_type_id', 'loan_type_id');
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class, 'bank_id', 'bank_id');
+    }
+
+    public function guarantors()
+    {
+        return $this->hasMany(Guarantor::class, 'loan_id', 'loan_id');
+    }
 } 

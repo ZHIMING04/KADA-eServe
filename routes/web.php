@@ -76,6 +76,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/members/{member}', 'update')->name('members.update');
         Route::delete('/members/{member}', 'destroy')->name('members.destroy');
     });
+
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::get('/finance/{loan}', [FinanceController::class, 'show'])->name('finance.show');
 });
 
 Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
