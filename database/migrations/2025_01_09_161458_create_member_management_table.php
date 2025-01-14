@@ -14,8 +14,9 @@ class CreateMemberManagementTable extends Migration
     public function up(): void
 {
     Schema::create('member_register', function (Blueprint $table) {
+        $table->id();
         $table->timestamps();
-        $table->string('no_anggota')->primary();
+        $table->string('no_anggota');
         $table->string('name');
         $table->string('email');
         $table->string('ic');
@@ -45,11 +46,8 @@ class CreateMemberManagementTable extends Migration
         $table->string('gred');
         $table->string('no_pf');
         $table->string('salary');
-        $table->string('no_anggota');
-        $table->foreign('no_anggota')
-              ->references('no_anggota')
-              ->on('member_register')
-              ->onDelete('cascade');
+        $table->unsignedBigInteger('no_anggota'); // Add this column
+        $table->foreign('no_anggota')->references('id')->on('member_register')->onDelete('cascade');
     });
 
     Schema::create('family', function (Blueprint $table) {
@@ -58,11 +56,8 @@ class CreateMemberManagementTable extends Migration
         $table->string('relationship');
         $table->string('name');
         $table->string('ic');
-        $table->string('no_anggota');
-        $table->foreign('no_anggota')
-              ->references('no_anggota')
-              ->on('member_register')
-              ->onDelete('cascade');
+        $table->unsignedBigInteger('no_anggota'); // Add this column
+        $table->foreign('no_anggota')->references('id')->on('member_register')->onDelete('cascade');
     });
 
     Schema::create('savings', function (Blueprint $table) {
@@ -75,11 +70,8 @@ class CreateMemberManagementTable extends Migration
         $table->decimal('welfare_fund', 10, 2);
         $table->decimal('fixed_savings', 10, 2);
         $table->decimal('total_amount', 10, 2);
-        $table->string('no_anggota');
-        $table->foreign('no_anggota')
-              ->references('no_anggota')
-              ->on('member_register')
-              ->onDelete('cascade');
+        $table->unsignedBigInteger('no_anggota');
+        $table->foreign('no_anggota')->references('id')->on('member_register')->onDelete('cascade');
     });
 }
 
