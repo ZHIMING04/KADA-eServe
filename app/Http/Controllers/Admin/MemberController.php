@@ -15,7 +15,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::all();
+        $members = Member::where('status', 'approved')->get();
         return view('admin.members', compact('members'));
     }
 
@@ -74,5 +74,17 @@ class MemberController extends Controller
         
         return redirect()->route('admin.members.index')
                         ->with('success', 'Member deleted successfully');
+    }
+
+    public function pendingRegistrations()
+    {
+        // Get pending registrations
+        $pendingRegistrations = Member::where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.registrations.pending', [
+            'pendingRegistrations' => $pendingRegistrations
+        ]);
     }
 } 

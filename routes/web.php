@@ -42,6 +42,11 @@ Route::middleware(['auth'])->group(function () {
     // Loans and reports
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
+
+    // Loan Routes
+    Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
+    Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
+    Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
 });
 
 // Admin routes
@@ -61,6 +66,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/members/{member}', 'update')->name('members.update');
         Route::delete('/members/{member}', 'destroy')->name('members.destroy');
     });
+
+    // Add this new route
+    Route::get('/registrations/pending', [AdminMemberController::class, 'pendingRegistrations'])
+        ->name('registrations.pending');
 });
 
 

@@ -37,6 +37,8 @@ class CreateMemberManagementTable extends Migration
         $table->string('office_state');
         $table->unsignedBigInteger('guest_id');
         $table->foreign('guest_id')->references('id')->on('users')->onDelete('cascade');
+        $table->enum('status', ['pending', 'approved', 'rejected'])
+              ->default('pending');
     });
 
     Schema::create('working_info', function (Blueprint $table) {

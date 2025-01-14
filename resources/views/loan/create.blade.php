@@ -1,420 +1,388 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Permohonan Pinjaman') }}
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Loan Application') }}
         </h2>
     </x-slot>
 
-
-
-    <div class="py-6">
-    <div class="flex gap-4 mx-4">
-        <!-- Butir-butir Pembiayaan Card -->
-        <div class="w-1/3 bg-white shadow-sm rounded-lg">
-            <!--change back to flex-1 if u want equal size-->
-            <div class="border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900 p-4">
-                    <form method="POST" action="{{ route('loan.store') }}" class="space-y-6">
-                    @csrf
-                    Butir-butir Pembiayaan
-                </h3>
-            </div>
-            <div class="p-4">
-                <!-- Jenis Pembiayaan Dropdown -->
-                <div class="mb-4">
-                    <label for="jenis_pembiayaan" class="block text-sm font-medium text-gray-700">
-                        Jenis Pembiayaan <span class="text-red-500">*</span>
-                    </label>
-                    <select id="jenis_pembiayaan" 
-                        name="jenis_pembiayaan" 
-                        class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                        required>
-                        <option value="">Pilih Jenis Pembiayaan</option>
-                        <option value="albai">Al-Bai</option>
-                        <option value="alinah">Al-Inah</option>
-                        <option value="skimkhas">Skim Khas</option>
-                        <option value="karnivaL">Karnival Muslim Istimewa</option>
-                        <option value="baikpulih">Baik Pulih Kenderaan</option>
-                        <option value="cukaijalan">Cukai Jalan</option>
-                    </select>
-                    <x-input-error :messages="$errors->get('jenis_pembiayaan')" class="mt-2" />
-                </div>
-
-                <!-- Amaun Dipohon Input -->
-                <div class="mb-4">
-                    <label for="amaun_dipohon" class="block text-sm font-medium text-gray-700">
-                        Amaun Dipohon <span class="text-red-500">*</span>
-                    </label>
-                    <div class="relative mt-2 rounded-md shadow-sm">
-                        <input type="number" 
-                            name="amaun_dipohon" 
-                            id="amaun_dipohon" 
-                            class="block w-full rounded-md border border-green-500 pl-12 pr-12 focus:border-green-600 focus:ring-green-600 sm:text-sm" 
-                            placeholder="0.00" 
-                            required 
-                            step="0.01" 
-                            min="0">
-                    </div>
-                    <x-input-error :messages="$errors->get('amaun_dipohon')" class="mt-2" />
-                </div>
-
-                <!-- Tempoh Pembiayaan Input -->
-                 <div class="mb-4">
-                    <label for="tempoh_pembiayaan" class="block text-sm font-medium text-gray-700">
-                        Tempoh Pembiayaan (Bulan) <span class="text-red-500">*</span>
-                    </label>
-                        <div class="relative mt-2 rounded-md shadow-sm">
-                            <input type="number" 
-                            name="tempoh_pembiayaan" 
-                            id="tempoh_pembiayaan" 
-                            class="block w-full h-12 rounded-md border border-green-500 pl-4 pr-12 focus:border-green-600 focus:ring-green-600 sm:text-sm" 
-                            placeholder="Masukkan tempoh" 
-                            required 
-                            min="1"
-                            max="120">
-                         </div>
-                    <x-input-error :messages="$errors->get('tempoh_pembiayaan')" class="mt-2" />
-                </div>
-
-                <!--ansuran bulanan -->
-                <div class="mb-4">
-                    <label for="ansuran_bulanan" class="block text-sm font-medium text-gray-700">
-                        Ansuran Bulanan
-                    </label>
-                    <div class="relative mt-2 rounded-md shadow-sm">
-                        <input type="text" 
-                            name="ansuran_bulanan" 
-                            id="ansuran_bulanan" 
-                            class="block w-full h-12 rounded-md border border-gray-300 pl-16 pr-12 text-base bg-gray-50" 
-                            readonly>
-                    </div>
-                </div>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const amaunInput = document.getElementById('amaun_dipohon');
-                        const tempohInput = document.getElementById('tempoh_pembiayaan');
-                        const ansuranInput = document.getElementById('ansuran_bulanan');
-
-                        function calculateAnsuran() {
-                            const amaun = parseFloat(amaunInput.value) || 0;
-                            const tempoh = parseInt(tempohInput.value) || 1;
-                            const ansuran = (amaun / tempoh).toFixed(2);
-                            ansuranInput.value = ansuran;
-                        }
-
-                        amaunInput.addEventListener('input', calculateAnsuran);
-                        tempohInput.addEventListener('input', calculateAnsuran);
-                    });
-                </script>
-            </div>
-        </div>
-
-        <!-- Butir-butir Peribadi Card -->
-        <div class="flex-1 bg-white shadow-sm rounded-lg">
-            <div class="border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900 p-4">
-                    Butir-butir Peribadi Pemohon
-                </h3>
-            </div>
-            <div class="p-4">
-                <!-- ...existing code for peribadi form... -->
-                 <!-- Nama Input -->
-                <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-gray-700">
-                        Nama <span class="text-red-500">*</span>
-                     </label>
-                         <input type="text" 
-                     name="name" 
-                     id="name" 
-                     class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                     required 
-                     autofocus>
-                  <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                </div>
-                 <!-- IC and DOB in same row -->
-                 <div class="grid grid-cols-2 gap-4 mb-4">
-                        <!-- IC Number Input -->
-                        <div>
-                            <label for="ic" class="block text-sm font-medium text-gray-700">
-                                No. K/P <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                name="ic" 
-                                id="ic" 
-                                class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required 
-                                placeholder="000000-00-0000">
-                            <x-input-error :messages="$errors->get('ic')" class="mt-2" />
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6" x-data="{ currentStep: 1 }">
+                    <!-- Step Numbers -->
+                    <div class="flex justify-between mb-8">
+                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 1, 'text-gray-400': currentStep < 1 }">
+                            <span class="text-lg font-medium">1</span>
+                            <p class="text-sm">Maklumat Peribadi</p>
                         </div>
-
-                        <!-- Date of Birth Input -->
-                        <div>
-                            <label for="dob" class="block text-sm font-medium text-gray-700">
-                                Tarikh Lahir <span class="text-red-500">*</span>
-                            </label>
-                            <input type="date" 
-                                name="dob" 
-                                id="dob" 
-                                class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required>
-                            <x-input-error :messages="$errors->get('dob')" class="mt-2" />
+                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 2, 'text-gray-400': currentStep < 2 }">
+                            <span class="text-lg font-medium">2</span>
+                            <p class="text-sm">Maklumat Pinjaman</p>
+                        </div>
+                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 3, 'text-gray-400': currentStep < 3 }">
+                            <span class="text-lg font-medium">3</span>
+                            <p class="text-sm">Maklumat Penjamin</p>
+                        </div>
+                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 4, 'text-gray-400': currentStep < 4 }">
+                            <span class="text-lg font-medium">4</span>
+                            <p class="text-sm">Pengesahan</p>
                         </div>
                     </div>
 
-                    <!-- Gender, Religion, Race in same row -->
-                    <table class="w-full mb-4">
-                        <tr>
-                            <!-- Gender Dropdown -->
-                            <td class="pr-4">
-                                <label for="gender" class="block text-sm font-medium text-gray-700">
-                                    Jantina <span class="text-red-500">*</span>
-                                </label>
-                                <select id="gender" name="gender" class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" required>
-                                    <option value="">Pilih Jantina</option>
-                                    <option value="Lelaki">Lelaki</option>
-                                    <option value="Perempuan">Perempuan</option>
-                                </select>
-                            </td>
+                    <form method="POST" action="{{ route('loan.store') }}">
+                        @csrf
+                        
+                        <!-- Step 1: Personal Information -->
+                        <div x-show="currentStep === 1">
+                            <h2 class="text-xl font-semibold mb-6">Maklumat Peribadi</h2>
+                            
+                            <div class="space-y-6">
+                                <!-- Name -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Nama</label>
+                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        {{ $member->name }}
+                                    </div>
+                                </div>
 
-                            <!-- Religion Dropdown -->
-                            <td class="pr-4">
-                                <label for="agama" class="block text-sm font-medium text-gray-700">
-                                    Agama <span class="text-red-500">*</span>
-                                </label>
-                                <select id="agama" name="agama" class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" required>
-                                    <option value="">Pilih Agama</option>
-                                    <option value="Islam">Islam</option>
-                                    <option value="Buddha">Buddha</option>
-                                    <option value="Hindu">Hindu</option>
-                                    <option value="Kristian">Kristian</option>
-                                    <option value="Lain-lain">Lain-lain</option>
-                                </select>
-                            </td>
+                                <!-- IC Number -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        {{ $member->ic }}
+                                    </div>
+                                </div>
 
-                            <!-- Race Dropdown -->
-                            <td>
-                                <label for="bangsa" class="block text-sm font-medium text-gray-700">
-                                    Bangsa <span class="text-red-500">*</span>
-                                </label>
-                                <select id="bangsa" name="bangsa" class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" required>
-                                    <option value="">Pilih Bangsa</option>
-                                    <option value="Melayu">Melayu</option>
-                                    <option value="Cina">Cina</option>
-                                    <option value="India">India</option>
-                                    <option value="Lain-lain">Lain-lain</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </table>
+                                <!-- Address -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        {{ $member->address }}
+                                    </div>
+                                </div>
 
-                <!-- Address Section -->
-<div class="mb-4">
-    <!-- Full Address Input -->
-    <div class="mb-4">
-        <label for="address" class="block text-sm font-medium text-gray-700">
-            Alamat <span class="text-red-500">*</span>
-        </label>
-        <input type="text" 
-               name="address" 
-               id="address" 
-               class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-               required>
-        <x-input-error :messages="$errors->get('address')" class="mt-2" />
-    </div>
+                                <!-- Phone -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
+                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        {{ $member->phone }}
+                                    </div>
+                                </div>
 
-    <!-- City, Postcode and State in one row -->
-    <table class="w-full">
-        <tr>
-            <!-- City -->
-            <td class="pr-4">
-                <label for="city" class="block text-sm font-medium text-gray-700">
-                    Bandar <span class="text-red-500">*</span>
-                </label>
-                <input type="text" 
-                       name="city" 
-                       id="city" 
-                       class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                       required>
-            </td>
+                                <!-- Email -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Emel</label>
+                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                        {{ $member->email }}
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Postcode -->
-            <td class="pr-4">
-                <label for="postcode" class="block text-sm font-medium text-gray-700">
-                    Poskod <span class="text-red-500">*</span>
-                </label>
-                <input type="text" 
-                       name="postcode" 
-                       id="postcode" 
-                       class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                       required>
-            </td>
+                            <!-- Next Step Button -->
+                            <div class="mt-8 flex justify-end">
+                                <button type="button" 
+                                        @click="currentStep = 2"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    Seterusnya
+                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
 
-            <!-- State -->
-            <td>
-                <label for="state" class="block text-sm font-medium text-gray-700">
-                    Negeri <span class="text-red-500">*</span>
-                </label>
-                <select name="state" 
-                        id="state" 
-                        class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                        required>
-                    <option value="">Pilih Negeri</option>
-                    <option value="Johor">Johor</option>
-                    <option value="Kedah">Kedah</option>
-                    <option value="Kelantan">Kelantan</option>
-                    <option value="Melaka">Melaka</option>
-                    <option value="Negeri Sembilan">Negeri Sembilan</option>
-                    <option value="Pahang">Pahang</option>
-                    <option value="Perak">Perak</option>
-                    <option value="Perlis">Perlis</option>
-                    <option value="Pulau Pinang">Pulau Pinang</option>
-                    <option value="Sabah">Sabah</option>
-                    <option value="Sarawak">Sarawak</option>
-                    <option value="Selangor">Selangor</option>
-                    <option value="Terengganu">Terengganu</option>
-                </select>
-            </td>
-        </tr>
-    </table>
-</div>
+                        <!-- Step 2: Loan Details -->
+                        <div x-show="currentStep === 2" x-cloak>
+                            <h2 class="text-xl font-semibold mb-6">Maklumat Pinjaman</h2>
+                            
+                            <div class="space-y-6">
+                                <!-- Loan Type -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Jenis Pinjaman</label>
+                                    <select name="loan_type_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Pilih Jenis Pinjaman</option>
+                                        @foreach($loanTypes as $type)
+                                            <option value="{{ $type->id }}">{{ $type->name }} - Maksimum RM{{ number_format($type->max_amount, 2) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                <!-- Member Details Section -->
-                 <table class="w-full mb-4">
-                    <tr>
-                        <!-- Member Number -->
-                        <td class="pr-2">
-                            <label for="member_no" class="block text-sm font-medium text-gray-700">
-                                No. Anggota <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                name="member_no" 
-                                id="member_no" 
-                                class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required>
-                            <x-input-error :messages="$errors->get('member_no')" class="mt-2" />
-                        </td>
+                                <!-- Loan Amount -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Jumlah Pinjaman (RM)</label>
+                                    <input type="number" name="loan_amount" step="0.01" min="0" 
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
 
-                        <!-- PF Number -->
-                        <td class= "pl-2"> 
-                            <label for="pf_no" class="block text-sm font-medium text-gray-700">
-                                No. PF <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                name="pf_no" 
-                                id="pf_no" 
-                                class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required>
-                            <x-input-error :messages="$errors->get('pf_no')" class="mt-2" />
-                        </td>
-                    </tr>
-                </table>
+                                <!-- Loan Period -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Tempoh Pinjaman (Bulan)</label>
+                                    <input type="number" name="loan_period" min="1" max="60"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
 
-                <!-- Office Address Section -->
-                <div class="mb-4">
-                    <label for="office_address" class="block text-sm font-medium text-gray-700">
-                        Alamat Pejabat <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                        name="office_address" 
-                        id="office_address" 
-                        class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                        required>
-                    <x-input-error :messages="$errors->get('office_address')" class="mt-2" />
+                                <!-- Monthly Income -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Gaji Kasar Bulanan (RM)</label>
+                                    <input type="number" name="monthly_gross_salary" step="0.01" min="0"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Gaji Bersih Bulanan (RM)</label>
+                                    <input type="number" name="monthly_net_salary" step="0.01" min="0"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+
+                                <!-- Purpose -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Tujuan Pinjaman</label>
+                                    <textarea name="purpose" rows="3" 
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" 
+                                        @click="currentStep = 1"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                    Sebelumnya
+                                </button>
+                                <button type="button" 
+                                        @click="currentStep = 3"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    Seterusnya
+                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Guarantor Information -->
+                        <div x-show="currentStep === 3" x-cloak>
+                            <h2 class="text-xl font-semibold mb-6">Maklumat Penjamin</h2>
+                            
+                            <!-- First Guarantor -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium mb-4">Penjamin Pertama</h3>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
+                                        <input type="text" name="guarantor1_name" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+                                        <input type="text" name="guarantor1_ic" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
+                                        <input type="text" name="guarantor1_phone" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                                        <textarea name="guarantor1_address" rows="3" 
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
+                                        <select name="guarantor1_relationship" 
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            <option value="">Pilih Hubungan</option>
+                                            <option value="parent">Ibu/Bapa</option>
+                                            <option value="spouse">Suami/Isteri</option>
+                                            <option value="sibling">Adik-beradik</option>
+                                            <option value="relative">Saudara</option>
+                                            <option value="friend">Rakan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Second Guarantor -->
+                            <div class="mt-12">
+                                <h3 class="text-lg font-medium mb-4">Penjamin Kedua</h3>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
+                                        <input type="text" name="guarantor2_name" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
+                                        <input type="text" name="guarantor2_ic" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
+                                        <input type="text" name="guarantor2_phone" 
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                                        <textarea name="guarantor2_address" rows="3" 
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
+                                        <select name="guarantor2_relationship" 
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                            <option value="">Pilih Hubungan</option>
+                                            <option value="parent">Ibu/Bapa</option>
+                                            <option value="spouse">Suami/Isteri</option>
+                                            <option value="sibling">Adik-beradik</option>
+                                            <option value="relative">Saudara</option>
+                                            <option value="friend">Rakan</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" 
+                                        @click="currentStep = 2"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                    Sebelumnya
+                                </button>
+                                <button type="button" 
+                                        @click="currentStep = 4"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    Seterusnya
+                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Confirmation with Summary -->
+                        <div x-show="currentStep === 4" x-cloak>
+                            <h2 class="text-xl font-semibold mb-6">Pengesahan</h2>
+                            
+                            <div class="space-y-8">
+                                <!-- Personal Information Summary -->
+                                <div>
+                                    <h3 class="text-lg font-medium mb-4">Maklumat Peribadi</h3>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <dl class="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500">Nama</dt>
+                                                <dd class="text-sm text-gray-900">{{ $member->name }}</dd>
+                                            </div>
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500">No. Kad Pengenalan</dt>
+                                                <dd class="text-sm text-gray-900">{{ $member->ic }}</dd>
+                                            </div>
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500">Alamat</dt>
+                                                <dd class="text-sm text-gray-900">{{ $member->address }}</dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <!-- Loan Details Summary -->
+                                <div>
+                                    <h3 class="text-lg font-medium mb-4">Maklumat Pinjaman</h3>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <dl class="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500">Jumlah Pinjaman</dt>
+                                                <dd class="text-sm text-gray-900" x-text="'RM ' + document.getElementsByName('loan_amount')[0]?.value"></dd>
+                                            </div>
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500">Tempoh Pinjaman</dt>
+                                                <dd class="text-sm text-gray-900" x-text="document.getElementsByName('loan_period')[0]?.value + ' bulan'"></dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+
+                                <!-- Guarantor Information Summary -->
+                                <div>
+                                    <h3 class="text-lg font-medium mb-4">Maklumat Penjamin</h3>
+                                    <div class="space-y-4">
+                                        <!-- First Guarantor -->
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h4 class="font-medium mb-2">Penjamin Pertama</h4>
+                                            <dl class="grid grid-cols-1 gap-4">
+                                                <div>
+                                                    <dt class="text-sm font-medium text-gray-500">Nama</dt>
+                                                    <dd class="text-sm text-gray-900" x-text="document.getElementsByName('guarantor1_name')[0]?.value"></dd>
+                                                </div>
+                                                <div>
+                                                    <dt class="text-sm font-medium text-gray-500">No. Kad Pengenalan</dt>
+                                                    <dd class="text-sm text-gray-900" x-text="document.getElementsByName('guarantor1_ic')[0]?.value"></dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+
+                                        <!-- Second Guarantor -->
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <h4 class="font-medium mb-2">Penjamin Kedua</h4>
+                                            <dl class="grid grid-cols-1 gap-4">
+                                                <div>
+                                                    <dt class="text-sm font-medium text-gray-500">Nama</dt>
+                                                    <dd class="text-sm text-gray-900" x-text="document.getElementsByName('guarantor2_name')[0]?.value"></dd>
+                                                </div>
+                                                <div>
+                                                    <dt class="text-sm font-medium text-gray-500">No. Kad Pengenalan</dt>
+                                                    <dd class="text-sm text-gray-900" x-text="document.getElementsByName('guarantor2_ic')[0]?.value"></dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Agreement -->
+                                <div class="mt-8">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" name="terms_agreed" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                        <span class="ml-2">Saya mengesahkan bahawa semua maklumat yang diberikan adalah benar dan tepat</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="mt-8 flex justify-between">
+                                <button type="button" 
+                                        @click="currentStep = 3"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                    Sebelumnya
+                                </button>
+                                <button type="submit"
+                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                    Hantar Permohonan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-
-                <!-- Office City and Postcode -->
-                <table class="w-full mb-4">
-                    <tr>
-                        <!-- Office City -->
-                        <td class="pr-2">
-                            <label for="office_city" class="block text-sm font-medium text-gray-700">
-                                Bandar <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                name="office_city" 
-                                id="office_city" 
-                                class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required>
-                            <x-input-error :messages="$errors->get('office_city')" class="mt-2" />
-                        </td>
-
-                        <!-- Office Postcode -->
-                        <td class="pl-2">
-                            <label for="office_postcode" class="block text-sm font-medium text-gray-700">
-                                Poskod <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                name="office_postcode" 
-                                id="office_postcode" 
-                                class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                required>
-                            <x-input-error :messages="$errors->get('office_postcode')" class="mt-2" />
-                        </td>
-                    </tr>
-                </table>
-
-                <!-- Bank Details Section -->
-                    <table class="w-full mb-4">
-                        <tr>
-                            <!-- Bank Name -->
-                            <td class="pr-2">
-                                <label for="bank" class="block text-sm font-medium text-gray-700">
-                                    Nama Bank <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" 
-                                    name="bank" 
-                                    id="bank" 
-                                    class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                    required>
-                                <x-input-error :messages="$errors->get('bank')" class="mt-2" />
-                            </td>
-
-                            <!-- Bank Account Number -->
-                            <td class="pl-2">
-                                <label for="bank_no" class="block text-sm font-medium text-gray-700">
-                                    No. Akaun Bank <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" 
-                                    name="bank_no" 
-                                    id="bank_no" 
-                                    class="mt-1 block w-3/4 rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
-                                    required>
-                                <x-input-error :messages="$errors->get('bank_no')" class="mt-2" />
-                            </td>
-                        </tr>
-                    </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            </div> 
+            </div>
         </div>
     </div>
-
-       
-
-                    <div class="flex items-center justify-end mt-6">
-                    <x-secondary-button type="reset" class="mr-3">
-                        {{ __('Reset') }}
-                    </x-secondary-button>
-                    <x-primary-button>
-                        {{ __('Hantar') }}
-                    </x-primary-button>
-                    </div>
-</div>
-
 </x-app-layout>
 
 
