@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    protected $redirectTo = '/guest.dashboard';
+    protected $redirectTo = '/dashboard';
 
     protected function authenticated(Request $request, $user)
     {
@@ -16,7 +16,7 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->route('dashboard'); // default redirect for non-admin users
+        return redirect()->route('guest.dashboard'); // default redirect for non-admin users
       
     }
 } 

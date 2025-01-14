@@ -5,18 +5,24 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Member;
+use App\Models\User;
 use App\Models\WorkingInfo;
 use App\Models\Savings;
 use App\Models\Family;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::where('status', 'approved')->get();
-        return view('admin.members', compact('members'));
+        // Only get users who have the member role
+        $members = User::whereIs('member')->get();
+
+        return view('admin.members', [
+            'members' => $members
+        ]);
     }
 
     public function show($id)
@@ -78,13 +84,31 @@ class MemberController extends Controller
 
     public function pendingRegistrations()
     {
-        // Get pending registrations
-        $pendingRegistrations = Member::where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Only get users who are guests (not yet members)
+        $pendingRegistrations = User::whereIs('guest')->get();
 
         return view('admin.registrations.pending', [
             'pendingRegistrations' => $pendingRegistrations
         ]);
+    }
+
+    public function promote(User $user)
+    {
+        try {
+            // Remove guest role
+            Bouncer::retract('guest')->from($user);
+            
+            // Assign member role
+            Bouncer::assign('member')->to($user);
+            
+            // Refresh bouncer cache
+            Bouncer::refresh();
+
+            return redirect()->route('admin.registrations.pending')
+                ->with('success', 'User has been promoted to member successfully.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.registrations.pending')
+                ->with('error', 'Failed to promote user: ' . $e->getMessage());
+        }
     }
 } 

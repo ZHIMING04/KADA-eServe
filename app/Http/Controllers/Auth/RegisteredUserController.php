@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Silber\Bouncer\BouncerFacade as Bouncer;
+
 
 class RegisteredUserController extends Controller
 {
@@ -41,10 +43,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign guest role to newly registered users
+        Bouncer::assign('guest')->to($user);
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('guest.dashboard');
     }
 }

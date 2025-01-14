@@ -87,14 +87,15 @@
                         <option value="export">Export</option>
                     </select>
                 </div>
-                <button class="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                <a href="{{ route('admin.members.create') }}" 
+                   class="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
                     <div class="flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                         </svg>
                         <span>Tambah Ahli Baru</span>
                     </div>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -152,7 +153,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                             Tiada rekod ahli yang diluluskan
                         </td>
                     </tr>

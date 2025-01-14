@@ -31,6 +31,15 @@
                                            class="text-blue-600 hover:text-blue-900">Lihat</a>
                                     </div>
                                 </td>
+                                <td>
+                                <form action="{{ route('admin.promote', $registration->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        Promote to Member
+                                    </button>
+                                </form>
+                                </td>
+
                             </tr>
                         @endforeach
                     </tbody>
