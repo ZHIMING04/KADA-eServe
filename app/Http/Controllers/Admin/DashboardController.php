@@ -15,8 +15,13 @@ class DashboardController extends Controller
         
         // Get pending loan applications
         $pendingLoans = Loan::where('status', 'pending')->count();
+        
+        // Calculate total savings (modify based on your data structure)
         $totalSavings = $this->calculateTotalSaving();
+        
+        // Get total loan applications
         $totalLoanApplications = $this->calculateTotalLoanApplications();
+
         return view('admin.dashboard', compact(
             'totalUsers', 
             'userGrowth',
@@ -33,17 +38,18 @@ class DashboardController extends Controller
         
         if ($lastMonth === 0) return 0;
         
-        return round((($currentMonth - $lastMonth) / $lastMonth) * 100);
+        return round((($currentMonth - $lastMonth) / $lastMonth) * 100, 1);
     }
 
     private function calculateTotalSaving()
     {
-        return 100;
-
+        // Implement your total savings calculation logic here
+        // Example: return User::sum('savings_amount');
+        return 2500000; // Placeholder value - replace with actual calculation
     }
 
     private function calculateTotalLoanApplications()
     {
-        return 100;
+        return Loan::where('status', 'approved')->count();
     }
 }

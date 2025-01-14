@@ -15,12 +15,19 @@
 
     <!-- Action Buttons -->
     <div class="mb-6 flex gap-4">
-        <button class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
-            Lulus Pendaftaran
-        </button>
-        <button class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-            Tolak Pendaftaran
-        </button>
+        <form action="{{ route('admin.registrations.approve', $member->id) }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+                Lulus Pendaftaran
+            </button>
+        </form>
+        
+        <form action="{{ route('admin.registrations.reject', $member->id) }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                Tolak Pendaftaran
+            </button>
+        </form>
     </div>
 
     <!-- Member Information Cards -->
@@ -81,7 +88,11 @@
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <p class="text-sm text-gray-600">Jawatan</p>
-                    <p class="font-medium">{{ $workingInfo->jawatan }}</p>
+                    @if($workingInfo)
+                        <p class="font-medium">{{ $workingInfo->jawatan }}</p>
+                    @else
+                        <p class="text-gray-500">Tiada maklumat</p>
+                    @endif
                 </div>
                 <div class="space-y-1">
                     <p class="text-sm text-gray-600">Gred</p>

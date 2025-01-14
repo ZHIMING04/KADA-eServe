@@ -145,7 +145,7 @@
                     @forelse($loans as $loan)
                         <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
                             <td>{{ $loan->loan_id }}</td>
-                            <td>{{ $loan->member->name }}</td>
+                            <td>{{ $loan->member ? $loan->member->name : 'N/A' }}</td>
                             <td>{{ $loan->loanType->loan_type }}</td>
                             <td>{{ number_format($loan->loan_amount, 2) }}</td>
                             <td>{{ $loan->loan_period }} bulan</td>
@@ -159,7 +159,7 @@
                             </td>
                             <td>
                                 <div class="flex justify-center">
-                                    <a href="{{ route('admin.finance.show', $loan->loan_id) }}" 
+                                    <a href="{{ route('admin.finance.show', ['loanId' => $loan->loan_id]) }}" 
                                        class="action-button text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

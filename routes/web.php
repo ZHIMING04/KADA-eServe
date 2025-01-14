@@ -34,7 +34,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     
     // Dashboard
-    Route::get('member/dashboard', function () {
+    Route::get('/member/dashboard', function () {
         return view('member.dashboard');
     })->name('member.dashboard');
 
@@ -57,6 +57,9 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 });
 
 // Admin routes
+Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+        ->name('admin.dashboard');
 
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
@@ -72,14 +75,39 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::post('/admin/promote/{user}', 'promote')->name('admin.promote');
         Route::get('/admin/registrations/pending', 'pendingRegistrations')
             ->name('admin.registrations.pending');
+        Route::get('/admin/registrations/{id}/show', 'showRegistration')
+            ->name('admin.registrations.show');
     });
-
 });
 
-Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
-Route::get('/guest/success', function () {
-    return view('guest.success');
-})->name('guest.success');
+// Add new admin loan management routes
+Route::middleware(['auth', 'can:manage-loans'])->group(function () {
+    // Finance/Loan management routes
+    Route::controller(FinanceController::class)
+        ->prefix('admin/finance')
+        ->name('admin.finance.')
+        ->group(function () {
+            // Basic CRUD operations
+            Route::get('/', 'index')->name('index');                    
+            Route::get('/{loanId}', 'show')->name('show');               
+            Route::get('/{loanId}/edit', 'edit')->name('edit');          
+            Route::put('/{loanId}', 'update')->name('update');           
+            Route::delete('/{loanId}', 'destroy')->name('destroy');      
+            
+            // Loan approval operations - Make sure all route parameters match
+            Route::post('/{loanId}/approve', 'approve')->name('approve'); 
+            Route::post('/{loanId}/reject', 'reject')->name('reject');   
+            
+            // Export functionality
+            Route::get('/export', 'export')->name('export');           
+    });
+});
 
+Route::middleware(['auth', 'can:approve-member-registration'])->group(function () {
+    Route::post('/admin/registrations/{id}/approve', [AdminMemberController::class, 'approve'])
+        ->name('admin.registrations.approve');
+    Route::post('/admin/registrations/{id}/reject', [AdminMemberController::class, 'reject'])
+        ->name('admin.registrations.reject');
+});
 
 
