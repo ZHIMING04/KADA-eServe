@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Member extends Model
 {
     protected $table = 'member_register';
+    protected $primaryKey = 'id';
     
     protected $fillable = [
         'no_anggota',
