@@ -33,27 +33,27 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Member Details -->
+            <!-- Members Details -->
             <div class="info-card">
-                <h3 class="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">MUHAMMAD BIN ALI TUN MAHATHIR YAP JUN HAO</h3>
+                <h3 class="text-9xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{$member->name}}</h3>
                 <div class="flex flex-wrap">
                     <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>IC:</strong> 012345678901</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>IC:</strong> {{$member->ic}}</p>
                     </div>
                     <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No PF:</strong> 1111</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No PF:</strong> {{$member->no_pf}}</p>
                     </div>
                     <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No Ahli:</strong> 2222</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No Ahli:</strong> {{$member->no_anggota}}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Saving Details and Chart -->
-            <div class="flex flex-wrap -mx-4">
-                <div class="w-full md:w-1/2 px-4">
+            <div class="flex flex-wrap -mx-2">
+                <div class="w-full md:w-1/2 px-2">
                     <div class="info-card">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">MAKLUMAT SAHAM AHLI</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">MAKLUMAT SAHAM AHLI</h3>
                         <div id="chart-demo-pie"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
@@ -66,21 +66,26 @@
                                             enabled: true
                                         },
                                         animations: {
-                                            enabled: false
+                                            enabled: true
                                         },
                                     },
                                     fill: {
-                                        opacity: 1,
+                                        opacity: 2,
                                     },
-                                    series: [44,55,66,11,22],
-                                    labels: ["Modal Syer", "Modal Yuran", "Simpanan Tetap", "Tabung Anggota", "Simpanan Anggota"],
+                                    series: [
+                                        {{$saving->share_capital}},
+                                        {{$saving->subscription_capital}},
+                                        {{$saving->fixed_savings}},
+                                        {{$saving->welfare_fund}},
+                                    ],
+                                    labels: ["Modal Syer", "Modal Yuran", "Simpanan Tetap", "Tabung Majikan"],
                                     tooltip: {
                                         theme: 'dark'
                                     },
                                     grid: {
-                                        strokeDashArray: 4,
+                                        strokeDashArray: 2,
                                     },
-                                    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
+                                    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560'],
                                     legend: {
                                         show: true,
                                         position: 'bottom',
@@ -92,8 +97,9 @@
                                         },
                                         itemMargin: {
                                             horizontal: 8,
-                                            vertical: 8
+                                            vertical: 15
                                         },
+                                        fontSize: '14px' // Increase font size for better readability
                                     },
                                     tooltip: {
                                         fillSeriesColor: false
@@ -101,7 +107,7 @@
                                 })).render();
                             });
                         </script>
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 text-center animate-pop-out">RM {{ number_format($member->esaving_amount ?? 198, 2) }} </h3>
+                     <!-- //<h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 text-center animate-pop-out">RM {{ number_format($totalSavings,2) }} </h3> -->
                         <style>
                             @keyframes pop-out {
                                 0% {
@@ -118,6 +124,41 @@
                             }
                         </style>
 
+                        <table class="min-w-full divide-y divide-gray-200 mt-2">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Jenis
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Amaun (RM)
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Modal Syer</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->share_capital, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Modal Yuran</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->subscription_capital, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Tabung Anggota</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->welfare_fund, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Simpanan Anggota</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->fixed_savings, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm font-bold text-gray-900">JUMLAH</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm font-bold text-gray-900">{{ number_format($totalSavings,2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
                     </div>
                 </div>
 
@@ -125,9 +166,9 @@
 
 
             <!-- Loan Details -->
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <div class="p-2 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-7xl mx-auto">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">MAKLUMAT PINJAMAN</h3>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">MAKLUMAT PINJAMAN</h3>
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
@@ -144,36 +185,42 @@
                                     Bayaran Bulanan
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tarikh Permohonan
+                                    Kadar Faedah
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Status
+                                    Tarikh Permohonan
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                           
+                           @forelse($loans as $loan)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                       001
+                                       {{$loan->loan_id}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        Kereta
+                                        {{$loan->loan_type->loan_type }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        RM10000
+                                        RM {{number_format($loan->loan_amount, 2)}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        RM100
+                                        RM {{number_format($loan->monthly_repayment, 2)}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        12/12/2024
+                                        {{$loan->interest_rate}} %
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        BERJAYA
+                                        {{$loan->created_at}}
                                     </td>
                                 </tr>
-                           
+                           @empty
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="6">
+                                        Tiada rekod pinjaman
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

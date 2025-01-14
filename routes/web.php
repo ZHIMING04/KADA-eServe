@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
     // Loans and reports
     Route::resource('loan', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
+    
 
     // Loan Routes
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
