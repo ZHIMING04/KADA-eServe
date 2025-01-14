@@ -107,6 +107,7 @@
                     <th class="px-6 py-4">
                         <input type="checkbox" id="selectAll" class="rounded">
                     </th>
+                    <th class="px-6 py-4 font-semibold text-gray-700">No. Anggota</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">Nama</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">Email</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">No. KP</th>
@@ -115,11 +116,12 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($members as $member)
+                @forelse($members as $member)
                     <tr class="border-b hover:bg-gray-50 transition duration-150 ease-in-out">
                         <td class="px-6 py-4">
                             <input type="checkbox" name="selected_members[]" value="{{ $member->id }}" class="member-checkbox rounded">
                         </td>
+                        <td class="px-6 py-4">{{ $member->no_anggota }}</td>
                         <td class="px-6 py-4">{{ $member->name }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $member->email }}</td>
                         <td class="px-6 py-4 text-gray-600">{{ $member->ic }}</td>
@@ -136,7 +138,7 @@
                                 <form action="{{ route('admin.members.destroy', $member->id) }}" 
                                       method="POST" 
                                       class="inline" 
-                                      onsubmit="return confirm('Are you sure you want to delete this member?')">
+                                      onsubmit="return confirm('Adakah anda pasti untuk memadam ahli ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="action-button text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50">
@@ -148,7 +150,13 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            Tiada rekod ahli yang diluluskan
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

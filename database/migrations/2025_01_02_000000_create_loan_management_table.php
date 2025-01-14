@@ -58,9 +58,36 @@ class CreateLoanManagementTable extends Migration
             $table->timestamps();
 
             // Foreign Key Constraints
-            $table->foreign('member_id')->references('member_id')->on('members')->onDelete('cascade');
-            $table->foreign('loan_type_id')->references('loan_type_id')->on('loan_types')->onDelete('cascade');
-            $table->foreign('bank_id')->references('bank_id')->on('banks')->onDelete('cascade');
+            $table->foreign('member_id')
+                  ->references('id')
+                  ->on('member_register')
+                  ->onDelete('cascade');
+            $table->foreign('loan_type_id')
+                  ->references('loan_type_id')
+                  ->on('loan_types')
+                  ->onDelete('cascade');
+            $table->foreign('bank_id')
+                  ->references('bank_id')
+                  ->on('banks')
+                  ->onDelete('cascade');
+        });
+
+        // Create Guarantors Table
+        Schema::create('guarantors', function (Blueprint $table) {
+            $table->id('guarantor_id');
+            $table->string('loan_id', 50);
+            $table->string('name');
+            $table->string('ic', 20);
+            $table->string('phone', 15);
+            $table->text('address');
+            $table->enum('relationship', ['parent', 'spouse', 'sibling', 'relative', 'friend']);
+            $table->integer('guarantor_order'); // 1 for first guarantor, 2 for second guarantor
+            $table->timestamps();
+
+            $table->foreign('loan_id')
+                  ->references('loan_id')
+                  ->on('loans')
+                  ->onDelete('cascade');
         });
     }
 
