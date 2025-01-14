@@ -165,6 +165,7 @@
                     <h1 class="text-2xl font-bold">Senarai Ahli</h1>
                     <p class="text-white/80 mt-1">Pengurusan maklumat ahli yang telah diluluskan</p>
                 </div>
+
             </div>
         </div>
 
@@ -173,15 +174,7 @@
             <table id="membersTable" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <input type="checkbox" id="selectAll" class="rounded">
-                        </th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Anggota</th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. KP</th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Telefon</th>
-                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tindakan</th>
+
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">

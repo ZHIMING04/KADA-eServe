@@ -190,10 +190,7 @@
                                 Tiada pendaftaran yang menunggu
                             </td>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+
     </div>
 @endsection
 
