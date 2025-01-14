@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Member extends Model
 {
     protected $table = 'member_register';
+    protected $primaryKey = 'id';
     
     protected $fillable = [
         'no_anggota',
@@ -28,7 +29,8 @@ class Member extends Model
         'office_city',
         'office_postcode',
         'office_state',
-        'guest_id'
+        'guest_id',
+        'status'
     ];
 
     public function workingInfo()
@@ -44,6 +46,11 @@ class Member extends Model
     public function familyMembers()
     {
         return $this->hasMany(Family::class, 'no_anggota', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
     }
 }
 

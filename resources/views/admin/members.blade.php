@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Ahli')
+@section('title', 'Senarai Ahli')
 
 @push('styles')
     <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -40,230 +40,145 @@
             font-weight: 500 !important;
             transition: all 0.3s ease !important;
         }
-
         .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
             background: #e5e7eb !important;
             color: #1f2937 !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
             transform: translateY(-1px);
         }
-
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
             background: #3b82f6 !important;
             color: white !important;
             font-weight: 600 !important;
             box-shadow: 0 2px 4px rgba(59,130,246,0.3) !important;
         }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-            background: #2563eb !important;
+        .page-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
         }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            opacity: 0.5 !important;
-            cursor: not-allowed !important;
+        .header-content {
+            display: flex;
+            align-items: center;
+            color: white;
         }
-
+        .header-icon {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-right: 1.5rem;
+        }
+        .container {
+            max-width: 95% !important;
+            margin: 0 auto;
+        }
+        #membersTable {
+            width: 100% !important;
+        }
+        #membersTable th, 
+        #membersTable td {
+            padding: 1rem 1.5rem !important;
+        }
+        #membersTable thead th {
+            font-weight: 600;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        #membersTable tbody td {
+            font-size: 0.95rem;
+        }
+        .dataTables_wrapper .dataTables_length {
+            margin-bottom: 1.5rem;
+            margin-left: 0.5rem;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1.5rem;
+            margin-right: 0.5rem;
+        }
         .dataTables_wrapper .dataTables_paginate {
-            padding: 1rem 0 !important;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            padding-right: 1rem;
+        }
+        .dataTables_wrapper .dataTables_info {
+            margin-top: 1.5rem;
+            margin-left: 1rem;
+            padding-bottom: 1rem;
         }
     </style>
 @endpush
 
 @section('content')
-    <!-- Header with gradient background -->
-    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 mb-8 text-white">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold">Senarai Ahli</h1>
-                <p class="mt-2 opacity-90">Pengurusan maklumat ahli KADA</p>
-            </div>
-            <!-- Add batch actions dropdown -->
-            <div class="flex space-x-4">
-                <div class="relative" id="batchActionsContainer" style="display: none;">
-                    <select id="batchActions" class="bg-white text-gray-700 font-semibold py-2 px-4 rounded-lg shadow-md">
-                        <option value="">Tindakan Pukal</option>
-                        <option value="delete">Padam</option>
-                        <option value="export">Export</option>
-                    </select>
+    <div class="container py-6">
+        <!-- Enhanced Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
                 </div>
-                <button class="bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        <span>Tambah Ahli Baru</span>
-                    </div>
-                </button>
+                <div>
+                    <h1 class="text-2xl font-bold">Senarai Ahli</h1>
+                    <p class="text-white/80 mt-1">Pengurusan maklumat ahli yang telah diluluskan</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Enhanced Table -->
-    <div class="table-container p-6">
-        <table id="membersTable" class="w-full text-left">
-            <thead class="table-header">
-                <tr>
-                    <th class="px-6 py-4">
-                        <input type="checkbox" id="selectAll" class="rounded">
-                    </th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">No. Anggota</th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">Nama</th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">Email</th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">No. KP</th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">No. Telefon</th>
-                    <th class="px-6 py-4 font-semibold text-gray-700">Tindakan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($members as $member)
-                    <tr class="border-b hover:bg-gray-50 transition duration-150 ease-in-out">
-                        <td class="px-6 py-4">
-                            <input type="checkbox" name="selected_members[]" value="{{ $member->id }}" class="member-checkbox rounded">
-                        </td>
-                        <td class="px-6 py-4">{{ $member->no_anggota }}</td>
-                        <td class="px-6 py-4">{{ $member->name }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $member->email }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $member->ic }}</td>
-                        <td class="px-6 py-4 text-gray-600">{{ $member->phone }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex space-x-3">
-                                <a href="{{ route('admin.members.show', $member->id) }}" 
-                                   class="action-button text-blue-500 hover:text-blue-700 p-1 rounded-full hover:bg-blue-50">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </a>
-                                <form action="{{ route('admin.members.destroy', $member->id) }}" 
-                                      method="POST" 
-                                      class="inline" 
-                                      onsubmit="return confirm('Adakah anda pasti untuk memadam ahli ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="action-button text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
+        <!-- Table Container -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6">
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" id="selectAll" class="rounded mr-2">
+                <label for="selectAll" class="text-sm text-gray-600">Pilih Semua</label>
+            </div>
+            <table id="membersTable" class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                            Tiada rekod ahli yang diluluskan
-                        </td>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                            <div class="flex items-center">
+                                <span>No.</span>
+                            </div>
+                        </th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Anggota</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. KP</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Telefon</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tindakan</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Add this form after your table -->
-    <form id="batchActionForm" method="POST" style="display: none;">
-        @csrf
-        <input type="hidden" name="_method" value="POST">
-        <input type="hidden" name="selected_ids" id="selected_ids">
-    </form>
-
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <!-- Export Modal -->
-    <div x-data="{ open: false }" 
-         x-show="open"
-         @open-export-modal.window="open = true"
-         @keydown.escape.window="open = false"
-         class="fixed inset-0 overflow-y-auto z-50" 
-         style="display: none;">
-        
-        <!-- Modal Backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-
-        <!-- Modal Content -->
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
-                     @click.away="open = false">
-                    
-                    <div class="mb-4">
-                        <h3 class="text-lg font-medium leading-6 text-gray-900">Select Fields to Export</h3>
-                    </div>
-                    
-                    <form id="exportForm" method="GET" action="{{ route('admin.members.export') }}">
-                        <input type="hidden" name="selected_ids" id="export_selected_ids">
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Personal Information -->
-                            <div>
-                                <h4 class="font-medium text-gray-700 mb-2">Personal Information</h4>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="no_anggota" class="rounded border-gray-300" checked>
-                                        <span class="ml-2">No. Anggota</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="name" class="rounded border-gray-300" checked>
-                                        <span class="ml-2">Name</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="email" class="rounded border-gray-300" checked>
-                                        <span class="ml-2">Email</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="ic" class="rounded border-gray-300">
-                                        <span class="ml-2">IC Number</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="phone" class="rounded border-gray-300">
-                                        <span class="ml-2">Phone</span>
-                                    </label>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($members as $member)
+                        <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
+                            <td><input type="checkbox" name="selected_members[]" value="{{ $member->id }}" class="member-checkbox rounded"></td>
+                            <td>{{ $member->no_anggota }}</td>
+                            <td>{{ $member->name }}</td>
+                            <td>{{ $member->email }}</td>
+                            <td>{{ $member->ic }}</td>
+                            <td>{{ $member->phone }}</td>
+                            <td>
+                                <div class="flex justify-center">
+                                    <a href="{{ route('admin.members.show', $member->id) }}" 
+                                       class="action-button text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </a>
                                 </div>
-                            </div>
-                            
-                            <!-- Address Information -->
-                            <div>
-                                <h4 class="font-medium text-gray-700 mb-2">Address Information</h4>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="address" class="rounded border-gray-300">
-                                        <span class="ml-2">Address</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="city" class="rounded border-gray-300">
-                                        <span class="ml-2">City</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="postcode" class="rounded border-gray-300">
-                                        <span class="ml-2">Postcode</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="fields[]" value="state" class="rounded border-gray-300">
-                                        <span class="ml-2">State</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-5 sm:mt-6 flex justify-end space-x-3">
-                            <button type="button" 
-                                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                                    @click="open = false">
-                                Cancel
-                            </button>
-                            <button type="submit"
-                                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
-                                Export PDF
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                Tiada rekod ahli yang diluluskan
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection
@@ -273,7 +188,7 @@
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#membersTable').DataTable({
+            var table = $('#membersTable').DataTable({
                 language: {
                     search: "Cari:",
                     lengthMenu: "Papar _MENU_ entri",
@@ -284,55 +199,24 @@
                         next: "Seterusnya",
                         previous: "Sebelumnya"
                     }
-                }
+                },
+                pageLength: 10,
+                responsive: true,
+                columnDefs: [
+                    { className: "px-6 py-4 whitespace-nowrap", targets: "_all" }
+                ],
+                order: [[1, 'asc']] // Sort by No. Anggota by default
             });
 
-            // Select all checkbox functionality
-            $('#selectAll').change(function() {
+            // Select All functionality
+            $('#selectAll').on('change', function() {
                 $('.member-checkbox').prop('checked', $(this).prop('checked'));
-                updateBatchActionsVisibility();
             });
 
-            // Individual checkbox change handler
-            $('.member-checkbox').change(function() {
-                updateBatchActionsVisibility();
-            });
-
-            // Show/hide batch actions based on selection
-            function updateBatchActionsVisibility() {
-                const checkedBoxes = $('.member-checkbox:checked').length;
-                $('#batchActionsContainer').toggle(checkedBoxes > 0);
-            }
-
-            // Update batch actions handler
-            $('#batchActions').change(function() {
-                const action = $(this).val();
-                const selectedIds = $('.member-checkbox:checked').map(function() {
-                    return $(this).val();
-                }).get();
-                
-                if (!selectedIds.length) {
-                    alert('Please select at least one member');
-                    return;
-                }
-
-                switch(action) {
-                    case 'delete':
-                        if (confirm('Are you sure you want to delete the selected members?')) {
-                            const form = $('#batchActionForm');
-                            $('#selected_ids').val(selectedIds.join(','));
-                            form.attr('action', '{{ route("admin.members.batch-delete") }}');
-                            form.find('input[name="_method"]').val('DELETE');
-                            form.submit();
-                        }
-                        break;
-                    case 'export':
-                        $('#export_selected_ids').val(selectedIds.join(','));
-                        window.dispatchEvent(new CustomEvent('open-export-modal'));
-                        break;
-                }
-
-                $(this).val('');
+            // Update Select All checkbox state based on individual checkboxes
+            $('.member-checkbox').on('change', function() {
+                var allChecked = $('.member-checkbox:checked').length === $('.member-checkbox').length;
+                $('#selectAll').prop('checked', allChecked);
             });
         });
     </script>

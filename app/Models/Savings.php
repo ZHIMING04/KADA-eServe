@@ -21,6 +21,6 @@ class Savings extends Model
 
     public function member()
     {
-        return $this->belongsTo(Member::class, 'no_anggota');
+        return $this->belongsTo(Member::class, 'no_anggota', 'id');
     }
 } 

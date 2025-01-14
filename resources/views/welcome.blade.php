@@ -34,10 +34,32 @@
                         <a class="nav-link" href="#">Hubungi</a>
                     </li>
                 </ul>
-                <div class="navbar-nav">
-                    <a class="nav-link" href="/login">Log Masuk</a>
-                    <a class="nav-link" href="/register">Daftar</a>
-                </div>
+                <ul class="navbar-nav">
+                    @auth
+                        <li class="nav-item">
+                            @if(auth()->user()->isAn('admin'))
+                                <a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard Admin</a>
+                            @elseif(auth()->user()->isA('member'))
+                                <a href="{{ route('member.dashboard') }}" class="nav-link">Dashboard Ahli</a>
+                            @else
+                                <a href="{{ route('guest.dashboard') }}" class="nav-link">Dashboard</a>
+                            @endif
+                        </li>
+                        <li class="nav-item">
+                            <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-link nav-link">Log Keluar</button>
+                            </form>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a href="{{ route('login') }}" class="nav-link">Log Masuk</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('register') }}" class="nav-link">Daftar</a>
+                        </li>
+                    @endauth
+                </ul>
             </div>
         </div>
     </nav>

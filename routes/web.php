@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\AdminRegistrationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnnualReportController;
 
@@ -17,22 +18,18 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// Guest routes
-Route::prefix('guest')->name('guest.')->group(function () {
-    Route::get('/register', [MemberController::class, 'create'])->name('register');
-    Route::post('/register', [MemberController::class, 'store'])->name('register.store');
-    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report.public');
-    Route::get('/success', function () {
+
         return view('guest.success');
-    })->name('success');
+    })->name('guest.success');
 });
 
-// Authenticated user routes
-Route::middleware(['auth'])->group(function () {
+//Member routes
+Route::middleware(['auth', 'can:apply-loan'])->group(function () {
+    
     // Dashboard
-    Route::get('guest/dashboard', function () {
-        return view('guest.dashboard');
-    })->name('dashboard');
+    Route::get('/member/dashboard', function () {
+        return view('member.dashboard');
+    })->name('member.dashboard');
 
     // Profile routes
     Route::controller(ProfileController::class)->group(function () {
@@ -42,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Loans and reports
+    
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
 
@@ -55,24 +53,55 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin routes
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+        ->name('admin.dashboard');
 
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
-        Route::get('/members', 'index')->name('members.index');
-        Route::get('/members/create', 'create')->name('members.create');
-        Route::post('/members', 'store')->name('members.store');
-        Route::delete('/members/batch-delete', 'batchDelete')->name('members.batch-delete');
-        Route::get('/members/export', 'export')->name('members.export');
-        Route::get('/members/{member}', 'show')->name('members.show');
-        Route::get('/members/{member}/edit', 'edit')->name('members.edit');
-        Route::put('/members/{member}', 'update')->name('members.update');
-        Route::delete('/members/{member}', 'destroy')->name('members.destroy');
+        Route::get('/admin/members', 'index')->name('admin.members.index');
+        Route::get('/admin/members/create', 'create')->name('admin.members.create');
+        Route::post('/admin/members', 'store')->name('admin.members.store');
+        Route::delete('/admin/members/batch-delete', 'batchDelete')->name('admin.members.batch-delete');
+        Route::get('/admin/members/export', 'export')->name('admin.members.export');
+        Route::get('/admin/members/{member}', 'show')->name('admin.members.show');
+        Route::get('/admin/members/{member}/edit', 'edit')->name('admin.members.edit');
+        Route::put('/admin/members/{member}', 'update')->name('admin.members.update');
+        Route::delete('/admin/members/{member}', 'destroy')->name('admin.members.destroy');
+        Route::post('/admin/promote/{user}', 'promote')->name('admin.promote');
+        Route::get('/admin/registrations/pending', 'pendingRegistrations')
+            ->name('admin.registrations.pending');
+        Route::get('/admin/registrations/{id}/show', 'showRegistration')
+            ->name('admin.registrations.show');
     });
+});
 
-    // Add this new route
-    Route::get('/registrations/pending', [AdminMemberController::class, 'pendingRegistrations'])
-        ->name('registrations.pending');
+// Add new admin loan management routes
+Route::middleware(['auth', 'can:manage-loans'])->group(function () {
+    // Finance/Loan management routes
+    Route::controller(FinanceController::class)
+        ->prefix('admin/finance')
+        ->name('admin.finance.')
+        ->group(function () {
+            // Basic CRUD operations
+            Route::get('/', 'index')->name('index');                    
+            Route::get('/{loanId}', 'show')->name('show');               
+            Route::get('/{loanId}/edit', 'edit')->name('edit');          
+            Route::put('/{loanId}', 'update')->name('update');           
+            Route::delete('/{loanId}', 'destroy')->name('destroy');      
+            
+            // Loan approval operations - Make sure all route parameters match
+            Route::post('/{loanId}/approve', 'approve')->name('approve'); 
+            Route::post('/{loanId}/reject', 'reject')->name('reject');   
+            
+            // Export functionality
+            Route::get('/export', 'export')->name('export');           
+    });
+});
+
+Route::middleware(['auth', 'can:approve-member-registration'])->group(function () {
+    Route::post('/admin/registrations/{id}/approve', [AdminMemberController::class, 'approve'])
+        ->name('admin.registrations.approve');
+    Route::post('/admin/registrations/{id}/reject', [AdminMemberController::class, 'reject'])
+        ->name('admin.registrations.reject');
 });

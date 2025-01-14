@@ -93,13 +93,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
-                        <span class="text-sm font-medium text-green-500">+8%</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800">{{ number_format($totalSavings) }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">RM {{ number_format($totalSavings, 2) }}</h3>
                     <p class="text-gray-600">Jumlah Simpanan</p>
                 </div>
 
-                <!-- Loan Approval Card -->
+                <!-- Active Loans Card -->
                 <div class="stat-card bg-white rounded-2xl p-6 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <div class="p-2 bg-yellow-100 rounded-lg">
@@ -107,7 +106,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                             </svg>
                         </div>
-                        <span class="text-sm font-medium text-green-500">85%</span>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-800">{{ number_format($totalLoanApplications) }}</h3>
                     <p class="text-gray-600">Pinjaman Aktif</p>
@@ -144,23 +142,51 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-02-20</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">AM</div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">Ahmad Maslan</div>
-                                                <div class="text-sm text-gray-500">ahmad@example.com</div>
+                                @forelse($recentActivities as $activity)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ \Carbon\Carbon::parse($activity->date)->format('Y-m-d') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                                    {{ substr($activity->name, 0, 2) }}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">{{ $activity->name }}</div>
+                                                    <div class="text-sm text-gray-500">{{ $activity->email }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Permohonan Pinjaman</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diluluskan</span>
-                                    </td>
-                                </tr>
-                                <!-- Add more rows as needed -->
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $activity->type }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                {{ $activity->status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                                   ($activity->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                                                   ($activity->status === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800')) }}">
+                                                @switch($activity->status)
+                                                    @case('completed')
+                                                        Selesai
+                                                        @break
+                                                    @case('approved')
+                                                        Diluluskan
+                                                        @break
+                                                    @case('pending')
+                                                        Menunggu
+                                                        @break
+                                                    @default
+                                                        Ditolak
+                                                @endswitch
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                                            Tiada aktiviti terkini
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -171,11 +197,23 @@
 
     <!-- Initialize Charts -->
     <script>
+        // Prepare data for Savings Trend Chart
+        const savingsData = @json($savingsTrend->pluck('total'));
+        const savingsLabels = @json($savingsTrend->map(function($item) {
+            return \Carbon\Carbon::createFromDate($item->year, $item->month, 1)->format('M Y');
+        }));
+
+        // Prepare data for Demographics Chart
+        const demographicsData = @json($demographics->pluck('total'));
+        const demographicsLabels = @json($demographics->map(function($item) {
+            return $item->age_group . ' tahun';
+        }));
+
         // Savings Trend Chart
         var savingsOptions = {
             series: [{
                 name: 'Simpanan',
-                data: [2100000, 2200000, 2300000, 2400000, 2450000, 2500000]
+                data: savingsData
             }],
             chart: {
                 type: 'area',
@@ -202,7 +240,7 @@
                 width: 2
             },
             xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                categories: savingsLabels
             },
             tooltip: {
                 y: {
@@ -218,12 +256,12 @@
 
         // Demographics Chart
         var demographicsOptions = {
-            series: [30, 35, 25, 10],
+            series: demographicsData,
             chart: {
                 type: 'donut',
                 height: 320
             },
-            labels: ['18-30 tahun', '31-40 tahun', '41-50 tahun', '51+ tahun'],
+            labels: demographicsLabels,
             colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
             legend: {
                 position: 'bottom'
