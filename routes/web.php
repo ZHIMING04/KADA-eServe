@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\AdminRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
@@ -56,9 +57,7 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'can:approve-loan'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
+
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
         Route::get('/admin/members', 'index')->name('admin.members.index');
@@ -74,7 +73,13 @@ Route::middleware(['auth', 'can:approve-loan'])->group(function () {
         Route::get('/admin/registrations/pending', 'pendingRegistrations')
             ->name('admin.registrations.pending');
     });
+
 });
+
+Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
+Route::get('/guest/success', function () {
+    return view('guest.success');
+})->name('guest.success');
 
 
 

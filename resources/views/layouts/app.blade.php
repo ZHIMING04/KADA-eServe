@@ -13,9 +13,11 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
         <link rel="icon" type="image/png" href="{{ asset('images/KADAlogoresize.png') }}">
 
-        <!-- Add Alpine.js -->
+        <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased">

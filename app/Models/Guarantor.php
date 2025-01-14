@@ -20,4 +20,17 @@ class Guarantor extends Model
     {
         return $this->belongsTo(Loan::class, 'loan_id', 'loan_id');
     }
+
+    public function getRelationshipInMalay()
+    {
+        $relationships = [
+            'parent' => 'Ibu/Bapa',
+            'spouse' => 'Suami/Isteri',
+            'sibling' => 'Adik-beradik',
+            'relative' => 'Saudara',
+            'friend' => 'Rakan'
+        ];
+
+        return $relationships[$this->relationship] ?? ucfirst($this->relationship);
+    }
 } 

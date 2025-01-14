@@ -28,7 +28,7 @@ class CreateLoanManagementTable extends Migration
 
         // Create LoanTypes Table
         Schema::create('loan_types', function (Blueprint $table) {
-            $table->id('loan_type_id');
+            $table->unsignedBigInteger('loan_type_id')->primary();
             $table->string('loan_type', 100);
             $table->timestamps();
         });
