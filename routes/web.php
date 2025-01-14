@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\AdminRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
@@ -54,6 +55,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Registration routes
+    Route::controller(AdminRegistrationController::class)->group(function () {
+        Route::get('/registrations/pending', 'pending')->name('registrations.pending');
+        Route::get('/registrations/{member}', 'show')->name('registrations.show');
+        // You might want to add these routes later for approve/reject functionality
+        // Route::post('/registrations/{member}/approve', 'approve')->name('registrations.approve');
+        // Route::post('/registrations/{member}/reject', 'reject')->name('registrations.reject');
+    });
+
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
         Route::get('/members', 'index')->name('members.index');
@@ -66,10 +76,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/members/{member}', 'update')->name('members.update');
         Route::delete('/members/{member}', 'destroy')->name('members.destroy');
     });
-
-    // Add this new route
-    Route::get('/registrations/pending', [AdminMemberController::class, 'pendingRegistrations'])
-        ->name('registrations.pending');
 });
+
+Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
+Route::get('/guest/success', function () {
+    return view('guest.success');
+})->name('guest.success');
 
 

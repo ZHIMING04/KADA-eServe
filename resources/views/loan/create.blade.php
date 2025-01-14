@@ -7,82 +7,78 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6" x-data="{ currentStep: 1 }">
-                    <!-- Step Numbers -->
-                    <div class="flex justify-between mb-8">
-                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 1, 'text-gray-400': currentStep < 1 }">
-                            <span class="text-lg font-medium">1</span>
-                            <p class="text-sm">Maklumat Peribadi</p>
-                        </div>
-                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 2, 'text-gray-400': currentStep < 2 }">
-                            <span class="text-lg font-medium">2</span>
-                            <p class="text-sm">Maklumat Pinjaman</p>
-                        </div>
-                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 3, 'text-gray-400': currentStep < 3 }">
-                            <span class="text-lg font-medium">3</span>
-                            <p class="text-sm">Maklumat Penjamin</p>
-                        </div>
-                        <div class="text-center" :class="{ 'text-purple-600': currentStep >= 4, 'text-gray-400': currentStep < 4 }">
-                            <span class="text-lg font-medium">4</span>
-                            <p class="text-sm">Pengesahan</p>
-                        </div>
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl rounded-xl">
+                <div class="p-8" x-data="{ currentStep: 1 }">
+                    <!-- Step Numbers - Updated Design -->
+                    <div class="flex justify-between mb-12 relative">
+                        <!-- Progress Bar -->
+                        <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-gray-200 w-full -z-1"></div>
+                        <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-primary transition-all duration-500"
+                             :style="'width: ' + ((currentStep - 1) * 33.33) + '%'"></div>
+                        
+                        <!-- Step Indicators -->
+                        <template x-for="step in 4" :key="step">
+                            <div class="relative z-10 text-center">
+                                <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center"
+                                     :class="currentStep >= step ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
+                                    <span class="text-lg font-medium" x-text="step"></span>
+                                </div>
+                                <p class="mt-2 text-sm font-medium" 
+                                   :class="currentStep >= step ? 'text-primary' : 'text-gray-400'">
+                                    <span x-show="step === 1">Maklumat Peribadi</span>
+                                    <span x-show="step === 2">Maklumat Pinjaman</span>
+                                    <span x-show="step === 3">Maklumat Penjamin</span>
+                                    <span x-show="step === 4">Pengesahan</span>
+                                </p>
+                            </div>
+                        </template>
                     </div>
 
-                    <form method="POST" action="{{ route('loan.store') }}">
+                    <form method="POST" action="{{ route('loan.store') }}" class="space-y-8">
                         @csrf
                         
-                        <!-- Step 1: Personal Information -->
-                        <div x-show="currentStep === 1">
-                            <h2 class="text-xl font-semibold mb-6">Maklumat Peribadi</h2>
+                        <!-- Step 1: Personal Information - Updated Design -->
+                        <div x-show="currentStep === 1" class="transition-all duration-500">
+                            <h2 class="text-2xl font-bold mb-8 text-gray-800 dark:text-white">Maklumat Peribadi</h2>
                             
-                            <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <!-- Name -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Nama</label>
-                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        {{ $member->name }}
-                                    </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Nama</label>
+                                    <div class="text-lg text-gray-900 dark:text-white">{{ $member->name }}</div>
                                 </div>
 
                                 <!-- IC Number -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
-                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        {{ $member->ic }}
-                                    </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">No. Kad Pengenalan</label>
+                                    <div class="text-lg text-gray-900 dark:text-white">{{ $member->ic }}</div>
                                 </div>
 
                                 <!-- Address -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        {{ $member->address }}
-                                    </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Alamat</label>
+                                    <div class="text-lg text-gray-900 dark:text-white">{{ $member->address }}</div>
                                 </div>
 
                                 <!-- Phone -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
-                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        {{ $member->phone }}
-                                    </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">No. Telefon</label>
+                                    <div class="text-lg text-gray-900 dark:text-white">{{ $member->phone }}</div>
                                 </div>
+                                
 
                                 <!-- Email -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Emel</label>
-                                    <div class="mt-1 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                        {{ $member->email }}
-                                    </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Emel</label>
+                                    <div class="text-lg text-gray-900 dark:text-white">{{ $member->email }}</div>
                                 </div>
                             </div>
 
-                            <!-- Next Step Button -->
-                            <div class="mt-8 flex justify-end">
+                            <!-- Updated Button Design -->
+                            <div class="mt-12 flex justify-end">
                                 <button type="button" 
                                         @click="currentStep = 2"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Seterusnya
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -91,15 +87,16 @@
                             </div>
                         </div>
 
-                        <!-- Step 2: Loan Details -->
-                        <div x-show="currentStep === 2" x-cloak>
-                            <h2 class="text-xl font-semibold mb-6">Maklumat Pinjaman</h2>
+                        <!-- Step 2: Loan Details - Updated Design -->
+                        <div x-show="currentStep === 2" x-cloak class="transition-all duration-500">
+                            <h2 class="text-2xl font-bold mb-8 text-gray-800 dark:text-white">Maklumat Pinjaman</h2>
                             
-                            <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <!-- Loan Type -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Jenis Pinjaman</label>
-                                    <select name="loan_type_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Jenis Pinjaman</label>
+                                    <select name="loan_type_id" 
+                                            class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
                                         <option value="">Pilih Jenis Pinjaman</option>
                                         @foreach($loanTypes as $type)
                                             <option value="{{ $type->id }}">{{ $type->name }} - Maksimum RM{{ number_format($type->max_amount, 2) }}</option>
@@ -108,45 +105,44 @@
                                 </div>
 
                                 <!-- Loan Amount -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Jumlah Pinjaman (RM)</label>
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Jumlah Pinjaman (RM)</label>
                                     <input type="number" name="loan_amount" step="0.01" min="0" 
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
                                 </div>
 
                                 <!-- Loan Period -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tempoh Pinjaman (Bulan)</label>
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Tempoh Pinjaman (Bulan)</label>
                                     <input type="number" name="loan_period" min="1" max="60"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
                                 </div>
 
                                 <!-- Monthly Income -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Gaji Kasar Bulanan (RM)</label>
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Gaji Kasar Bulanan (RM)</label>
                                     <input type="number" name="monthly_gross_salary" step="0.01" min="0"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
                                 </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Gaji Bersih Bulanan (RM)</label>
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Gaji Bersih Bulanan (RM)</label>
                                     <input type="number" name="monthly_net_salary" step="0.01" min="0"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                           class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
                                 </div>
 
                                 <!-- Purpose -->
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Tujuan Pinjaman</label>
+                                <div class="space-y-4">
+                                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">Tujuan Pinjaman</label>
                                     <textarea name="purpose" rows="3" 
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                              class="w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500"></textarea>
                                 </div>
                             </div>
 
-                            <!-- Navigation Buttons -->
-                            <div class="mt-8 flex justify-between">
-                                <button type="button" 
-                                        @click="currentStep = 1"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                            <!-- Step 2 Navigation Buttons -->
+                            <div class="mt-12 flex justify-between">
+                                <button type="button" @click="currentStep = 1"
+                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
                                     <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
@@ -154,7 +150,7 @@
                                 </button>
                                 <button type="button" 
                                         @click="currentStep = 3"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Seterusnya
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -174,31 +170,31 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
                                         <input type="text" name="guarantor1_name" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
                                         <input type="text" name="guarantor1_ic" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
                                         <input type="text" name="guarantor1_phone" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Alamat</label>
                                         <textarea name="guarantor1_address" rows="3" 
-                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
                                         <select name="guarantor1_relationship" 
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                             <option value="">Pilih Hubungan</option>
                                             <option value="parent">Ibu/Bapa</option>
                                             <option value="spouse">Suami/Isteri</option>
@@ -217,31 +213,31 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
                                         <input type="text" name="guarantor2_name" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
                                         <input type="text" name="guarantor2_ic" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
                                         <input type="text" name="guarantor2_phone" 
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Alamat</label>
                                         <textarea name="guarantor2_address" rows="3" 
-                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
                                         <select name="guarantor2_relationship" 
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                             <option value="">Pilih Hubungan</option>
                                             <option value="parent">Ibu/Bapa</option>
                                             <option value="spouse">Suami/Isteri</option>
@@ -253,11 +249,10 @@
                                 </div>
                             </div>
 
-                            <!-- Navigation Buttons -->
-                            <div class="mt-8 flex justify-between">
-                                <button type="button" 
-                                        @click="currentStep = 2"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                            <!-- Step 3 Navigation Buttons -->
+                            <div class="mt-12 flex justify-between">
+                                <button type="button" @click="currentStep = 2"
+                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
                                     <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
@@ -265,7 +260,7 @@
                                 </button>
                                 <button type="button" 
                                         @click="currentStep = 4"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Seterusnya
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -356,24 +351,24 @@
                                 <!-- Terms and Agreement -->
                                 <div class="mt-8">
                                     <label class="inline-flex items-center">
-                                        <input type="checkbox" name="terms_agreed" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                        <input type="checkbox" name="terms_agreed" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50">
                                         <span class="ml-2">Saya mengesahkan bahawa semua maklumat yang diberikan adalah benar dan tepat</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <!-- Navigation Buttons -->
-                            <div class="mt-8 flex justify-between">
-                                <button type="button" 
-                                        @click="currentStep = 3"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                            <!-- Step 4 Navigation Buttons -->
+                            <div class="mt-12 flex justify-between">
+                                <button type="button" @click="currentStep = 3"
+                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
                                     <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
                                     Sebelumnya
                                 </button>
+                                
                                 <button type="submit"
-                                        class="inline-flex items-center px-6 py-2 bg-gray-100 text-black font-medium rounded-lg hover:bg-gray-200 border border-gray-300">
+                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Hantar Permohonan
                                 </button>
                             </div>
