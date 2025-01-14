@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Loan;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class DashboardController extends Controller
 {

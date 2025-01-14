@@ -8,7 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Http\Controllers\Auth\MemberController;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -20,6 +20,22 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate();
+
+        $request->session()->regenerate();
+
+        // Check if user is admin using Bouncer
+        if (Bouncer::is(Auth::user())->an('admin')) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
+        return redirect()->intended(route('dashboard', absolute: false));
+    }
 
     /**
      * Destroy an authenticated session.
@@ -34,24 +50,4 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
-
-
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        try {
-            $request->authenticate();
-
-            $request->session()->regenerate();
-
-            return redirect('guest/dashboard');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors([
-                'email' => 'ID Pengguna atau Kata Laluan tidak sah.',
-            ])->withInput($request->only('email'));
-        }
-    }
-
 }

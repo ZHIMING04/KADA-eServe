@@ -17,6 +17,13 @@
                     </x-nav-link>
                 </div>
             </div>
+            @auth
+                @if (Auth::user()->can('register-member'))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('register') }}">Register Member</a>
+                    </li>
+                @endif
+            @endauth
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -80,7 +87,14 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>
-
+        @auth
+            @if (Auth::user()->can('register-member'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">Register Member</a>
+                </li>
+            @endif
+        @endauth  
+              
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">

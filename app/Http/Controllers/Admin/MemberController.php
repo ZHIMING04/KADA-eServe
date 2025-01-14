@@ -8,8 +8,10 @@ use App\Models\Member;
 use App\Models\WorkingInfo;
 use App\Models\Savings;
 use App\Models\Family;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class MemberController extends Controller
 {
@@ -75,4 +77,6 @@ class MemberController extends Controller
         return redirect()->route('admin.members.index')
                         ->with('success', 'Member deleted successfully');
     }
+
+    
 } 

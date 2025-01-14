@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ApplicationController;
 
 require __DIR__.'/auth.php';
 
@@ -61,6 +62,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::put('/members/{member}', 'update')->name('members.update');
         Route::delete('/members/{member}', 'destroy')->name('members.destroy');
     });
+});
+
+Route::middleware(['auth', 'can:promote-users'])->group(function () {
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/promote/{user}', [DashboardController::class, 'promote'])->name('admin.promote');
+});
+
+Route::middleware(['auth', 'can:register-member'])->group(function () {
+    Route::get('/register', [DashboardController::class, 'show'])->name('register.form');
+    Route::post('/register', [DashboardController::class, 'submit'])->name('register.submit');
 });
 
 
