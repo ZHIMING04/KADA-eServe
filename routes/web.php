@@ -21,7 +21,7 @@ Route::get('/', function () {
 Route::prefix('guest')->name('guest.')->group(function () {
     Route::get('/register', [MemberController::class, 'create'])->name('register');
     Route::post('/register', [MemberController::class, 'store'])->name('register.store');
-    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report'); //annualReport
+    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report.public');
     Route::get('/success', function () {
         return view('guest.success');
     })->name('success');
@@ -51,7 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
 
     //AnnualReport
-    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report');
+    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report.private');
 });
 
 // Admin routes

@@ -15,7 +15,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('guest.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('annual.report')" :active="request()->routeIs('annual.create')">
+                    <x-nav-link :href="route('annual.report')" :active="request()->routeIs('annual.report')">
                         {{ __('Annual Report') }}
                     </x-nav-link>
                     <x-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
