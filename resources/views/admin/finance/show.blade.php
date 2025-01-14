@@ -17,12 +17,19 @@
         <!-- Action Buttons -->
         <div class="mb-6 flex gap-4">
             @if($loan->status === 'pending')
-                <button class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-150 ease-in-out">
-                    Lulus Pinjaman
-                </button>
-                <button class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-150 ease-in-out">
-                    Tolak Pinjaman
-                </button>
+                <form action="{{ route('admin.finance.approve', ['loanId' => $loan->loan_id]) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        Lulus Pinjaman
+                    </button>
+                </form>
+                
+                <form action="{{ route('admin.finance.reject', ['loanId' => $loan->loan_id]) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                        Tolak Pinjaman
+                    </button>
+                </form>
             @endif
         </div>
 

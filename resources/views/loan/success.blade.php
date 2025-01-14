@@ -18,10 +18,17 @@
                     <p class="text-gray-600 dark:text-gray-400 mb-8">
                         Permohonan pinjaman anda telah berjaya dihantar dan akan diproses dalam masa yang terdekat.
                     </p>
-                    <a href="{{ route('dashboard') }}" 
-                       class="inline-flex items-center px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
-                        Kembali ke Halaman Utama
-                    </a>
+                    @if(auth()->user()->isAn('admin'))
+                        <a href="{{ route('admin.dashboard') }}" 
+                           class="inline-flex items-center px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                            Kembali ke Halaman Utama
+                        </a>
+                    @else
+                        <a href="{{ route('member.dashboard') }}" 
+                           class="inline-flex items-center px-4 py-2 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                            Kembali ke Halaman Utama
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

@@ -20,6 +20,35 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        try {
+            $request->authenticate();
+
+            $request->session()->regenerate();
+
+            // Get authenticated user
+            $user = Auth::user();
+
+            // Redirect based on role
+            if ($user->isAn('admin')) {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->isA('member')) {
+                return redirect()->route('member.dashboard');
+            }
+
+            // Default redirect for guest role
+            return redirect()->route('guest.dashboard');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors([
+                'email' => 'ID Pengguna atau Kata Laluan tidak sah.',
+            ])->withInput($request->only('email'));
+        }
+    }
 
     /**
      * Destroy an authenticated session.
@@ -34,24 +63,4 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
-
-
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        try {
-            $request->authenticate();
-
-            $request->session()->regenerate();
-
-            return redirect('guest/dashboard');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors([
-                'email' => 'ID Pengguna atau Kata Laluan tidak sah.',
-            ])->withInput($request->only('email'));
-        }
-    }
-
 }

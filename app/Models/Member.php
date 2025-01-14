@@ -47,6 +47,11 @@ class Member extends Model
     {
         return $this->hasMany(Family::class, 'no_anggota', 'id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'email', 'email');
+    }
 }
 
 
