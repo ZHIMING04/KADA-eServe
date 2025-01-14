@@ -24,6 +24,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Tentang Kami</a>
                     </li>
+                    <li>
+                        <a class="nav-link" href="{{ route('annual.report') }}">Annual Report</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Perkhidmatan</a>
                     </li>

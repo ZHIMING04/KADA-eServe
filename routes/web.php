@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnnualReportController;
 
 require __DIR__.'/auth.php';
 
@@ -20,6 +21,7 @@ Route::get('/', function () {
 Route::prefix('guest')->name('guest.')->group(function () {
     Route::get('/register', [MemberController::class, 'create'])->name('register');
     Route::post('/register', [MemberController::class, 'store'])->name('register.store');
+    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report'); //annualReport
     Route::get('/success', function () {
         return view('guest.success');
     })->name('success');
@@ -47,6 +49,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
     Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
+
+    //AnnualReport
+    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report');
 });
 
 // Admin routes
@@ -71,5 +76,3 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/registrations/pending', [AdminMemberController::class, 'pendingRegistrations'])
         ->name('registrations.pending');
 });
-
-
