@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,23 +9,31 @@ class CreateLoanManagementTable extends Migration
 {
     public function up()
     {
-        // Create loan_types first
+        // Create Members Table
+        Schema::create('members', function (Blueprint $table) {
+            $table->id('member_id');
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->string('phone', 15)->nullable();
+            $table->text('address')->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('postcode', 10)->nullable();
+            $table->string('state', 100)->nullable();
+            $table->text('office_address')->nullable();
+            $table->string('office_city', 100)->nullable();
+            $table->string('office_postcode', 10)->nullable();
+            $table->timestamps();
+        });
+
+        // Create LoanTypes Table
         Schema::create('loan_types', function (Blueprint $table) {
             $table->id('loan_type_id');
             $table->string('loan_type', 100);
             $table->timestamps();
         });
 
-        Schema::create('guarantors', function (Blueprint $table) {   
-            $table->string('guarantor_id', 50)->primary();
-            $table->string('no_pf');
-            $table->string('name');
-            $table->string('ic');
-            $table->string('phone');
-            $table->timestamps();
-        });
-
-        // Then banks
+        // Create Banks Table
         Schema::create('banks', function (Blueprint $table) {
             $table->id('bank_id');
             $table->string('bank_name', 100);
@@ -34,48 +41,35 @@ class CreateLoanManagementTable extends Migration
             $table->timestamps();
         });
 
-        // Then loans
+        // Create Loans Table
         Schema::create('loans', function (Blueprint $table) {
             $table->string('loan_id', 50)->primary();
-            $table->string('no_anggota');
+            $table->unsignedBigInteger('member_id');
             $table->unsignedBigInteger('loan_type_id');
             $table->unsignedBigInteger('bank_id');
             $table->date('date_apply');
-            $table->decimal('loan_amount', 10, 2);
-            $table->decimal('interest_rate', 5, 2);
-            $table->decimal('monthly_repayment', 10, 2);
-            $table->decimal('monthly_gross_salary', 10, 2);
-            $table->decimal('monthly_net_salary', 10, 2);
+            $table->double('loan_amount', 10, 2);
+            $table->double('interest_rate', 5, 2);
+            $table->double('monthly_repayment', 10, 2);
+            $table->double('monthly_gross_salary', 10, 2);
+            $table->double('monthly_net_salary', 10, 2);
             $table->integer('loan_period');
-            $table->enum('status', ['pending', 'approved', 'rejected', ])->default('pending');
+            $table->string('status')->default('pending');
             $table->timestamps();
-        });
 
-        // Add all foreign keys in one place
-        Schema::table('loans', function (Blueprint $table) {
-            $table->foreign('no_anggota')
-                  ->references('no_anggota')
-                  ->on('member_register')
-                  ->onDelete('cascade');
-            $table->foreign('loan_type_id')
-                  ->references('loan_type_id')
-                  ->on('loan_types')
-                  ->onDelete('cascade');
-            $table->foreign('bank_id')
-                  ->references('bank_id')
-                  ->on('banks')
-                  ->onDelete('cascade');
+            // Foreign Key Constraints
+            $table->foreign('member_id')->references('member_id')->on('members')->onDelete('cascade');
+            $table->foreign('loan_type_id')->references('loan_type_id')->on('loan_types')->onDelete('cascade');
+            $table->foreign('bank_id')->references('bank_id')->on('banks')->onDelete('cascade');
         });
+    }
 
-        // Create guarantors table
-}
     public function down()
     {
+        // Drop tables in reverse order to handle foreign key constraints
         Schema::dropIfExists('loans');
         Schema::dropIfExists('banks');
         Schema::dropIfExists('loan_types');
-        Schema::dropIfExists('member_register');
+        Schema::dropIfExists('members');
     }
 }
-    
-
