@@ -29,9 +29,9 @@ Route::prefix('guest')->name('guest.')->group(function () {
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {
     // Dashboard
-    Route::get('guest/dashboard', function () {
+    Route::get('/guest/dashboard', function () {
         return view('guest.dashboard');
-    })->name('dashboard');
+    })->middleware(['auth', 'verified'])->name('guest.dashboard');
 
     // Profile routes
     Route::controller(ProfileController::class)->group(function () {
@@ -85,5 +85,9 @@ Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.
 Route::get('/guest/success', function () {
     return view('guest.success');
 })->name('guest.success');
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 

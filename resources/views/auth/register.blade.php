@@ -107,6 +107,7 @@
             </div>
             <button type="submit" class="submit-button">Daftar Akaun</button>
         </form>
+    
     </div>
 </body>
 </html>
