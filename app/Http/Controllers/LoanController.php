@@ -175,4 +175,5 @@ class LoanController extends Controller
     {
         return view('loan.success')->with('success', 'Permohonan pinjaman anda telah berjaya dihantar!');
     }
+
 }
