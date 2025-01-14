@@ -28,7 +28,8 @@ class Member extends Model
         'office_city',
         'office_postcode',
         'office_state',
-        'guest_id'
+        'guest_id',
+        'status'
     ];
 
     public function workingInfo()

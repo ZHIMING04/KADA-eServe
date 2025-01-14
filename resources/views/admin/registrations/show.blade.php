@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Maklumat Ahli')
+@section('title', 'Maklumat Pendaftaran')
 
 @section('content')
     <!-- Back button and header -->
@@ -9,8 +9,18 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Kembali ke Senarai Ahli
+            Kembali ke Pendaftaran Menunggu
         </a>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-6 flex gap-4">
+        <button class="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+            Lulus Pendaftaran
+        </button>
+        <button class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+            Tolak Pendaftaran
+        </button>
     </div>
 
     <!-- Member Information Cards -->
@@ -83,7 +93,7 @@
                 </div>
                 <div class="space-y-1">
                     <p class="text-sm text-gray-600">Gaji</p>
-                    <p class="font-medium">RM {{ $workingInfo->salary }}</p>
+                    <p class="font-medium">RM {{ number_format($workingInfo->salary, 2) }}</p>
                 </div>
             </div>
 
@@ -134,7 +144,7 @@
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Maklumat Keluarga</h2>
             <div class="space-y-4">
-                @foreach($familyMembers as $family)
+                @forelse($familyMembers as $family)
                     <div class="p-4 border rounded-lg">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="space-y-1">
@@ -151,7 +161,9 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-gray-500">Tiada maklumat keluarga</p>
+                @endforelse
             </div>
         </div>
     </div>
