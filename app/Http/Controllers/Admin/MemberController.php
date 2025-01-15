@@ -12,6 +12,7 @@ use App\Models\Family;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
+use App\Models\Loan;
 
 class MemberController extends Controller
 {
@@ -210,6 +211,77 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Ralat semasa menolak pendaftaran: ' . $e->getMessage());
+        }
+    }
+
+    public function getMemberLoans($memberId)
+    {
+        $loans = Loan::where('member_id', $memberId)
+            ->where('loan_amount', '>', 0)
+            ->get(['id', 'loan_id', 'loan_type', 'loan_amount']);
+        
+        return response()->json($loans);
+    }
+
+    public function addTransaction(Request $request, $memberId)
+    {
+        try {
+            $validated = $request->validate([
+                'type' => 'required|in:savings,loan',
+                'savings_type' => 'required_if:type,savings',
+                'loan_id' => 'required_if:type,loan|exists:loans,id',
+                'amount' => 'required|numeric|min:0'
+            ]);
+
+            DB::beginTransaction();
+
+            // Create transaction record
+            $transaction = Transaction::create([
+                'member_id' => $memberId,
+                'type' => $validated['type'],
+                'savings_type' => $validated['type'] === 'savings' ? $validated['savings_type'] : null,
+                'loan_id' => $validated['type'] === 'loan' ? $validated['loan_id'] : null,
+                'amount' => $validated['amount']
+            ]);
+
+            // Update the appropriate record based on transaction type
+            if ($validated['type'] === 'savings') {
+                $savings = Savings::where('member_id', $memberId)->first();
+                
+                if (!$savings) {
+                    throw new \Exception('Rekod simpanan tidak dijumpai');
+                }
+
+                $savingsType = $validated['savings_type'];
+                $savings->$savingsType += $validated['amount'];
+                $savings->save();
+
+            } else {
+                $loan = Loan::find($validated['loan_id']);
+                
+                if (!$loan) {
+                    throw new \Exception('Rekod pembiayaan tidak dijumpai');
+                }
+
+                $loan->loan_amount -= $validated['amount'];
+                $loan->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berjaya disimpan'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Transaction Error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat: ' . $e->getMessage()
+            ], 422);
         }
     }
 } 

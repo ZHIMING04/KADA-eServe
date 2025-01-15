@@ -77,10 +77,10 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::put('/admin/members/{member}', 'update')->name('admin.members.update');
         Route::delete('/admin/members/{member}', 'destroy')->name('admin.members.destroy');
         Route::post('/admin/promote/{user}', 'promote')->name('admin.promote');
-        Route::get('/admin/registrations/pending', 'pendingRegistrations')
-            ->name('admin.registrations.pending');
-        Route::get('/admin/registrations/{id}/show', 'showRegistration')
-            ->name('admin.registrations.show');
+        Route::get('/admin/registrations/pending', 'pendingRegistrations')->name('admin.registrations.pending');
+        Route::get('/admin/registrations/{id}/show', 'showRegistration')->name('admin.registrations.show');
+        Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
+        Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
 });
 
