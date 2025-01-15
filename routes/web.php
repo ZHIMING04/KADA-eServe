@@ -18,7 +18,18 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+// Add the annual report route here, outside of any middleware groups
+Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report');
 
+// Guest routes
+Route::middleware(['auth'])->group(function () {
+    // Guest dashboard
+    Route::get('/guest/dashboard', function () {
+        return view('guest.dashboard');
+    })->name('guest.dashboard');
+
+    // Guest success page
+    Route::get('/guest/success', function () {
         return view('guest.success');
     })->name('guest.success');
 });
@@ -47,9 +58,6 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
     Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
-
-    //AnnualReport
-    Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report.private');
 });
 
 // Admin routes
