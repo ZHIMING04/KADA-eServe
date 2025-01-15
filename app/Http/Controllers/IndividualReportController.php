@@ -7,27 +7,35 @@ use Illuminate\Support\Facades\Auth; // Import the Auth facade
 use App\Models\IndividualReport;
 use App\Models\Member;
 use App\Models\Loan;
+use Illuminate\Support\Facades\DB;
 
 
 class IndividualReportController extends Controller
 {
     public function display()
     {
-        //  // Retrieve the authenticated user
-        //  $user = Auth::user();
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+ 
+        $loans = DB::table('loans')->where('member_id',$member->id)->get();
 
-        //  // Retrieve member details from the members table using the authenticated user's ID
-        //  $member = Member::where('guest_id', $user->id)->first();
- 
-        //  // Check if the member exists
-        //  if (!$member) {
-        //      return redirect()->back()->with('error', 'Member not found.');
-        //  }
- 
-        //  // Retrieve loan details for the member
-        //  $loans = Loan::where('no_anggota', $member->no_anggota)->get();
- // return view('individualReport.report', compact('member', 'loans'));
-         return view('individualReport.report');
+        $loans = $loans->map(function ($loan) {
+            $loan->loan_type = DB::table('loan_types')->where('loan_type_id', $loan->loan_type_id)->first();
+            return $loan;
+        });
+
+        $saving = DB::table('savings')->where('no_anggota',$member->id)->first();
+
+        $totalSavings=$this->calculateTotalSaving($saving);
+
+         return view('individualReport.report',compact('member','loans','saving','totalSavings'));
     }
+
+
+    private function calculateTotalSaving($saving)
+    {
+        return $saving->share_capital + $saving->subscription_capital + $saving->welfare_fund + $saving->fixed_savings;
+    }
+  
+
 }
 
