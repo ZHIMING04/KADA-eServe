@@ -85,35 +85,35 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Nama Penuh</p>
-                        <p class="font-medium">{{ $loan->member->name }}</p>
+                        <p class="font-medium">{{ $loan->member?->name ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">No. KP</p>
-                        <p class="font-medium">{{ $loan->member->ic }}</p>
+                        <p class="font-medium">{{ $loan->member?->ic ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Email</p>
-                        <p class="font-medium">{{ $loan->member->email }}</p>
+                        <p class="font-medium">{{ $loan->member?->email ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">No. Telefon</p>
-                        <p class="font-medium">{{ $loan->member->phone }}</p>
+                        <p class="font-medium">{{ $loan->member?->phone ?? 'N/A' }}</p>
                     </div>
                     <div class="col-span-2 space-y-1">
                         <p class="text-sm text-gray-600">Alamat Rumah</p>
-                        <p class="font-medium">{{ $loan->member->address }}</p>
+                        <p class="font-medium">{{ $loan->member?->address ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Bandar</p>
-                        <p class="font-medium">{{ $loan->member->city }}</p>
+                        <p class="font-medium">{{ $loan->member?->city ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Poskod</p>
-                        <p class="font-medium">{{ $loan->member->postcode }}</p>
+                        <p class="font-medium">{{ $loan->member?->postcode ?? 'N/A' }}</p>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Negeri</p>
-                        <p class="font-medium">{{ $loan->member->state }}</p>
+                        <p class="font-medium">{{ $loan->member?->state ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>

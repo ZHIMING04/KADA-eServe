@@ -159,7 +159,8 @@
                             <td>{{ $member->ic }}</td>
                             <td>{{ $member->phone }}</td>
                             <td>
-                                <div class="flex justify-center">
+                                <div class="flex justify-center space-x-2">
+                                    <!-- View button -->
                                     <a href="{{ route('admin.members.show', $member->id) }}" 
                                        class="action-button text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,6 +168,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
                                     </a>
+
+                                    <!-- Add Transaction button -->
+                                    <button onclick="openTransactionModal({{ $member->id }})" 
+                                            class="action-button text-green-500 hover:text-green-700 p-2 rounded-full hover:bg-green-50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -181,11 +190,63 @@
             </table>
         </div>
     </div>
+
+    <!-- Transaction Modal -->
+    <div class="modal fade" id="transactionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-lg shadow-xl">
+                <div class="modal-header bg-gray-50 rounded-t-lg">
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Add Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="transactionForm">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Transaction Type</label>
+                            <select class="form-select w-full rounded-md shadow-sm" id="transactionType" name="type" required>
+                                <option value="savings">Savings Deposit</option>
+                                <option value="loan">Loan Repayment</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4" id="savingsTypeDiv">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Simpanan</label>
+                            <select class="form-select w-full rounded-md shadow-sm" name="savings_type">
+                                <option value="share_capital">Modal Syer</option>
+                                <option value="subscription_capital">Modal Yuran</option>
+                                <option value="member_deposit">Deposit Ahli</option>
+                                <option value="welfare_fund">Tabung Kebajikan</option>
+                                <option value="fixed_savings">Simpanan Tetap</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4" id="loanDiv" style="display: none;">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Pilih Pembiayaan</label>
+                            <select class="form-select w-full rounded-md shadow-sm" name="loan_id">
+                                <option value="">Tiada rekod Pembiayaan</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Amount (RM)</label>
+                            <input type="number" class="form-input w-full rounded-md shadow-sm" name="amount" step="0.01" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 rounded-b-lg">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTransaction()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function() {
             var table = $('#membersTable').DataTable({
@@ -219,5 +280,80 @@
                 $('#selectAll').prop('checked', allChecked);
             });
         });
+
+        let currentMemberId = null;
+
+        function openTransactionModal(memberId) {
+            currentMemberId = memberId;
+            if ($('#transactionType').val() === 'loan') {
+                fetchMemberLoans(memberId);
+            }
+            $('#transactionModal').modal('show');
+        }
+
+        function fetchMemberLoans(memberId) {
+            fetch(`/admin/members/${memberId}/loans`)
+                .then(response => response.json())
+                .then(loans => {
+                    const loanSelect = $('select[name="loan_id"]');
+                    loanSelect.empty();
+                    loans.forEach(loan => {
+                        loanSelect.append(`<option value="${loan.id}">Loan #${loan.loan_id} (RM${loan.loan_amount})</option>`);
+                    });
+                });
+        }
+
+        $('#transactionType').change(function() {
+            if (this.value === 'savings') {
+                $('#savingsTypeDiv').show();
+                $('#loanDiv').hide();
+            } else {
+                $('#savingsTypeDiv').hide();
+                $('#loanDiv').show();
+                if (currentMemberId) {
+                    fetchMemberLoans(currentMemberId);
+                }
+            }
+        });
+
+        function submitTransaction() {
+            const form = $('#transactionForm');
+            const formData = new FormData(form[0]);
+
+            // Convert FormData to JSON
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch(`/admin/members/${currentMemberId}/transaction`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Transaksi berjaya!');
+                    $('#transactionModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Transaksi gagal');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ralat: Transaksi gagal');
+            });
+        }
     </script>
 @endpush 
