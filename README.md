@@ -41,3 +41,7 @@ php artisan migrate
 Once everything is configured, you can serve the application locally by running:
 php artisan serve
 
+php artisan artisan tinker
+use App\Models\User; use Silber\Bouncer\BouncerFacade as Bouncer; $admin = User::find(1);Bouncer::assign('admin')->to($admin); exit;
+
+
