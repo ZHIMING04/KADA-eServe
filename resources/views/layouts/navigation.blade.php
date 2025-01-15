@@ -20,7 +20,29 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    @auth
+                        @if(auth()->user()->isA('guest'))
+                            <x-nav-link :href="route('guest.dashboard')" :active="request()->routeIs('guest.dashboard')">
+                                {{ __('Guest Dashboard') }}
+                            </x-nav-link>
 
+                            <x-nav-link :href="route('guest.register')" :active="request()->routeIs('guest.register')">
+                                {{ __('Member Registration') }}
+                            </x-nav-link>
+
+                        @elseif(auth()->user()->isA('member'))
+                            <x-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
+                                {{ __('Loan Application') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('report.display')" :active="request()->routeIs('loan.create')">
+                                {{ __('Individual Report') }}
+                            </x-nav-link>
+                        @endif
+
+                    @endauth
                 </div>
             </div>
 
