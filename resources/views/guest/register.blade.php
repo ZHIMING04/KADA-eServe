@@ -15,7 +15,7 @@
             <!-- Background Image -->
             <div class="absolute inset-0 z-0">
                 <img src="{{ asset('images/paddy.jpg') }}" alt="Background" 
-                    class="w-full h-full object-cover opacity-65">
+                    class="w-full h-full object-cover">
             </div>
 
             <form method="POST" action="{{ route('guest.register.store') }}" class="relative z-10">
