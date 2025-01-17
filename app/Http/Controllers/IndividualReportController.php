@@ -33,7 +33,7 @@ class IndividualReportController extends Controller
 
     private function calculateTotalSaving($saving)
     {
-        return $saving->share_capital + $saving->subscription_capital + $saving->welfare_fund + $saving->fixed_savings;
+        return $saving->share_capital + $saving->subscription_capital + $saving->welfare_fund + $saving->fixed_savings+$saving->member_deposit;
     }
   
 
