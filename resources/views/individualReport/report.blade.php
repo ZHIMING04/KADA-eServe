@@ -75,17 +75,18 @@
                                     series: [
                                         {{$saving->share_capital}},
                                         {{$saving->subscription_capital}},
+                                        {{$saving->member_deposit}},
                                         {{$saving->fixed_savings}},
                                         {{$saving->welfare_fund}},
                                     ],
-                                    labels: ["Modal Syer", "Modal Yuran", "Simpanan Tetap", "Tabung Majikan"],
+                                    labels: ["Modal Syer", "Modal Yuran", "Deposit Ahli","Tabung Kebajikan", "Simpanan Tetap"],
                                     tooltip: {
                                         theme: 'dark'
                                     },
                                     grid: {
                                         strokeDashArray: 2,
                                     },
-                                    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560'],
+                                    colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0'],
                                     legend: {
                                         show: true,
                                         position: 'bottom',
@@ -99,7 +100,7 @@
                                             horizontal: 8,
                                             vertical: 15
                                         },
-                                        fontSize: '14px' // Increase font size for better readability
+                                        fontSize: '11px' // Increase font size for better readability
                                     },
                                     tooltip: {
                                         fillSeriesColor: false
@@ -145,11 +146,15 @@
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->subscription_capital, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Tabung Anggota</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Deposit Ahli</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->member_deposit, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Tabung Kebajikan</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->welfare_fund, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Simpanan Anggota</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Simpanan Tetap</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->fixed_savings, 2) }}</td>
                                 </tr>
                                 <tr>
@@ -185,10 +190,10 @@
                                     Bayaran Bulanan
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Kadar Faedah
+                                    Tarikh Permahonan
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tarikh Permohonan
+                                    Status
                                 </th>
                             </tr>
                         </thead>
@@ -208,16 +213,28 @@
                                         RM {{number_format($loan->monthly_repayment, 2)}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{$loan->interest_rate}} %
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {{$loan->created_at}}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        @if($loan->status == 'pending')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                                DIPROSES
+                                            </span>
+                                        @elseif($loan->status == 'rejected')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                DITOLAK
+                                            </span>
+                                        @elseif($loan->status == 'approved')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                DILULUSKAN
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                            @empty
                                 <tr>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="6">
-                                        Tiada rekod pinjaman
+                                        TIADA REKOD PINJAMAN
                                     </td>
                                 </tr>
                             @endforelse

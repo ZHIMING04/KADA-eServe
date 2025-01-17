@@ -42,7 +42,7 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
-        Route::delete('/profile', 'destroy')->name('profile.destroy');
+        Route::get('/profile/show', 'show')->name('profile.show');
     });
 
     // Loans and reports

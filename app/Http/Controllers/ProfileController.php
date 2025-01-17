@@ -8,53 +8,62 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use App\Models\WorkingInfo;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+
+    public function show(): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+
+        $workingInfo = WorkingInfo::where('no_anggota', $member->id)->first();
+ 
+        return view('profile.show', compact('member','workingInfo'));
+    }
+
+    public function edit(Request $request): View
+    {   
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+
+        $workingInfo = WorkingInfo::where('no_anggota', $member->id)->first();
+ 
+        return view('profile.edit', compact('member','workingInfo'));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request):RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+        $request->validate([
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'postcode' => 'required|string|max:5',
+            'state' => 'required|string|max:255',
+            'office_address' => 'required|string|max:255',
+            'office_city' => 'required|string|max:255',
+            'office_postcode' => 'required|string|max:5',
+            'office_state' => 'required|string|max:255',
         ]);
 
-        $user = $request->user();
+        DB::table('member_register')->where('guest_id', auth()->id())->update([
+            'address' => $request->address,
+            'city' => $request->city,
+            'postcode' => $request->postcode,
+            'state' => $request->state,
+        
+            'office_address' => $request->office_address,
+            'office_city' => $request->office_city,
+            'office_postcode' => $request->office_postcode,
+            'office_state' => $request->office_state,
+        ]);
 
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return Redirect::route('profile.edit')->with('status', 'Profile updated successfully.');
     }
 }
