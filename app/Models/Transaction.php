@@ -9,18 +9,18 @@ class Transaction extends Model
     protected $fillable = [
         'member_id',
         'type',
+        'amount',
         'savings_type',
-        'loan_id',
-        'amount'
+        'loan_id'
     ];
 
     public function member()
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Member::class, 'member_id', 'id');
     }
 
     public function loan()
     {
-        return $this->belongsTo(Loan::class);
+        return $this->belongsTo(Loan::class, 'loan_id', 'loan_id');
     }
 } 

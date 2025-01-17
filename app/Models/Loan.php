@@ -32,7 +32,7 @@ class Loan extends Model
     // Define relationships
     public function member()
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Member::class, 'member_id', 'id');
     }
 
     public function loanType()
