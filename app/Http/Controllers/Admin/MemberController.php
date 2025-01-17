@@ -88,27 +88,44 @@ class MemberController extends Controller
 
     public function export(Request $request)
     {
-        try {
-            $ids = explode(',', $request->selected_ids);
-            $fields = $request->fields ?? ['no_anggota', 'name', 'email']; // Default fields if none selected
-            
-            $membersData = Member::whereIn('id', $ids)->get();
-            
-            if ($membersData->isEmpty()) {
-                return back()->with('error', 'No members selected for export');
-            }
+        // Field translations
+        $fieldTranslations = [
+            'no_anggota' => 'No. Anggota',
+            'name' => 'Nama',
+            'email' => 'Email',
+            'ic' => 'No. KP',
+            'phone' => 'No. Telefon',
+            'address' => 'Alamat',
+            'city' => 'Bandar',
+            'postcode' => 'Poskod',
+            'state' => 'Negeri'
+        ];
 
-            $pdf = PDF::loadView('admin.exports.members-pdf', [
-                'membersData' => $membersData,
-                'fields' => $fields
-            ])->setPaper('a4', 'landscape');
-
-            return $pdf->download('members-export-' . now()->format('Y-m-d-His') . '.pdf');
-
-        } catch (\Exception $e) {
-            \Log::error('Export Error: ' . $e->getMessage());
-            return back()->with('error', 'Error generating PDF: ' . $e->getMessage());
+        // Get the members data
+        $membersData = Member::query();
+        
+        // If specific IDs are selected
+        if ($request->has('selected_ids')) {
+            $selectedIds = explode(',', $request->selected_ids);
+            $membersData->whereIn('id', $selectedIds);
         }
+
+        // Get selected fields
+        $selectedFields = $request->has('selected_fields') 
+            ? explode(',', $request->selected_fields)
+            : ['no_anggota', 'name', 'email', 'ic', 'phone']; // Default fields
+
+        $membersData = $membersData->get();
+
+        // Generate PDF
+        $pdf = PDF::loadView('admin.exports.members-pdf', [
+            'membersData' => $membersData,
+            'selectedFields' => $selectedFields,
+            'fieldTranslations' => $fieldTranslations
+        ]);
+
+        // Change stream() to download() and provide a filename
+        return $pdf->download('senarai-ahli-' . now()->format('Y-m-d') . '.pdf');
     }
 
     public function destroy($id)

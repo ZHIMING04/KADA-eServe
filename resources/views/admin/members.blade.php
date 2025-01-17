@@ -310,6 +310,77 @@
             </div>
         </div>
     </div>
+
+    <!-- Add this modal structure to blade file -->
+    <div class="modal fade" id="exportFieldsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-lg shadow-xl">
+                <div class="modal-header bg-gray-50 rounded-t-lg">
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Select Fields to Export</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="exportFieldsForm">
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- Personal Information -->
+                            <div>
+                                <h6 class="font-medium text-gray-700 mb-3">Personal Information</h6>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="no_anggota" class="rounded" checked>
+                                        <label class="ml-2">No. Anggota</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="name" class="rounded" checked>
+                                        <label class="ml-2">Name</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="email" class="rounded" checked>
+                                        <label class="ml-2">Email</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="ic" class="rounded">
+                                        <label class="ml-2">IC Number</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="phone" class="rounded">
+                                        <label class="ml-2">Phone</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Address Information -->
+                            <div>
+                                <h6 class="font-medium text-gray-700 mb-3">Address Information</h6>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="address" class="rounded">
+                                        <label class="ml-2">Address</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="city" class="rounded">
+                                        <label class="ml-2">City</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="postcode" class="rounded">
+                                        <label class="ml-2">Postcode</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" name="export_fields[]" value="state" class="rounded">
+                                        <label class="ml-2">State</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 rounded-b-lg">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="exportPDF()">Export PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -338,22 +409,38 @@
                 order: [[1, 'asc']] // Sort by No. Anggota by default
             });
 
-            // Update selected count and button state
-            function updateSelectedState() {
-                const selectedCount = $('.member-checkbox:checked').length;
-                $('#selectedCount').text(selectedCount);
-                $('#executeAction').prop('disabled', selectedCount === 0);
-            }
-
-            // Listen for checkbox changes
-            $('.member-checkbox').on('change', function() {
-                updateSelectedState();
-            });
-
+            // Select All checkbox functionality
             $('#selectAll').on('change', function() {
                 $('.member-checkbox').prop('checked', $(this).prop('checked'));
-                updateSelectedState();
+                updateSelectedCount();
+                updateExecuteButton();
             });
+
+            // Individual checkbox functionality
+            $(document).on('change', '.member-checkbox', function() {
+                // Check if all checkboxes are checked
+                const totalCheckboxes = $('.member-checkbox').length;
+                const checkedCheckboxes = $('.member-checkbox:checked').length;
+                
+                // Update the "Select All" checkbox state
+                $('#selectAll').prop('checked', totalCheckboxes === checkedCheckboxes);
+                $('#selectAll').prop('indeterminate', checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes);
+                
+                updateSelectedCount();
+                updateExecuteButton();
+            });
+
+            // Update selected count display
+            function updateSelectedCount() {
+                const selectedCount = $('.member-checkbox:checked').length;
+                $('#selectedCount').text(selectedCount);
+            }
+
+            // Update execute button state
+            function updateExecuteButton() {
+                const selectedCount = $('.member-checkbox:checked').length;
+                $('#executeAction').prop('disabled', selectedCount === 0);
+            }
         });
 
         let currentMemberId = null;
@@ -472,22 +559,7 @@
                     break;
                     
                 case 'export':
-                    // Create form for PDF export
-                    const form = document.createElement('form');
-                    form.method = 'GET';
-                    form.action = '/admin/members/export';
-                    
-                    // Add selected IDs
-                    const idsInput = document.createElement('input');
-                    idsInput.type = 'hidden';
-                    idsInput.name = 'selected_ids';
-                    idsInput.value = selectedIds.join(',');
-                    form.appendChild(idsInput);
-
-                    // Add to document and submit
-                    document.body.appendChild(form);
-                    form.submit();
-                    document.body.removeChild(form);
+                    showExportModal();
                     break;
                     
                 case 'transaction':
@@ -534,6 +606,47 @@
                 console.error('Error:', error);
                 alert('Ralat: ' + error.message);
             });
+        }
+
+        function showExportModal() {
+            $('#exportFieldsModal').modal('show');
+        }
+
+        function exportPDF() {
+            const selectedIds = $('.member-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            const selectedFields = $('input[name="export_fields[]"]:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            // Create form for PDF export
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = '/admin/members/export';
+            
+            // Add selected IDs
+            const idsInput = document.createElement('input');
+            idsInput.type = 'hidden';
+            idsInput.name = 'selected_ids';
+            idsInput.value = selectedIds.join(',');
+            form.appendChild(idsInput);
+
+            // Add selected fields
+            const fieldsInput = document.createElement('input');
+            fieldsInput.type = 'hidden';
+            fieldsInput.name = 'selected_fields';
+            fieldsInput.value = selectedFields.join(',');
+            form.appendChild(fieldsInput);
+
+            // Add to document and submit
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            // Close the modal
+            $('#exportFieldsModal').modal('hide');
         }
     </script>
 @endpush 
