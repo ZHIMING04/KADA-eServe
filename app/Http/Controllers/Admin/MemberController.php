@@ -292,4 +292,91 @@ class MemberController extends Controller
             ], 422);
         }
     }
+
+    public function batchDelete(Request $request)
+    {
+        try {
+            if (!$request->has('selected_members')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sila pilih ahli terlebih dahulu'
+                ]);
+            }
+
+            $selectedIds = $request->selected_members;
+            
+            // Delete the members
+            Member::whereIn('id', $selectedIds)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ahli berjaya dipadamkan'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Batch Delete Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function batchTransaction(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'member_ids' => 'required|array',
+                'member_ids.*' => 'exists:member_register,id',
+                'type' => 'required|in:savings',
+                'savings_type' => 'required_if:type,savings',
+                'amount' => 'required|numeric|min:0'
+            ]);
+
+            DB::beginTransaction();
+
+            foreach ($validated['member_ids'] as $memberId) {
+                if ($validated['type'] === 'savings') {
+                    $member = Member::findOrFail($memberId);
+                    $savings = Savings::where('no_anggota', $member->id)->firstOrFail();
+                    $savingsType = $validated['savings_type'];
+                    
+                    // Update the specific savings type
+                    $savings->$savingsType += $validated['amount'];
+                    
+                    // Recalculate total
+                    $savings->total_amount = $savings->share_capital + 
+                                           $savings->subscription_capital + 
+                                           $savings->member_deposit + 
+                                           $savings->welfare_fund + 
+                                           $savings->fixed_savings;
+                    
+                    $savings->save();
+
+                    // Create transaction record
+                    $transaction = new Transaction();
+                    $transaction->member_id = $memberId;
+                    $transaction->type = $validated['type'];
+                    $transaction->amount = $validated['amount'];
+                    $transaction->savings_type = $validated['savings_type'];
+                    $transaction->save();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berkumpulan berjaya disimpan'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Batch Transaction Error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat: ' . $e->getMessage()
+            ], 422);
+        }
+    }
 } 

@@ -127,6 +127,27 @@
             </div>
         </div>
 
+        <!-- Batch Actions Bar -->
+        <div class="mb-4 bg-white p-4 rounded-lg shadow-sm flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <select id="batchAction" class="form-select rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+                        <option value="">Pilih Tindakan</option>
+                        <option value="delete">Padam</option>
+                        <option value="export">Export PDF</option>
+                        <option value="transaction">Tambah Transaksi</option>
+                    </select>
+                </div>
+                <button onclick="executeBatchAction()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50" id="executeAction" disabled>
+                    Laksana
+                </button>
+            </div>
+            
+            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                <span id="selectedCount">0</span> ahli dipilih
+            </div>
+        </div>
+
         <!-- Table Container -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6">
             <div class="mb-4 flex items-center">
@@ -152,7 +173,12 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($members as $member)
                         <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
-                            <td><input type="checkbox" name="selected_members[]" value="{{ $member->id }}" class="member-checkbox rounded"></td>
+                            <td>
+                                <input type="checkbox" 
+                                       name="selected_members[]" 
+                                       value="{{ $member->id }}" 
+                                       class="member-checkbox rounded">
+                            </td>
                             <td>{{ $member->no_anggota }}</td>
                             <td>{{ $member->name }}</td>
                             <td>{{ $member->email }}</td>
@@ -241,6 +267,49 @@
             </div>
         </div>
     </div>
+
+    <!-- Batch Transaction Modal -->
+    <div class="modal fade" id="batchTransactionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-lg shadow-xl">
+                <div class="modal-header bg-gray-50 rounded-t-lg">
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Tambah Transaksi Berkumpulan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="batchTransactionForm">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Transaksi</label>
+                            <select class="form-select w-full rounded-md shadow-sm" id="batchTransactionType" name="type" required>
+                                <option value="savings">Simpanan</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4" id="batchSavingsTypeDiv">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Simpanan</label>
+                            <select class="form-select w-full rounded-md shadow-sm" name="savings_type">
+                                <option value="share_capital">Modal Syer</option>
+                                <option value="subscription_capital">Modal Yuran</option>
+                                <option value="member_deposit">Deposit Ahli</option>
+                                <option value="welfare_fund">Tabung Kebajikan</option>
+                                <option value="fixed_savings">Simpanan Tetap</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jumlah (RM)</label>
+                            <input type="number" class="form-input w-full rounded-md shadow-sm" name="amount" step="0.01" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 rounded-b-lg">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submitBatchTransaction()">Hantar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -269,15 +338,21 @@
                 order: [[1, 'asc']] // Sort by No. Anggota by default
             });
 
-            // Select All functionality
-            $('#selectAll').on('change', function() {
-                $('.member-checkbox').prop('checked', $(this).prop('checked'));
+            // Update selected count and button state
+            function updateSelectedState() {
+                const selectedCount = $('.member-checkbox:checked').length;
+                $('#selectedCount').text(selectedCount);
+                $('#executeAction').prop('disabled', selectedCount === 0);
+            }
+
+            // Listen for checkbox changes
+            $('.member-checkbox').on('change', function() {
+                updateSelectedState();
             });
 
-            // Update Select All checkbox state based on individual checkboxes
-            $('.member-checkbox').on('change', function() {
-                var allChecked = $('.member-checkbox:checked').length === $('.member-checkbox').length;
-                $('#selectAll').prop('checked', allChecked);
+            $('#selectAll').on('change', function() {
+                $('.member-checkbox').prop('checked', $(this).prop('checked'));
+                updateSelectedState();
             });
         });
 
@@ -351,6 +426,105 @@
                 if (data.success) {
                     alert('Transaksi berjaya!');
                     $('#transactionModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Transaksi gagal');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ralat: ' + error.message);
+            });
+        }
+
+        function executeBatchAction() {
+            const selectedIds = $('.member-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            const action = $('#batchAction').val();
+
+            switch(action) {
+                case 'delete':
+                    if (!confirm('Adakah anda pasti untuk memadam ahli yang dipilih?')) {
+                        return;
+                    }
+
+                    // Submit delete request
+                    fetch('/admin/members/batch-delete', {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            selected_members: selectedIds
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Ralat semasa memproses permintaan');
+                        }
+                    });
+                    break;
+                    
+                case 'export':
+                    // Create form for PDF export
+                    const form = document.createElement('form');
+                    form.method = 'GET';
+                    form.action = '/admin/members/export';
+                    
+                    // Add selected IDs
+                    const idsInput = document.createElement('input');
+                    idsInput.type = 'hidden';
+                    idsInput.name = 'selected_ids';
+                    idsInput.value = selectedIds.join(',');
+                    form.appendChild(idsInput);
+
+                    // Add to document and submit
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                    break;
+                    
+                case 'transaction':
+                    $('#batchTransactionModal').modal('show');
+                    break;
+            }
+        }
+
+        function submitBatchTransaction() {
+            const selectedIds = $('.member-checkbox:checked').map(function() {
+                return $(this).val();
+            }).get();
+
+            const form = $('#batchTransactionForm');
+            const formData = new FormData(form[0]);
+
+            const data = {
+                member_ids: selectedIds,
+                type: formData.get('type'),
+                savings_type: formData.get('savings_type'),
+                amount: formData.get('amount')
+            };
+
+            fetch('/admin/members/batch-transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Transaksi berjaya disimpan!');
+                    $('#batchTransactionModal').modal('hide');
                     location.reload();
                 } else {
                     alert(data.message || 'Transaksi gagal');
