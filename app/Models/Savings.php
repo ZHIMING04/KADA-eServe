@@ -10,13 +10,13 @@ class Savings extends Model
     
     protected $fillable = [
         'entrance_fee',
+        'no_anggota',
         'share_capital',
         'subscription_capital',
         'member_deposit',
         'welfare_fund',
         'fixed_savings',
-        'total_amount',
-        'no_anggota'
+        'total_amount'
     ];
 
     public function member()

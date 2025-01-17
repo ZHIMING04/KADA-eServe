@@ -9,10 +9,12 @@ use App\Models\User;
 use App\Models\WorkingInfo;
 use App\Models\Savings;
 use App\Models\Family;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Models\Loan;
+use Illuminate\Support\Facades\Hash;
 
 class MemberController extends Controller
 {
@@ -161,35 +163,43 @@ class MemberController extends Controller
     public function approve($id)
     {
         try {
-            DB::transaction(function () use ($id) {
-                // Find the member
-                $member = Member::findOrFail($id);
-                
-                // Update member status
-                $member->update([
-                    'status' => 'approved'
-                ]);
+            DB::beginTransaction();
+            
+            // Find the member registration
+            $member = Member::findOrFail($id);
+            
+            // Check if member is already approved
+            if ($member->status === 'approved') {
+                throw new \Exception('Member is already approved.');
+            }
 
-                // Find associated user
-                $user = User::where('email', $member->email)->first();
-                
-                if ($user) {
-                    // Remove guest role
-                    Bouncer::retract('guest')->from($user);
-                    
-                    // Assign member role
-                    Bouncer::assign('member')->to($user);
-                    
-                    // Refresh bouncer cache
-                    Bouncer::refresh();
-                }
-            });
+            // Get the user from guest_id
+            $user = User::findOrFail($member->guest_id);
 
-            return redirect()->route('admin.registrations.pending')
-                ->with('success', 'Pendaftaran telah diluluskan dan pengguna telah dinaikkan pangkat ke ahli.');
+            // Remove guest role first
+            Bouncer::retract('guest')->from($user);
+
+            // Assign member role if not already assigned
+            if (!$user->isA('member')) {
+                Bouncer::assign('member')->to($user);
+            }
+
+            // Update member status
+            $member->update(['status' => 'approved']);
+
+            DB::commit();
+
+            // Redirect to members list with success message
+            return redirect()->route('admin.members.index')
+                            ->with('success', 'Ahli berjaya diluluskan');
+
         } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Member approval error: ' . $e->getMessage());
+            
+            // Redirect back with error message
             return redirect()->back()
-                ->with('error', 'Ralat semasa meluluskan pendaftaran: ' . $e->getMessage());
+                            ->with('error', 'Ralat: ' . $e->getMessage());
         }
     }
 
@@ -218,7 +228,7 @@ class MemberController extends Controller
     {
         $loans = Loan::where('member_id', $memberId)
             ->where('loan_amount', '>', 0)
-            ->get(['id', 'loan_id', 'loan_type', 'loan_amount']);
+            ->get(['loan_id', 'loan_type_id', 'loan_amount']);
         
         return response()->json($loans);
     }
@@ -229,43 +239,41 @@ class MemberController extends Controller
             $validated = $request->validate([
                 'type' => 'required|in:savings,loan',
                 'savings_type' => 'required_if:type,savings',
-                'loan_id' => 'required_if:type,loan|exists:loans,id',
+                'loan_id' => 'required_if:type,loan|exists:loans,loan_id',
                 'amount' => 'required|numeric|min:0'
             ]);
 
             DB::beginTransaction();
 
-            // Create transaction record
-            $transaction = Transaction::create([
-                'member_id' => $memberId,
-                'type' => $validated['type'],
-                'savings_type' => $validated['type'] === 'savings' ? $validated['savings_type'] : null,
-                'loan_id' => $validated['type'] === 'loan' ? $validated['loan_id'] : null,
-                'amount' => $validated['amount']
-            ]);
-
-            // Update the appropriate record based on transaction type
             if ($validated['type'] === 'savings') {
-                $savings = Savings::where('member_id', $memberId)->first();
-                
-                if (!$savings) {
-                    throw new \Exception('Rekod simpanan tidak dijumpai');
-                }
-
+                $savings = Savings::where('no_anggota', $memberId)->firstOrFail();
                 $savingsType = $validated['savings_type'];
-                $savings->$savingsType += $validated['amount'];
-                $savings->save();
-
-            } else {
-                $loan = Loan::find($validated['loan_id']);
                 
-                if (!$loan) {
-                    throw new \Exception('Rekod pembiayaan tidak dijumpai');
-                }
-
+                // Update the specific savings type
+                $savings->$savingsType += $validated['amount'];
+                
+                // Recalculate total
+                $savings->total_amount = $savings->share_capital + 
+                                       $savings->subscription_capital + 
+                                       $savings->member_deposit + 
+                                       $savings->welfare_fund + 
+                                       $savings->fixed_savings;
+                
+                $savings->save();
+            } else {
+                $loan = Loan::where('loan_id', $validated['loan_id'])->firstOrFail();
                 $loan->loan_amount -= $validated['amount'];
                 $loan->save();
             }
+
+            // Create transaction record
+            $transaction = new Transaction();
+            $transaction->member_id = $memberId;
+            $transaction->type = $validated['type'];
+            $transaction->amount = $validated['amount'];
+            $transaction->savings_type = $validated['type'] === 'savings' ? $validated['savings_type'] : null;
+            $transaction->loan_id = $validated['type'] === 'loan' ? $validated['loan_id'] : null;
+            $transaction->save();
 
             DB::commit();
 

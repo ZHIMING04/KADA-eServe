@@ -298,13 +298,17 @@
                     const loanSelect = $('select[name="loan_id"]');
                     loanSelect.empty();
                     loans.forEach(loan => {
-                        loanSelect.append(`<option value="${loan.id}">Loan #${loan.loan_id} (RM${loan.loan_amount})</option>`);
+                        loanSelect.append(`<option value="${loan.loan_id}">Loan #${loan.loan_id} (RM${loan.loan_amount})</option>`);
                     });
+                })
+                .catch(error => {
+                    console.error('Error fetching loans:', error);
                 });
         }
 
         $('#transactionType').change(function() {
-            if (this.value === 'savings') {
+            const type = $(this).val();
+            if (type === 'savings') {
                 $('#savingsTypeDiv').show();
                 $('#loanDiv').hide();
             } else {
@@ -320,11 +324,18 @@
             const form = $('#transactionForm');
             const formData = new FormData(form[0]);
 
-            // Convert FormData to JSON
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+            // Create data object with the correct type
+            const data = {
+                type: $('#transactionType').val(), // Get the selected type
+                amount: formData.get('amount')
+            };
+
+            // Add appropriate fields based on transaction type
+            if (data.type === 'savings') {
+                data.savings_type = formData.get('savings_type');
+            } else if (data.type === 'loan') {
+                data.loan_id = formData.get('loan_id');
+            }
 
             fetch(`/admin/members/${currentMemberId}/transaction`, {
                 method: 'POST',
@@ -335,12 +346,7 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     alert('Transaksi berjaya!');
@@ -352,7 +358,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Ralat: Transaksi gagal');
+                alert('Ralat: ' + error.message);
             });
         }
     </script>
