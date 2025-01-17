@@ -111,4 +111,7 @@ Route::middleware(['auth', 'can:approve-member-registration'])->group(function (
         ->name('admin.registrations.reject');
 });
 
+Route::post('/admin/members/batch-transaction', [AdminMemberController::class, 'batchTransaction'])
+    ->name('admin.members.batch-transaction');
+
 
