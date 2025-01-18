@@ -50,6 +50,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('guest.dashboard');
+        return redirect()->route('verification.notice');
     }
 }
