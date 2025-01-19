@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define roles
+        // Define admin abilities
+        Bouncer::allow('admin')->to('access-admin');
+        Bouncer::allow('admin')->to('manage-annual-reports');
+        Bouncer::allow('admin')->to('view-admin-dashboard');
     }
 }

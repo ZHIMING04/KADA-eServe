@@ -71,6 +71,9 @@
                                 <x-dropdown-link :href="route('profile.edit')">
                                     {{ __('Profile') }}
                                 </x-dropdown-link>
+                                <x-nav-link :href="route('annual.report')" :active="request()->routeIs('annual.report')">
+                                    {{ __('Annual Report') }}
+                                </x-nav-link>
                                 <x-dropdown-link :href="route('loan.create')">
                                     {{ __('Loan Application') }}
                                 </x-dropdown-link>

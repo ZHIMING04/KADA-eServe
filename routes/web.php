@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
+use App\Http\Controllers\AnnualReportController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
@@ -17,12 +18,17 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+//Anual Report
+Route::get('/annual_report', [AnnualReportController::class, 'index'])->name('annual.report');
+
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth'])->group(function () {
     Route::get('/guest/dashboard', function () {
         return view('guest.dashboard');
     })->name('guest.dashboard');
 
+    
+    
     Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
     Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
     Route::get('/guest/success', function () {
@@ -109,6 +115,25 @@ Route::middleware(['auth', 'can:approve-member-registration'])->group(function (
         ->name('admin.registrations.approve');
     Route::post('/admin/registrations/{id}/reject', [AdminMemberController::class, 'reject'])
         ->name('admin.registrations.reject');
+
+        Route::resource('admin/annual-reports', Admin\AnnualReportController::class)
+        ->except(['show'])
+        ->names('admin.annual-reports');
 });
+
+Route::get('/annual-report', [AnnualReportController::class, 'index'])->name('annual.report.annaual');
+Route::get('/annual-report/list', [AnnualReportController::class, 'getFiles'])->name('annual.report.list');
+
+// Public routes (anyone can view)
+Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports.index');
+
+// Admin routes (only admin can manage)
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'can:access-admin']], function () {
+    Route::resource('annual-reports', Admin\AnnualReportController::class)
+        ->except(['show'])
+        ->names('admin.annual-reports')
+        ->middleware('can:manage-annual-reports');
+});
+
 
 
