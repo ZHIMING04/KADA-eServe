@@ -46,7 +46,7 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 
     // Profile routes
     Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
     });
