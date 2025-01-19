@@ -35,6 +35,8 @@
         }
     </style>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <!-- Members Details -->
@@ -58,7 +60,7 @@
             <div class="flex flex-wrap -mx-2">
                 <div class="w-full md:w-1/2 px-2">
                     <div class="info-card">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">MAKLUMAT SAHAM AHLI</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"><i class="fas fa-hand-holding-usd"></i> MAKLUMAT SAHAM AHLI</h3>
                         <div id="chart-demo-pie"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
@@ -81,10 +83,10 @@
                                         {{$saving->share_capital}},
                                         {{$saving->subscription_capital}},
                                         {{$saving->member_deposit}},
-                                        {{$saving->fixed_savings}},
                                         {{$saving->welfare_fund}},
+                                        {{$saving->fixed_savings}},
                                     ],
-                                    labels: ["Modal Syer", "Modal Yuran", "Deposit Ahli","Tabung Kebajikan", "Simpanan Tetap"],
+                                    labels: ["Modal Syer", "Modal Yuran", "Simpanan Anggota","Tabung Anggota", "Simpanan Tetap"],
                                     tooltip: {
                                         theme: 'dark'
                                     },
@@ -151,11 +153,11 @@
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->subscription_capital, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Deposit Ahli</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Simpanan Anggota</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->member_deposit, 2) }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Tabung Kebajikan</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">Tabung Anggota</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{{ number_format($saving->welfare_fund, 2) }}</td>
                                 </tr>
                                 <tr>
@@ -178,7 +180,7 @@
             <!-- Loan Details -->
             <div class="p-2 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-7xl mx-auto">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">MAKLUMAT PINJAMAN</h3>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"><i class="fas fa-coins"></i> MAKLUMAT PINJAMAN YANG DILULUSKAN</h3>
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
                             <tr>
@@ -229,21 +231,6 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {{$loan->created_at}}
                                     </td>
-                                    <!-- <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        @if($loan->status == 'pending')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
-                                                DIPROSES
-                                            </span>
-                                        @elseif($loan->status == 'rejected')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                DITOLAK
-                                            </span>
-                                        @elseif($loan->status == 'approved')
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                DILULUSKAN
-                                            </span>
-                                        @endif
-                                    </td> -->
                                 </tr>
                            @empty
                                 <tr>

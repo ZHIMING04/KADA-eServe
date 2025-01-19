@@ -8,7 +8,11 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
+use App\Http\Controllers\LoanStatusController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+use Illuminate\Support\Facades\Log;
 
 require __DIR__.'/auth.php';
 
@@ -44,6 +48,21 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
     });
+
+    Route::get('/send-test-email', function () {
+        try {
+            Mail::to('poh.yee@graduate.utm.my')->send(new TestMail());
+            Log::info('Test email sent to poh.yee@graduate.utm.my');
+            return 'Test email sent!';
+        } catch (\Exception $e) {
+            Log::error('Failed to send test email: ' . $e->getMessage());
+            return 'Failed to send test email.';
+        }
+    });
+
+    //Loan Status
+    Route::get('/status', [LoanStatusController::class, 'display'])->name('loan.display');
+    Route::get('/status/{id}', [LoanStatusController::class, 'show'])->name('loan.show');
 
     // Loans and reports
     

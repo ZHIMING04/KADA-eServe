@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // Import the Auth facade
-use App\Models\IndividualReport;
 use App\Models\Member;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
