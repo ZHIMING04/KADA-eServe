@@ -8,6 +8,7 @@ use App\Models\IndividualReport;
 use App\Models\Member;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class IndividualReportController extends Controller
@@ -36,6 +37,28 @@ class IndividualReportController extends Controller
         return $saving->share_capital + $saving->subscription_capital + $saving->welfare_fund + $saving->fixed_savings+$saving->member_deposit;
     }
   
+
+    public function export(Request $request){
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+ 
+        $loans = DB::table('loans')->where('member_id',$member->id)->get();
+
+        $loans = $loans->map(function ($loan) {
+            $loan->loan_type = DB::table('loan_types')->where('loan_type_id', $loan->loan_type_id)->first();
+            return $loan;
+        });
+
+        $saving = DB::table('savings')->where('no_anggota',$member->id)->first();
+
+        $totalSavings=$this->calculateTotalSaving($saving);
+
+        // Generate PDF
+        $pdf = PDF::loadView('individualReport.exportpdf',compact('member','loans','saving','totalSavings'));
+
+        // Download PDF file
+        return $pdf->download('Laporan-Individu-'.$member->no_anggota.'.pdf');
+
+    }
 
 }
 

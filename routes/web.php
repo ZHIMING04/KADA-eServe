@@ -55,6 +55,8 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
+    Route::get('/report/export', [IndividualReportController::class, 'export'])->name('report.export');
+
     
 
     // Loan Routes

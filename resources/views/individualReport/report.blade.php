@@ -1,8 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Laporan Individu') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Laporan Individu') }}</h2>
+            <form method="get" action="{{ route('report.export') }}">
+            @csrf
+            <x-primary-button type="submit">{{ __('Muat Turun Laporan Anda') }}</x-primary-button>
+            </form>
+        </div>
     </x-slot>
 
     <style>
@@ -46,6 +50,7 @@
                     <div class="w-full md:w-1/3 mb-2">
                         <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No Ahli:</strong> {{$member->no_anggota}}</p>
                     </div>
+    
                 </div>
             </div>
 
@@ -190,15 +195,21 @@
                                     Bayaran Bulanan
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tarikh Permahonan
+                                    Kadar
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Status
+                                    Tarikh Pinjaman
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                           @forelse($loans as $loan)
+                            @php
+                                $approvedLoans = $loans->filter(function ($loan) {
+                                return $loan->status == 'approved';
+                                });
+                            @endphp
+
+                            @forelse($approvedLoans as $loan)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                        {{$loan->loan_id}}
@@ -213,9 +224,12 @@
                                         RM {{number_format($loan->monthly_repayment, 2)}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                        {{$loan->interest_rate}}%
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {{$loan->created_at}}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <!-- <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         @if($loan->status == 'pending')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
                                                 DIPROSES
@@ -229,7 +243,7 @@
                                                 DILULUSKAN
                                             </span>
                                         @endif
-                                    </td>
+                                    </td> -->
                                 </tr>
                            @empty
                                 <tr>
