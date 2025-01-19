@@ -83,7 +83,7 @@
             <h1>Daftar Akaun</h1>
             <p>Sila isi maklumat di bawah untuk membuat akaun baharu.</p>
         </div>
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
             <input type="text" name="name" placeholder="Nama Penuh" class="input-field" value="{{ old('name') }}" required>
             @error('name')

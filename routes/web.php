@@ -9,6 +9,12 @@ use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 require __DIR__.'/auth.php';
 
@@ -113,5 +119,40 @@ Route::middleware(['auth', 'can:approve-member-registration'])->group(function (
 
 Route::post('/admin/members/batch-transaction', [AdminMemberController::class, 'batchTransaction'])
     ->name('admin.members.batch-transaction');
+
+    Route::post('send-mail', function (Request $request) {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $details = [
+            'title' => 'Success',
+            'content' => 'This is an email testing using Laravel-Brevo',
+        ];
+    
+        return back()->with('success', 'Email sent at ' . now());
+    })->name('send.mail');
+
+
+// Add this route with auth and verified middleware
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware(['auth'])->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+ 
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+ 
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/profile', function () {
+    // Only verified users may access this route...
+})->middleware(['auth', 'verified']);
 
 
