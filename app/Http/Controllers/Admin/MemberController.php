@@ -21,21 +21,28 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::select([
-            'id',
-            'no_anggota',
-            'name',
-            'email',
-            'ic',
-            'phone'
-        ])
-        ->orderBy('no_anggota')
-        ->get();
+        // Get approved members with specific attributes
+        $members = Member::where('status', 'approved')
+            ->select([
+                'id',
+                'no_anggota',
+                'name',
+                'ic',
+                'phone',
+                'email',
+                'address',
+                'city',
+                'postcode',
+                'state',
+                'status',
+                'created_at'
+            ])
+            ->get();
 
-        // Get current dividend rate from settings
-        $currentDividendRate = Setting::where('key', 'dividend_rate')->first()->value ?? 5.00;
-
-        return view('admin.members', compact('members', 'currentDividendRate'));
+        return view('admin.members', [
+            'members' => $members,
+            'currentDividendRate' => Setting::where('key', 'dividend_rate')->value('value') ?? 0
+        ]);
     }
 
     public function show($id)
