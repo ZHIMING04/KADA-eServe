@@ -13,6 +13,11 @@ use App\Http\Controllers\MemberStatusController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Providers\RouteServiceProvider;
 
 
 require __DIR__.'/auth.php';
