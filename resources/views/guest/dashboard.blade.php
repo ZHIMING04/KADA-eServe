@@ -18,6 +18,7 @@
             --deep-blue: #004d99;
             --light-green: #e8f5e9;
             --text-gray: #666;
+            --accent-red: #e74c3c;
         }
 
         body {
@@ -311,6 +312,34 @@
                 padding: 80px 0;
             }
         }
+
+        .welcome-text {
+            color: #d35400; /* Same as member dashboard */
+            font-weight: 800;
+        }
+
+        .membership-text {
+            color: var(--deep-blue);
+        }
+
+        .apply-now-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #e67e22; /* Warm orange */
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .apply-now-btn:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -322,9 +351,12 @@
         
         <div class="container">
             <div class="hero-content text-center animate-fadeInUp">
-                <h1 class="main-title">Nikmati Faedah<br>Keahlian KADA!</h1>
+                <h1 class="main-title">
+                    <span class="welcome-text">Nikmati Faedah</span><br>
+                    <span class="membership-text">Keahlian KADA!</span>
+                </h1>
                 <p class="hero-description mx-auto">Platform digital untuk meningkatkan kemajuan sektor pertanian di Kemubu.</p>
-                <a href="http://kada-eserve.test/guest/register" class="btn btn-custom animate-fadeInUp delay-1">Sertai KADA</a>
+                <a href="http://kada-eserve.test/guest/register" class="btn apply-now-btn animate-fadeInUp delay-1">Sertai KADA</a>
             </div>
         </div>
     </section>
