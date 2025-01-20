@@ -574,6 +574,80 @@
     }
 </script>
 
+<style>
+    :root {
+        --primary-blue: #0066cc;
+        --secondary-blue: #4d94ff;
+        --light-blue: #e6f2ff;
+        --accent-blue: #00a3ff;
+        --deep-blue: #004d99;
+        --text-gray: #666;
+    }
+
+    .py-12 {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
+    }
+
+    .bg-white {
+        background: white;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 102, 204, 0.1);
+    }
+
+    .btn {
+        padding: 12px 30px;
+        font-weight: 600;
+        color: white;
+        background: linear-gradient(45deg, var(--primary-blue), var(--accent-blue));
+        border: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+        background: linear-gradient(45deg, var(--accent-blue), var(--primary-blue));
+    }
+
+    /* Step indicators styling */
+    .rounded-full {
+        background: var(--light-blue);
+        border: 2px solid var(--primary-blue);
+    }
+
+    .bg-primary {
+        background: var(--primary-blue) !important;
+    }
+
+    .text-primary {
+        color: var(--primary-blue) !important;
+    }
+
+    /* Form inputs styling */
+    input, select, textarea {
+        border-color: var(--secondary-blue) !important;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary-blue) !important;
+        box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1) !important;
+    }
+
+    /* Feature box styling */
+    .bg-gray-50 {
+        background: white;
+        border: 1px solid rgba(0, 102, 204, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .bg-gray-50:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 102, 204, 0.1);
+    }
+</style>
+
 
 
 

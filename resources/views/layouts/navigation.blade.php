@@ -67,22 +67,13 @@
                     <x-slot name="content">
                         @auth
                             @if(auth()->user()->isA('guest'))
-                                <x-dropdown-link :href="route('guest.register')">
-                                    {{ __('Permohonan Ahli') }}
-                                </x-dropdown-link>
                                 
                             @elseif(auth()->user()->isA('member'))
                                 <x-dropdown-link :href="route('profile.edit')">
                                     {{ __('Profil') }}
                                 </x-dropdown-link>
-                                <x-dropdown-link :href="route('loan.create')">
-                                    {{ __('Permohonan Pinjaman') }}
-                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('loan.display')">
                                     {{ __('Loan Status') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('report.display')">
-                                    {{ __('Laporan Individu') }}
                                 </x-dropdown-link>
                             @endif
                             
