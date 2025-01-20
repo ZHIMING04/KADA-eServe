@@ -74,6 +74,9 @@
                                 <x-dropdown-link :href="route('loan.create')">
                                     {{ __('Permohonan Pinjaman') }}
                                 </x-dropdown-link>
+                                <x-dropdown-link :href="route('loan.display')">
+                                    {{ __('Loan Status') }}
+                                </x-dropdown-link>
                                 <x-dropdown-link :href="route('report.display')">
                                     {{ __('Laporan Individu') }}
                                 </x-dropdown-link>
