@@ -8,182 +8,377 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-green: #20B2AA;
+            --secondary-green: #27ae60;
+            --primary-blue: #0066cc;
+            --secondary-blue: #4d94ff;
+            --light-blue: #e6f2ff;
+            --accent-blue: #00a3ff;
+            --deep-blue: #004d99;
+            --light-green: #e8f5e9;
+            --text-gray: #666;
+        }
+
         body {
             font-family: Arial, sans-serif;
         }
-        .feature-icon {
-            background-color: #007BFF;
-            color: white;
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .floating-shape {
+            position: absolute;
             border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            background: var(--primary-green);
+            top: 10%;
+            left: 5%;
+        }
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            background: var(--primary-blue);
+            bottom: 10%;
+            right: 5%;
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .category-icon i {
+            color: var(--primary-green) !important;
+        }
+
+        .category-card:hover .category-icon {
+            background: var(--primary-green);
+        }
+
+        .category-card:hover .category-icon i {
+            color: white !important;
+        }
+
+        .category-card {
+            text-align: center;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .promo-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .btn-custom {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-blue));
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+            background: linear-gradient(45deg, var(--accent-blue), var(--primary-blue));
+            color: white;
+        }
+
+        .main-title:hover {
+            /* No effects on hover */
+        }
+
+        .description-text {
+            color: #444;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .icon-circle {
             width: 70px;
             height: 70px;
+            background: var(--light-blue);
+            border-radius: 20px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin: 0 auto;
+            justify-content: center;
+            margin-bottom: 1.5rem;
             transition: all 0.3s ease;
         }
-        .feature-section {
-            padding: 60px 0;
-            background-color: #f9f9f9;
-        }
-        .feature-section h2 {
-            color: #007BFF;
-        }
-        .feature-card {
-            text-align: center;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin: 15px;
+        
+        .feature-box {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
             transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 204, 0.1);
         }
-        .feature-card:hover {
+        
+        .feature-box:hover {
             transform: translateY(-10px);
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 102, 204, 0.1);
+            border-color: var(--secondary-blue);
         }
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1);
-            background-color: #0056b3;
-        }
-        .feature-card:hover h4 {
-            color: #007BFF;
+        
+        .feature-box:hover .icon-circle {
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-blue));
         }
 
+        .feature-box:hover .icon-circle i {
+            color: white !important;
+        }
 
-        .display-4:hover {
-            background-size: 300% auto;
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientText 8s ease infinite;
+        .icon-circle i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
             transition: all 0.3s ease;
         }
 
-        @keyframes gradientText {
-            0% {
-                background-image: linear-gradient(45deg, 
-                    #007BFF 0%, 
-                    #00BCD4 50%, 
-                    #007BFF 100%
-                );
-            }
-            20% {
-                background-image: linear-gradient(45deg,
-                    #00BCD4 0%,
-                    #28a745 50%,
-                    #00BCD4 100%
-                );
-            }
-            40% {
-                background-image: linear-gradient(45deg,
-                    #28a745 0%,
-                    #9C27B0 50%,
-                    #28a745 100%
-                );
-            }
-            60% {
-                background-image: linear-gradient(45deg,
-                    #9C27B0 0%,
-                    #FF5722 50%,
-                    #9C27B0 100%
-                );
-            }
-            80% {
-                background-image: linear-gradient(45deg,
-                    #FF5722 0%,
-                    #007BFF 50%,
-                    #FF5722 100%
-                );
-            }
-            100% {
-                background-image: linear-gradient(45deg,
-                    #007BFF 0%,
-                    #00BCD4 50%,
-                    #007BFF 100%
-                );
-            }
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin-bottom: 1rem;
         }
 
-        @keyframes smoothUnderlineColorChange {
-            0%, 100% { background-color: #007BFF; }
-            20% { background-color: #00BCD4; }
-            40% { background-color: #28a745; }
-            60% { background-color: #9C27B0; }
-            80% { background-color: #FF5722; }
+        .feature-text {
+            color: var(--text-gray);
+            line-height: 1.6;
         }
 
-        .display-4:hover::after {
-            content: '';
+        .features-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f9fa, var(--light-blue));
+        }
+
+        .vertical-separator {
+            width: 3px;
+            height: 300px;  /* Adjust height as needed */
+            background: grey;
             position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 4px;
-            border-radius: 2px;
-            animation: smoothUnderlineColorChange 8s ease infinite;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 3px;
+        }
+
+        .kategori-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .right-section {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-fadeInRight {
+            animation: fadeInRight 0.8s ease-out forwards;
+        }
+
+        .animate-scaleIn {
+            animation: scaleIn 0.8s ease-out forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+
+        .feature-box:nth-child(1) { border-top: 3px solid var(--primary-blue); }
+        .feature-box:nth-child(2) { border-top: 3px solid var(--secondary-blue); }
+        .feature-box:nth-child(3) { border-top: 3px solid var(--accent-blue); }
+        .feature-box:nth-child(4) { border-top: 3px solid var(--deep-blue); }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section {
+                padding: 80px 0;
+            }
         }
     </style>
 </head>
 <body>
 
 <x-app-layout>
-    
-
-    <section class="feature-section text-center" style="padding:60px 0; background-color: #f9f9f9;">
-        <div class="text-center py-5"">
-            <div class="container">
-                <h2 class="display-4 fw-bold text-primary mb-4" style="position: relative; display: inline-block;">
-                    Nikmati Faedah Keahlian Kada!
-                </h2>
+    <section class="hero-section">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        
+        <div class="container">
+            <div class="hero-content text-center animate-fadeInUp">
+                <h1 class="main-title">Nikmati Faedah<br>Keahlian KADA!</h1>
+                <p class="hero-description mx-auto">Platform digital untuk meningkatkan kemajuan sektor pertanian di Kemubu.</p>
+                <a href="http://kada-eserve.test/guest/register" class="btn btn-custom animate-fadeInUp delay-1">Sertai KADA</a>
             </div>
         </div>
+    </section>
+
+    <section class="features-section">
         <div class="container">
-            <h2 style="color: #007BFF;">Ciri-Ciri Utama</h2>
-            <p>Platform digital untuk meningkatkan kemajuan sektor pertanian di Kemubu.</p>
-            <div class="row mt-5">
-                <div class="col-md-3">
-                    <div class="feature-card" style="text-align: center; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin: 15px;">
-                        <div class="feature-icon" style="background-color: #007BFF; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
+            <div class="text-center mb-5">
+                <h2 class="section-title animate-scaleIn">Mengapa Pilih Kami?</h2>
+                <p class="section-subtitle animate-scaleIn delay-1">Kami menawarkan pelbagai perkhidmatan dan faedah untuk membantu anda mencapai kejayaan</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6 animate-fadeInRight delay-1">
+                    <div class="feature-box">
+                        <div class="icon-circle">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <h3 class="feature-title">Bantuan Kewangan</h3>
+                        <p class="feature-text">Pinjaman dengan kadar faedah rendah dan tempoh pembayaran yang fleksibel untuk membantu pembangunan pertanian anda.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 animate-fadeInRight delay-2">
+                    <div class="feature-box">
+                        <div class="icon-circle">
                             <i class="fas fa-seedling"></i>
                         </div>
-                        <h4 class="mt-3">Mudah Digunakan</h4>
-                        <p>Sistem yang mesra pengguna untuk memudahkan akses dan penggunaan.</p>
+                        <h3 class="feature-title">Sokongan Teknikal</h3>
+                        <p class="feature-text">Khidmat nasihat dan bantuan teknikal dari pakar pertanian untuk meningkatkan hasil tanaman.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="feature-card" style="text-align: center; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin: 15px;">
-                        <div class="feature-icon" style="background-color: #007BFF; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-                            <i class="fas fa-chart-line"></i>
+
+                <div class="col-lg-6 animate-fadeInRight delay-2">
+                    <div class="feature-box">
+                        <div class="icon-circle">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <h4 class="mt-3">Reka Bentuk Moden</h4>
-                        <p>Antara muka yang moden dan responsif untuk pengalaman terbaik.</p>
+                        <h3 class="feature-title">Komuniti Aktif</h3>
+                        <p class="feature-text">Rangkaian petani yang saling membantu dan berkongsi pengalaman untuk kemajuan bersama.</p>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="feature-card" style="text-align: center; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin: 15px;">
-                        <div class="feature-icon" style="background-color: #007BFF; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-                            <i class="fas fa-tools"></i>
+
+                <div class="col-lg-6 animate-fadeInRight delay-3">
+                    <div class="feature-box">
+                        <div class="icon-circle">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
-                        <h4 class="mt-3">Boleh Diubahsuai</h4>
-                        <p>Mudah untuk menyesuaikan sistem mengikut keperluan organisasi.</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="feature-card" style="text-align: center; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); margin: 15px;">
-                        <div class="feature-icon" style="background-color: #007BFF; color: white; border-radius: 50%; width: 70px; height: 70px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <h4 class="mt-3">Sokongan 24/7</h4>
-                        <p>Bantuan teknikal sepanjang masa untuk memastikan kelancaran sistem.</p>
+                        <h3 class="feature-title">Program Latihan</h3>
+                        <p class="feature-text">Latihan berkala untuk meningkatkan kemahiran dan pengetahuan dalam bidang pertanian moden.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
 </x-app-layout>
     <footer class="bg-dark text-light py-3">
         <div class="container">
