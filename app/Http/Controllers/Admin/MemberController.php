@@ -15,26 +15,27 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Models\Loan;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Setting;
 
 class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::whereHas('user', function($query) {
-                $query->whereIs('member');
-            })
-            ->select([
-                'id',
-                'no_anggota',
-                'name',
-                'email',
-                'ic',
-                'phone'
-            ])
-            ->orderBy('no_anggota')
-            ->get();
+        $members = Member::select([
+            'id',
+            'no_anggota',
+            'name',
+            'email',
+            'ic',
+            'phone'
+        ])
+        ->orderBy('no_anggota')
+        ->get();
 
-        return view('admin.members', compact('members'));
+        // Get current dividend rate from settings
+        $currentDividendRate = Setting::where('key', 'dividend_rate')->first()->value ?? 5.00;
+
+        return view('admin.members', compact('members', 'currentDividendRate'));
     }
 
     public function show($id)

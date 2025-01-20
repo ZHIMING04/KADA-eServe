@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\Admin\SettingController;
 
 
 require __DIR__.'/auth.php';
@@ -187,5 +188,9 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/profile', function () {
     // Only verified users may access this route...
 })->middleware(['auth', 'verified']);
+
+// Add these routes
+Route::post('/admin/settings/dividend-rate', [SettingController::class, 'updateDividendRate']);
+Route::post('/admin/settings/interest-rate', [SettingController::class, 'updateInterestRate']);
 
 
