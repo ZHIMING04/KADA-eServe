@@ -6,13 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 
 class FinanceController extends Controller
 {
     public function index()
     {
         $loans = Loan::with('member')->get();
-        return view('admin.finance', compact('loans'));
+        
+        // Get current interest rate from settings
+        $currentInterestRate = Setting::where('key', 'interest_rate')->first()->value ?? 5.00;
+
+        return view('admin.finance', compact('loans', 'currentInterestRate'));
     }
 
     public function show($loanId)

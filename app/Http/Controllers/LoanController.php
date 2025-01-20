@@ -9,6 +9,7 @@ use App\Models\LoanType;
 use App\Models\Bank;
 use App\Models\Guarantor;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 
 class LoanController extends Controller
 {
@@ -51,6 +52,8 @@ class LoanController extends Controller
         // dd($request->all());
 
         \Log::info('Loan application submitted', $request->all());
+
+        $interestRate = Setting::where('key', 'interest_rate')->first()->value ?? 5.00;
 
         $validated = $request->validate([
             // Loan Details
@@ -181,7 +184,7 @@ class LoanController extends Controller
         ]);
 
         try {
-            $loan = DB::transaction(function () use ($validated) {
+            $loan = DB::transaction(function () use ($validated, $interestRate) {
                 \Log::info('Starting loan creation transaction');
                 
                 $member = DB::table('member_register')
@@ -209,10 +212,10 @@ class LoanController extends Controller
                     'bank_id' => $bank->bank_id,
                     'date_apply' => $validated['date_apply'],
                     'loan_amount' => $validated['loan_amount'],
-                    'interest_rate' => 5.00,
+                    'interest_rate' => $interestRate,
                     'monthly_repayment' => $this->calculateMonthlyRepayment(
                         $validated['loan_amount'], 
-                        5.00, 
+                        $interestRate, 
                         $validated['loan_period']
                     ),
                     'monthly_gross_salary' => $validated['monthly_gross_salary'],

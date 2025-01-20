@@ -13,6 +13,21 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Get total approved members
+        $totalApprovedMembers = Member::where('status', 'approved')->count();
+        
+        // Get pending member registrations
+        $pendingMembers = Member::where('status', 'pending')->count();
+        
+        // Calculate member growth percentage (only for approved members)
+        $previousMonthApprovedMembers = Member::where('status', 'approved')
+            ->where('created_at', '<', now()->startOfMonth())
+            ->count();
+        
+        $memberGrowthPercentage = $previousMonthApprovedMembers > 0 
+            ? (($totalApprovedMembers - $previousMonthApprovedMembers) / $previousMonthApprovedMembers) * 100 
+            : 0;
+
         // Get total users (members)
         $totalUsers = Member::whereHas('user', function($query) {
             $query->whereIs('member');
@@ -34,9 +49,6 @@ class DashboardController extends Controller
         $userGrowth = $lastMonthUsers > 0 
             ? (($currentMonthUsers - $lastMonthUsers) / $lastMonthUsers) * 100 
             : 0;
-
-        // Get pending loans count
-        $pendingLoans = Loan::where('status', 'pending')->count();
 
         // Get total savings for approved members
         $totalSavings = Savings::whereHas('member', function($query) {
@@ -117,9 +129,11 @@ class DashboardController extends Controller
             });
 
         return view('admin.dashboard', compact(
+            'totalApprovedMembers',
+            'pendingMembers',
+            'memberGrowthPercentage',
             'totalUsers',
             'userGrowth',
-            'pendingLoans',
             'totalSavings',
             'totalLoanApplications',
             'savingsTrend',
