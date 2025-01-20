@@ -52,29 +52,130 @@ class LoanController extends Controller
         $validated = $request->validate([
             // Loan Details
             'loan_type_id' => 'required|exists:loan_types,loan_type_id',
-            'bank_id' => 'required',
-            'bank_account' => 'required|string|max:20',
-            'loan_amount' => 'required|numeric|min:0',
-            'loan_period' => 'required|integer|min:1|max:60',
-            'monthly_gross_salary' => 'required|numeric|min:0',
-            'monthly_net_salary' => 'required|numeric|min:0',
-            'date_apply' => 'required|date',
+            'bank_id' => 'required|exists:banks,bank_id',
+            'bank_account' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9-]+$/' // Only numbers and hyphens allowed
+            ],
+            'loan_amount' => [
+                'required',
+                'numeric',
+                'min:1000', // Minimum loan amount
+                'max:100000' // Maximum loan amount
+            ],
+            'loan_period' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:60' // Maximum 60 months
+            ],
+            'monthly_gross_salary' => [
+                'required',
+                'numeric',
+                'min:0',
+                'gt:monthly_net_salary' // Must be greater than net salary
+            ],
+            'monthly_net_salary' => [
+                'required',
+                'numeric',
+                'min:0'
+            ],
+            'date_apply' => [
+                'required',
+                'date',
+                'before_or_equal:today'
+            ],
 
             // First Guarantor
-            'guarantor1_name' => 'required|string|max:255',
-            'guarantor1_ic' => 'required|string|max:20',
-            'guarantor1_phone' => 'required|string|max:15',
-            'guarantor1_address' => 'required|string',
-            'guarantor1_relationship' => 'required|in:parent,spouse,sibling,relative,friend',
+            'guarantor1_name' => [
+                'required',
+                'string',
+                'max:255',
+                'different:guarantor2_name' // Must be different from guarantor 2
+            ],
+            'guarantor1_ic' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9-]+$/',
+                'different:guarantor2_ic'
+            ],
+            'guarantor1_phone' => [
+                'required',
+                'string',
+                'max:15',
+                'regex:/^[0-9-]+$/',
+                'different:guarantor2_phone'
+            ],
+            'guarantor1_address' => [
+                'required',
+                'string',
+                'max:500',
+                'different:guarantor2_address'
+            ],
+            'guarantor1_relationship' => [
+                'required',
+                'in:parent,spouse,sibling,relative,friend'
+            ],
 
             // Second Guarantor
-            'guarantor2_name' => 'required|string|max:255',
-            'guarantor2_ic' => 'required|string|max:20',
-            'guarantor2_phone' => 'required|string|max:15',
-            'guarantor2_address' => 'required|string',
-            'guarantor2_relationship' => 'required|in:parent,spouse,sibling,relative,friend',
+            'guarantor2_name' => [
+                'required',
+                'string',
+                'max:255',
+                'different:guarantor1_name'
+            ],
+            'guarantor2_ic' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9-]+$/',
+                'different:guarantor1_ic'
+            ],
+            'guarantor2_phone' => [
+                'required',
+                'string',
+                'max:15',
+                'regex:/^[0-9-]+$/',
+                'different:guarantor1_phone'
+            ],
+            'guarantor2_address' => [
+                'required',
+                'string',
+                'max:500',
+                'different:guarantor1_address'
+            ],
+            'guarantor2_relationship' => [
+                'required',
+                'in:parent,spouse,sibling,relative,friend'
+            ],
 
+            // Terms and Conditions
             'terms_agreed' => 'required|accepted'
+        ], [
+            // Custom error messages
+            'required' => 'Ruangan :attribute perlu diisi',
+            'numeric' => 'Ruangan :attribute mestilah nombor',
+            'min' => 'Ruangan :attribute mestilah sekurang-kurangnya :min',
+            'max' => 'Ruangan :attribute tidak boleh melebihi :max',
+            'date' => 'Ruangan :attribute mestilah tarikh yang sah',
+            'regex' => 'Format :attribute tidak sah',
+            'different' => ':attribute mestilah berbeza dengan :other',
+            'gt' => ':attribute mestilah lebih besar daripada :value',
+            'exists' => ':attribute yang dipilih tidak sah',
+            'accepted' => 'Anda perlu bersetuju dengan terma dan syarat',
+            'before_or_equal' => ':attribute mestilah tarikh hari ini atau sebelumnya',
+            
+            // Custom attribute names
+            'loan_type_id.required' => 'Sila pilih jenis pembiayaan',
+            'bank_id.required' => 'Sila pilih bank',
+            'bank_account.regex' => 'Nombor akaun bank tidak sah',
+            'guarantor1_ic.regex' => 'Nombor KP penjamin 1 tidak sah',
+            'guarantor2_ic.regex' => 'Nombor KP penjamin 2 tidak sah',
+            'guarantor1_phone.regex' => 'Nombor telefon penjamin 1 tidak sah',
+            'guarantor2_phone.regex' => 'Nombor telefon penjamin 2 tidak sah'
         ]);
 
         try {
@@ -164,8 +265,23 @@ class LoanController extends Controller
             1 => 'Affin Bank Berhad',
             2 => 'Affin Islamic Bank Berhad',
             3 => 'Alliance Bank Malaysia Berhad',
-            // ... add all banks ...
-            30 => 'United Overseas Bank (Malaysia) Berhad'
+            4 => 'Alliance Islamic Bank Malaysia Berhad',
+            5 => 'Al Rajhi Banking & Investment Corporation (Malaysia) Berhad',
+            6 => 'AmBank (M) Berhad',
+            7 => 'Bank Islam Malaysia Berhad',
+            8 => 'Bank Kerjasama Rakyat Malaysia Berhad',
+            9 => 'Bank Muamalat Malaysia Berhad',
+            10 => 'Bank of China (Malaysia) Berhad',
+            11 => 'Bank Pertanian Malaysia Berhad (Agrobank)',
+            12 => 'Bank Simpanan Nasional',
+            13 => 'CIMB Bank Berhad',
+            14 => 'CIMB Islamic Bank Berhad',
+            15 => 'Citibank Berhad',
+            16 => 'Hong Leong Bank Berhad',
+            17 => 'Hong Leong Islamic Bank Berhad',
+            18 => 'HSBC Amanah Malaysia Berhad',
+            19 => 'HSBC Bank Malaysia Berhad',
+            20 => 'Industrial and Commercial Bank of China (Malaysia) Berhad'
         ];
 
         return $banks[$bankId] ?? 'Unknown Bank';
