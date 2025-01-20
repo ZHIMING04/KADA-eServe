@@ -32,7 +32,7 @@ Route::get('/hubungi-kami', function () {
 })->name('contact');
 
 // Guest routes (for authenticated users with guest role)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guest/dashboard', function () {
         return view('guest.dashboard');
     })->name('guest.dashboard');
@@ -167,8 +167,15 @@ Route::get('/email/verify', function () {
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
- 
-    return redirect('/home');
+    
+    // Redirect based on user's role after verification
+    if ($request->user()->can('access-admin-dashboard')) {
+        return redirect()->route('admin.dashboard');
+    } elseif ($request->user()->can('apply-loan')) {
+        return redirect()->route('member.dashboard');
+    } else {
+        return redirect()->route('guest.dashboard');
+    }
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
