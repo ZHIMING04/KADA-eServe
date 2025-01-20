@@ -34,10 +34,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @forelse($loans as $loan)
                 <div class="info-card">
-                    <div class="flex justify-between">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Pinjaman <strong>{{$loan->loan_type->loan_type}}</strong></h3>
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Id: <strong>{{$loan->loan_id}}</strong></p>
-                    </div>
+
+                <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
+                    <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                        Pinjaman {{$loan->loan_type->loan_type}}
+                    </h3>
+                    <p class="text-l font-semibold text-white flex items-center">Id: {{$loan->loan_id}}  </p>
+                </div>
+
                     <div class="rounded-lg justify-center items-center bg-gray-100 dark:bg-gray-800 p-4">
                         <div class="flex items-center mt-4">
                             <!-- Step 1 -->
@@ -152,12 +156,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         <div class="flex justify-center">
-                                            <a href="{{ route('loan.show', $loan->loan_id) }}" 
-                                            class="action-button text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
+                                            <a href="{{ route('loan.show', $loan->loan_id) }}">
+                                            <x-primary-button type="submit" class="bg-blue-500 hover:bg-blue-700">{{ __('BUTIRAN') }}</x-primary-button>
                                             </a>
                                         </div>
                                     </td>

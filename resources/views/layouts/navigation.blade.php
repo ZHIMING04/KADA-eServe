@@ -30,6 +30,10 @@
                                 {{ __('Permohonan Ahli') }}
                             </x-nav-link>
 
+                            <x-nav-link :href="route('guest.status')" :active="request()->routeIs('guest.status')">
+                                {{ __('Member Registration Status') }}
+                            </x-nav-link>
+
                         @elseif(auth()->user()->isA('member'))
                             <x-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
                                 {{ __('Dashboard Ahli') }}
