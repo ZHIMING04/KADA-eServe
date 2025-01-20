@@ -245,6 +245,7 @@ class MemberController extends Controller
     {
         $loans = Loan::where('member_id', $memberId)
             ->where('loan_amount', '>', 0)
+            ->where('status', 'approved')
             ->get(['loan_id', 'loan_type_id', 'loan_amount']);
         
         return response()->json($loans);

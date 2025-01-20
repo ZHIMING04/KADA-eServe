@@ -446,26 +446,38 @@
         let currentMemberId = null;
 
         function openTransactionModal(memberId) {
-            currentMemberId = memberId;
-            if ($('#transactionType').val() === 'loan') {
-                fetchMemberLoans(memberId);
-            }
+            // Reset form
+            $('#transactionForm')[0].reset();
+            
+            // Show modal
             $('#transactionModal').modal('show');
-        }
-
-        function fetchMemberLoans(memberId) {
-            fetch(`/admin/members/${memberId}/loans`)
-                .then(response => response.json())
-                .then(loans => {
+            
+            // Store member ID
+            currentMemberId = memberId;
+            
+            // Fetch and populate loans
+            $.ajax({
+                url: `/admin/members/${memberId}/loans`,
+                method: 'GET',
+                success: function(response) {
                     const loanSelect = $('select[name="loan_id"]');
                     loanSelect.empty();
-                    loans.forEach(loan => {
-                        loanSelect.append(`<option value="${loan.loan_id}">Loan #${loan.loan_id} (RM${loan.loan_amount})</option>`);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching loans:', error);
-                });
+                    
+                    if (response && response.length > 0) {
+                        loanSelect.append('<option value="">-- Pilih Pembiayaan --</option>');
+                        response.forEach(loan => {
+                            loanSelect.append(`<option value="${loan.loan_id}">LOAN-${loan.loan_id} (RM${loan.loan_amount.toFixed(2)})</option>`);
+                        });
+                    } else {
+                        loanSelect.append('<option value="">Tiada rekod Pembiayaan</option>');
+                    }
+                },
+                error: function() {
+                    const loanSelect = $('select[name="loan_id"]');
+                    loanSelect.empty();
+                    loanSelect.append('<option value="">Tiada rekod Pembiayaan</option>');
+                }
+            });
         }
 
         $('#transactionType').change(function() {
