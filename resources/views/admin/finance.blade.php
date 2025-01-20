@@ -107,6 +107,23 @@
             margin-left: 1rem;
             padding-bottom: 1rem;
         }
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+        .rate-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .rate-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 @endpush
 
@@ -124,6 +141,36 @@
                     <h1 class="text-2xl font-bold">Senarai Pinjaman</h1>
                     <p class="text-white/80 mt-1">Pengurusan pinjaman ahli</p>
                 </div>
+                <div class="header-actions">
+                    <button onclick="toggleInterestRate()" class="rate-button">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Kadar Faedah
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collapsible Section -->
+        <div id="interestRateSection" class="hidden mb-6 bg-white p-4 rounded-lg shadow-sm transition-all duration-300">
+            <div class="flex items-center space-x-4">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Kadar Faedah Pinjaman (%)
+                    </label>
+                    <input type="number" 
+                           id="interestRate" 
+                           class="form-input rounded-md border-gray-300 shadow-sm w-32" 
+                           step="0.01" 
+                           min="0" 
+                           max="100"
+                           value="{{ $currentInterestRate }}">
+                </div>
+                <button onclick="updateInterestRate()" 
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Kemaskini
+                </button>
             </div>
         </div>
 
@@ -180,6 +227,29 @@
             </table>
         </div>
     </div>
+
+    <!-- Add this modal for password confirmation -->
+    <div class="modal fade" id="passwordConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-lg shadow-xl">
+                <div class="modal-header bg-gray-50 rounded-t-lg">
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Pengesahan Kata Laluan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <p class="text-gray-600 mb-4">Sila masukkan kata laluan anda untuk mengesahkan tindakan ini.</p>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Kata Laluan</label>
+                        <input type="password" id="confirmPassword" class="form-input w-full rounded-md shadow-sm" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-gray-50 rounded-b-lg">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmPasswordAndUpdate()">Sahkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -206,5 +276,67 @@
                 ]
             });
         });
+
+        function toggleInterestRate() {
+            const section = document.getElementById('interestRateSection');
+            section.classList.toggle('hidden');
+        }
+
+        function updateInterestRate() {
+            $('#passwordConfirmModal').modal('show');
+        }
+
+        function confirmPasswordAndUpdate() {
+            const password = document.getElementById('confirmPassword').value;
+            const rate = document.getElementById('interestRate').value;
+
+            // First confirm password
+            fetch('/confirm-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // If password is confirmed, proceed with rate update
+                    updateRate(rate);
+                    $('#passwordConfirmModal').modal('hide');
+                    document.getElementById('confirmPassword').value = ''; // Clear password
+                } else {
+                    alert(data.message || 'Kata laluan tidak sah');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ralat semasa mengesahkan kata laluan');
+            });
+        }
+
+        function updateRate(rate) {
+            fetch('/admin/settings/interest-rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ rate: rate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Kadar faedah telah dikemaskini!');
+                } else {
+                    alert(data.message || 'Ralat semasa mengemaskini kadar faedah');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ralat semasa mengemaskini kadar faedah');
+            });
+        }
     </script>
 @endpush 
