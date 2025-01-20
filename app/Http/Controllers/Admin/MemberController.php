@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Models\Loan;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\MembershipApproved;
 
 class MemberController extends Controller
 {
@@ -201,14 +202,28 @@ class MemberController extends Controller
                 Bouncer::assign('member')->to($user);
             }
 
+            // Force refresh user roles cache
+            Bouncer::refresh();
+            
             // Update member status
-            $member->update(['status' => 'approved']);
+            $member->update([
+                'status' => 'approved',
+                'approved_at' => now()
+            ]);
+
+            // Send approval notification
+            $member->notify(new MembershipApproved());
 
             DB::commit();
 
+            // Clear user's cached permissions
+            if (auth()->id() === $user->id) {
+                auth()->user()->fresh();
+            }
+
             // Redirect to members list with success message
             return redirect()->route('admin.members.index')
-                            ->with('success', 'Ahli berjaya diluluskan');
+                            ->with('success', 'Ahli berjaya diluluskan dan emel pemberitahuan telah dihantar');
 
         } catch (\Exception $e) {
             DB::rollBack();
