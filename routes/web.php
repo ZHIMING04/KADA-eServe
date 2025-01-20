@@ -23,6 +23,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/hubungi-kami', function () {
+    return view('profile.contact');
+})->name('contact');
+
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth'])->group(function () {
     Route::get('/guest/dashboard', function () {
