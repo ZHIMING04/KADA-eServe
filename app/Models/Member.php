@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 
 class Member extends Model
 {
+    use HasFactory;
+    use Notifiable;
     protected $table = 'member_register';
     protected $primaryKey = 'id';
     
