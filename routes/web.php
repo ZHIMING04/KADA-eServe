@@ -9,10 +9,15 @@ use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
 use App\Http\Controllers\LoanStatusController;
+use App\Http\Controllers\MemberStatusController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Log;
+use App\Providers\RouteServiceProvider;
+use Illiminate\Support\Facades\URL;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 require __DIR__.'/auth.php';
 
@@ -27,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
         return view('guest.dashboard');
     })->name('guest.dashboard');
 
+    Route::get('/guest/status', [MemberStatusController::class, 'display'])->name('guest.status');
     Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
     Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
     Route::get('/guest/success', function () {

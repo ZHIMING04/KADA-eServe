@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Laporan Individu') }}</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('LAPORAN INDIVIDU') }}</h2>
             <form method="get" action="{{ route('report.export') }}">
             @csrf
             <x-primary-button type="submit">{{ __('Muat Turun Laporan Anda') }}</x-primary-button>
@@ -41,6 +41,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <!-- Members Details -->
             <div class="info-card">
+                <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg">
+                    <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /> </svg>
+                        Maklumat Peribadi
+                    </h3>
+                </div>
+
+                <br>
                 <h3 class="text-9xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{$member->name}}</h3>
                 <div class="flex flex-wrap">
                     <div class="w-full md:w-1/3 mb-2">
@@ -60,7 +68,12 @@
             <div class="flex flex-wrap -mx-2">
                 <div class="w-full md:w-1/2 px-2">
                     <div class="info-card">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"><i class="fas fa-hand-holding-usd"></i> MAKLUMAT SAHAM AHLI</h3>
+                        <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                                <i class="fas fa-hand-holding-usd mr-2"> </i> Maklumat Saham Ahli
+                            </h3>
+                        </div>
+                        <br>
                         <div id="chart-demo-pie"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
@@ -180,67 +193,74 @@
             <!-- Loan Details -->
             <div class="p-2 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-7xl mx-auto">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"><i class="fas fa-coins"></i> MAKLUMAT PINJAMAN YANG DILULUSKAN</h3>
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Pinjaman ID
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Pinjaman Jenis
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Amaun
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Bayaran Bulanan
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Kadar
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tarikh Pinjaman
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            @php
-                                $approvedLoans = $loans->filter(function ($loan) {
-                                return $loan->status == 'approved';
-                                });
-                            @endphp
+                    <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                                <i class="fas fa-coins mr-2"></i> Pinjaman yang Diluluskan
+                            </h3>
+                    </div>
 
-                            @forelse($approvedLoans as $loan)
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                       {{$loan->loan_id}}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{$loan->loan_type->loan_type }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        RM {{number_format($loan->loan_amount, 2)}}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        RM {{number_format($loan->monthly_repayment, 2)}}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{$loan->interest_rate}}%
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        {{$loan->created_at}}
-                                    </td>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Pinjaman ID
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Pinjaman Jenis
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Amaun
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Bayaran Bulanan
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Kadar
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Tarikh Pinjaman
+                                    </th>
                                 </tr>
-                           @empty
-                                <tr>
-                                    <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="6">
-                                        TIADA REKOD PINJAMAN
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @php
+                                    $approvedLoans = $loans->filter(function ($loan) {
+                                    return $loan->status == 'approved';
+                                    });
+                                @endphp
+
+                                @forelse($approvedLoans as $loan)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                           {{$loan->loan_id}}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            {{$loan->loan_type->loan_type }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            RM {{number_format($loan->loan_amount, 2)}}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            RM {{number_format($loan->monthly_repayment, 2)}}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            {{$loan->interest_rate}}%
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            {{$loan->created_at}}
+                                        </td>
+                                    </tr>
+                               @empty
+                                    <tr>
+                                        <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="6">
+                                            TIADA REKOD PINJAMAN
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
