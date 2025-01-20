@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lembaga Kemajuan Pertanian Kemubu (KADA)</title>
+    <title>Hubungi Kami - Lembaga Kemajuan Pertanian Kemubu (KADA)</title>
     <link rel="icon" type="image/png" href="{{ asset('images/KADAlogoresize.png') }}">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,35 +21,6 @@
         footer {
             margin-top: auto;
         }
-
-        /* Icon navigation styles */
-        .icon-nav {
-            background: #f8f9fa;
-            padding: 1rem 0;
-            border-top: 1px solid #dee2e6;
-            margin-top: 2rem;
-        }
-
-        .icon-nav .nav-item {
-            text-align: center;
-            color: #198754;
-        }
-
-        .icon-nav .nav-link {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        .icon-nav i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .icon-nav span {
-            font-size: 0.875rem;
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -63,7 +34,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Utama</a>
+                        <a class="nav-link" href="{{ route('welcome') }}">Utama</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Tentang Kami</a>
@@ -72,7 +43,7 @@
                         <a class="nav-link" href="#">Perkhidmatan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">Hubungi</a>
+                        <a class="nav-link active" href="#">Hubungi</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -105,59 +76,52 @@
         </div>
     </nav>
 
-    <!-- After nav section -->
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- Hero Section -->
-    <div class="container-fluid bg-light py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="display-4 fw-bold">Selamat Datang ke KADA</h1>
-                    <p class="lead">Memacu Pembangunan Pertanian dan Kesejahteraan Komuniti</p>
-                    <a href="#" class="btn btn-success btn-lg">Ketahui Lebih Lanjut</a>
-                </div>
-                <div class="col-md-6">
-                    <img src="{{ asset('images/paddy.jpg') }}" alt="KADA" class="img-fluid rounded">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Features Section -->
-    <div class="container my-5">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Pembangunan Pertanian</h5>
-                        <p class="card-text">Menyokong pembangunan sektor pertanian melalui teknologi moden dan amalan terbaik.</p>
+    <!-- Main Content -->
+    <main>
+        <!-- Contact Section -->
+        <div class="container my-5">
+            <h2 class="text-center mb-5">Hubungi Kami</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-map-marker-alt fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Alamat</h5>
+                            <p class="card-text">
+                                Lembaga Kemajuan Pertanian Kemubu<br>
+                                Peti Surat 127, Jalan Dato'Lundang 15710<br>
+                                Kota Bharu, Kelantan.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Sokongan Petani</h5>
-                        <p class="card-text">Menyediakan bantuan dan sokongan kepada petani untuk meningkatkan hasil pertanian.</p>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-phone fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Telefon</h5>
+                            <p class="card-text">+609-7455388</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Pembangunan Komuniti</h5>
-                        <p class="card-text">Membantu dalam pembangunan sosio-ekonomi komuniti pertanian.</p>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-envelope fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Emel</h5>
+                            <p class="card-text">prokada@kada.gov.my</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-light py-3">

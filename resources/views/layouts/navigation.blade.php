@@ -23,11 +23,11 @@
                     @auth
                         @if(auth()->user()->isA('guest'))
                             <x-nav-link :href="route('guest.dashboard')" :active="request()->routeIs('guest.dashboard')">
-                                {{ __('Guest Dashboard') }}
+                                {{ __('Dashboard Guest') }}
                             </x-nav-link>
 
                             <x-nav-link :href="route('guest.register')" :active="request()->routeIs('guest.register')">
-                                {{ __('Member Registration') }}
+                                {{ __('Permohonan Ahli') }}
                             </x-nav-link>
 
                             <x-nav-link :href="route('guest.status')" :active="request()->routeIs('guest.status')">
@@ -36,13 +36,13 @@
 
                         @elseif(auth()->user()->isA('member'))
                             <x-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
-                                {{ __('Dashboard') }}
+                                {{ __('Dashboard Ahli') }}
                             </x-nav-link>
                             <x-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
-                                {{ __('Loan Application') }}
+                                {{ __('Permohonan Pinjaman') }}
                             </x-nav-link>
-                            <x-nav-link :href="route('report.display')" :active="request()->routeIs('loan.create')">
-                                {{ __('Individual Report') }}
+                            <x-nav-link :href="route('report.display')" :active="request()->routeIs('report.display')">
+                                {{ __('Laporan Individu') }}
                             </x-nav-link>
                         @endif
 
@@ -68,21 +68,21 @@
                         @auth
                             @if(auth()->user()->isA('guest'))
                                 <x-dropdown-link :href="route('guest.register')">
-                                    {{ __('Member Registration') }}
+                                    {{ __('Permohonan Ahli') }}
                                 </x-dropdown-link>
                                 
                             @elseif(auth()->user()->isA('member'))
                                 <x-dropdown-link :href="route('profile.edit')">
-                                    {{ __('Profile') }}
+                                    {{ __('Profil') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('loan.create')">
-                                    {{ __('Loan Application') }}
+                                    {{ __('Permohonan Pinjaman') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('loan.display')">
                                     {{ __('Loan Status') }}
                                 </x-dropdown-link>
                                 <x-dropdown-link :href="route('report.display')">
-                                    {{ __('Individual Report') }}
+                                    {{ __('Laporan Individu') }}
                                 </x-dropdown-link>
                             @endif
                             
@@ -117,14 +117,14 @@
             @auth
                 @if(auth()->user()->isA('guest'))
                     <x-responsive-nav-link :href="route('guest.register')" :active="request()->routeIs('guest.register')">
-                        {{ __('Register') }}
+                        {{ __('Permohonan Ahli') }}
                     </x-responsive-nav-link>
                 @elseif(auth()->user()->isA('member'))
                     <x-responsive-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Dashboard Ahli') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
-                        {{ __('Loan Application') }}
+                        {{ __('Permohonan Pinjaman') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
@@ -141,7 +141,7 @@
             <div class="mt-3 space-y-1">
                 @if(auth()->user()->isA('member'))
                     <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
+                        {{ __('Profil') }}
                     </x-responsive-nav-link>
                 @endif
 

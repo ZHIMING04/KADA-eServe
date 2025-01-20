@@ -13,11 +13,7 @@ use App\Http\Controllers\MemberStatusController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
-use Illuminate\Support\Facades\Log;
-use App\Providers\RouteServiceProvider;
-use Illiminate\Support\Facades\URL;
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
 
 require __DIR__.'/auth.php';
 
@@ -25,6 +21,10 @@ require __DIR__.'/auth.php';
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+Route::get('/hubungi-kami', function () {
+    return view('profile.contact');
+})->name('contact');
 
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth'])->group(function () {
@@ -50,7 +50,7 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 
     // Profile routes
     Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
     });
@@ -140,5 +140,40 @@ Route::middleware(['auth', 'can:approve-member-registration'])->group(function (
 
 Route::post('/admin/members/batch-transaction', [AdminMemberController::class, 'batchTransaction'])
     ->name('admin.members.batch-transaction');
+
+    Route::post('send-mail', function (Request $request) {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $details = [
+            'title' => 'Success',
+            'content' => 'This is an email testing using Laravel-Brevo',
+        ];
+    
+        return back()->with('success', 'Email sent at ' . now());
+    })->name('send.mail');
+
+
+// Add this route with auth and verified middleware
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware(['auth'])->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+ 
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+ 
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/profile', function () {
+    // Only verified users may access this route...
+})->middleware(['auth', 'verified']);
 
 
