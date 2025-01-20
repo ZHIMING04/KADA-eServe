@@ -12,6 +12,22 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4 }">
+            <!-- Return Button - Minimalist dark arrow -->
+            <div class="fixed top-6 left-6 z-50">
+                <a href="{{ route('guest.dashboard') }}" 
+                   class="group inline-flex items-center p-2 text-gray-800 hover:text-gray-900 transition-all duration-300">
+                    <svg class="w-7 h-7 transform group-hover:-translate-x-1 transition-transform duration-200" 
+                         fill="none" 
+                         stroke="currentColor" 
+                         viewBox="0 0 24 24"
+                         stroke-width="2.5">
+                        <path stroke-linecap="round" 
+                              stroke-linejoin="round" 
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                </a>
+            </div>
+
             <!-- Background Image -->
             <div class="absolute inset-0 z-0">
                 <img src="{{ asset('images/paddy.jpg') }}" alt="Background" 

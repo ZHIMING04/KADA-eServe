@@ -64,16 +64,12 @@
                 </div>
             </div>
 
-            <!-- Saving Details and Chart -->
-            <div class="flex flex-wrap -mx-2">
-                <div class="w-full md:w-1/2 px-2">
-                    <div class="info-card">
-                        <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
-                            <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
-                                <i class="fas fa-hand-holding-usd mr-2"> </i> Maklumat Saham Ahli
-                            </h3>
-                        </div>
-                        <br>
+            <!-- First row with savings information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Existing Savings Card -->
+                <div class="bg-white rounded-2xl shadow-sm">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-4">Maklumat Saham Ahli</h2>
                         <div id="chart-demo-pie"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
@@ -183,12 +179,78 @@
                                 </tr>
                             </tbody>
                         </table>
-
                     </div>
                 </div>
 
+                <!-- New Transaction History Card with enhanced styling -->
+                <div class="bg-white rounded-2xl shadow-sm">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-6 text-gray-800">Sejarah Transaksi</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            TARIKH
+                                        </th>
+                                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            JENIS
+                                        </th>
+                                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            AMAUN (RM)
+                                        </th>
+                                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            RUJUKAN
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @forelse ($transactions as $transaction)
+                                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}
+                                            </td>
+                                            <td class="px-4 py-4 whitespace-nowrap">
+                                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                    {{ $transaction->type == 'savings' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                                    {{ $transaction->type_display }}
+                                                </span>
+                                            </td>
+                                            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                {{ number_format($transaction->amount, 2) }}
+                                            </td>
+                                            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                @if($transaction->type == 'loan' || $transaction->type == 'loan_payment')
+                                                    @if($transaction->reference && $transaction->reference != '-')
+                                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                            {{ $transaction->reference }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400">-</span>
+                                                    @endif
+                                                @else
+                                                    <span class="text-gray-400">-</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500">
+                                                <div class="flex flex-col items-center justify-center space-y-2">
+                                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <span class="font-medium">Tiada sejarah transaksi</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
 
             <!-- Loan Details -->
             <div class="p-2 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">

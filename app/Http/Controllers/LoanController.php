@@ -47,12 +47,15 @@ class LoanController extends Controller
 
     public function store(Request $request)
     {
+        // Add dd() to debug the incoming request
+        // dd($request->all());
+
         \Log::info('Loan application submitted', $request->all());
 
         $validated = $request->validate([
             // Loan Details
             'loan_type_id' => 'required|exists:loan_types,loan_type_id',
-            'bank_id' => 'required|exists:banks,bank_id',
+            'bank_id' => 'required',
             'bank_account' => [
                 'required',
                 'string',
@@ -164,7 +167,6 @@ class LoanController extends Controller
             'regex' => 'Format :attribute tidak sah',
             'different' => ':attribute mestilah berbeza dengan :other',
             'gt' => ':attribute mestilah lebih besar daripada :value',
-            'exists' => ':attribute yang dipilih tidak sah',
             'accepted' => 'Anda perlu bersetuju dengan terma dan syarat',
             'before_or_equal' => ':attribute mestilah tarikh hari ini atau sebelumnya',
             
@@ -193,7 +195,7 @@ class LoanController extends Controller
 
                 \Log::info('Member found', ['member_id' => $member->id]);
 
-                // Create bank record
+                // Create bank record without checking if it exists
                 $bank = Bank::create([
                     'bank_name' => $this->getBankName($validated['bank_id']),
                     'bank_account' => $validated['bank_account']
@@ -283,6 +285,10 @@ class LoanController extends Controller
             19 => 'HSBC Bank Malaysia Berhad',
             20 => 'Industrial and Commercial Bank of China (Malaysia) Berhad'
         ];
+
+        // Add debugging
+        \Log::info('Bank ID received:', ['bank_id' => $bankId]);
+        \Log::info('Bank name found:', ['bank_name' => $banks[$bankId] ?? 'Unknown Bank']);
 
         return $banks[$bankId] ?? 'Unknown Bank';
     }
