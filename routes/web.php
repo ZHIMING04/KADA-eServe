@@ -15,6 +15,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\AnnualReportController;
 
 require __DIR__.'/auth.php';
 
@@ -22,6 +23,9 @@ require __DIR__.'/auth.php';
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
+
+// Public route for viewing annual reports - accessible to all
+Route::get('/reports', [AnnualReportController::class, 'index'])->name('annual-reports');
 
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth'])->group(function () {
@@ -86,6 +90,16 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::get('/admin/registrations/{id}/show', 'showRegistration')->name('admin.registrations.show');
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
+    });
+
+    // Annual Reports routes
+    Route::middleware(['auth', 'can:manage-annual-reports'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports.index');
+        Route::get('/annual-reports/create', [AnnualReportController::class, 'create'])->name('annual-reports.create');
+        Route::post('/annual-reports', [AnnualReportController::class, 'store'])->name('annual-reports.store');
+        Route::get('/annual-reports/{id}/edit', [AnnualReportController::class, 'edit'])->name('annual-reports.edit');
+        Route::put('/annual-reports/{id}', [AnnualReportController::class, 'update'])->name('annual-reports.update');
+        Route::delete('/annual-reports/{id}', [AnnualReportController::class, 'destroy'])->name('annual-reports.destroy');
     });
 });
 
