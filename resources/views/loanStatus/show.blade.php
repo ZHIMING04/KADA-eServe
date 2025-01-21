@@ -1,9 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Pinjaman') }} <strong>{{$loan->loan_type->loan_type}}</strong></h2>
-            <a href="{{ route('loan.display') }}" class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-4 rounded">
-                KEMBALI
+            <div class="flex items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Pinjaman') }} <strong>{{$loan->loan_type->loan_type}}</strong></h2>
+                <a href="{{ route('loan.export', $loan->loan_id) }}" class="ml-4">
+                    <x-primary-button type="submit" class="bg-green-500 hover:bg-green-700">{{ __('EXPORT') }}</x-primary-button>
+                </a>
+            </div>
+            <a href="{{ route('loan.display') }}">
+                <x-primary-button type="submit" class="bg-blue-100 hover:bg-blue-700">{{ __('KEMBALI') }}</x-primary-button>
             </a>
         </div>
     </x-slot>
