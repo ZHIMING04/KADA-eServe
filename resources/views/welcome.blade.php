@@ -578,5 +578,25 @@
             });
         }
     </script>
+
+    <!-- Add the required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        var botmanWidget = {
+            frameEndpoint: '/botman/widget',
+            chatServer: '/botman',
+            title: 'Pembantu KADA',
+            introMessage: 'Selamat datang ke KADA! Bagaimana saya boleh bantu anda?',
+            placeholderText: 'Taip mesej anda...',
+            mainColor: '#198754',
+            bubbleBackground: '#198754',
+            aboutText: 'Pembantu Chat KADA',
+            bubbleIcon: 'mail',
+            displayMessageTime: true,
+            bubbleHint: "Ada Pertanyaan?",
+            widgetHeight: 430
+        };
+    </script>
+    <script src='https://cdn.jsdelivr.net/npm/botman-web-widget@0/build/js/widget.js'></script>
 </body>
 </html>

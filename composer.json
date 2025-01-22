@@ -11,6 +11,8 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
+        "botman/botman": "^2.8",
+        "botman/driver-web": "^1.5",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "silber/bouncer": "^1.0"

@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\BotManController;
 
 
 require __DIR__.'/auth.php';
@@ -161,29 +163,36 @@ Route::post('/admin/members/batch-transaction', [AdminMemberController::class, '
     })->name('send.mail');
 
 
-// Add this route with auth and verified middleware
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware(['auth'])->name('verification.notice');
+// Remove or comment out the default verification routes
+// Route::get('/email/verify', function () {
+//     return view('auth.verify-email');
+// })->middleware(['auth'])->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    
-    // Redirect based on user's role after verification
-    if ($request->user()->can('access-admin-dashboard')) {
-        return redirect()->route('admin.dashboard');
-    } elseif ($request->user()->can('apply-loan')) {
-        return redirect()->route('member.dashboard');
-    } else {
-        return redirect()->route('guest.dashboard');
-    }
-})->middleware(['auth', 'signed'])->name('verification.verify');
+// Add these custom verification routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/email/verify', function () {
+        // Don't generate URL here, let the notification handle it
+        return view('emails.verify-email');
+    })->name('verification.notice');
 
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
- 
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        
+        // Redirect based on user's role after verification
+        if ($request->user()->can('access-admin-dashboard')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($request->user()->can('apply-loan')) {
+            return redirect()->route('member.dashboard');
+        } else {
+            return redirect()->route('guest.dashboard');
+        }
+    })->middleware(['auth', 'signed'])->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Link pengesahan telah dihantar!');
+    })->middleware(['throttle:6,1'])->name('verification.send');
+});
 
 Route::get('/profile', function () {
     // Only verified users may access this route...
@@ -192,5 +201,10 @@ Route::get('/profile', function () {
 // Add these routes
 Route::post('/admin/settings/dividend-rate', [SettingController::class, 'updateDividendRate']);
 Route::post('/admin/settings/interest-rate', [SettingController::class, 'updateInterestRate']);
+
+Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
+Route::get('/botman/widget', function () {
+    return view('vendor.botman.widget');
+});
 
 
