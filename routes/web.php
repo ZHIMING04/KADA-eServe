@@ -61,20 +61,10 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/profile/show', 'show')->name('profile.show');
     });
 
-    Route::get('/send-test-email', function () {
-        try {
-            Mail::to('poh.yee@graduate.utm.my')->send(new TestMail());
-            Log::info('Test email sent to poh.yee@graduate.utm.my');
-            return 'Test email sent!';
-        } catch (\Exception $e) {
-            Log::error('Failed to send test email: ' . $e->getMessage());
-            return 'Failed to send test email.';
-        }
-    });
-
     //Loan Status
     Route::get('/status', [LoanStatusController::class, 'display'])->name('loan.display');
     Route::get('/status/{id}', [LoanStatusController::class, 'show'])->name('loan.show');
+    Route::get('/status/{id}/export', [LoanStatusController::class, 'export'])->name('loan.export');
 
     // Loans and reports
     

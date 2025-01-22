@@ -41,9 +41,13 @@
                             <x-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
                                 {{ __('Permohonan Pinjaman') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('loan.display')" :active="request()->routeIs('loan.display')">
+                                {{ __('Status Pinjaman') }}
+                            </x-nav-link>
                             <x-nav-link :href="route('report.display')" :active="request()->routeIs('report.display')">
                                 {{ __('Laporan Individu') }}
                             </x-nav-link>
+
                         @endif
 
                     @endauth
@@ -71,9 +75,6 @@
                             @elseif(auth()->user()->isA('member'))
                                 <x-dropdown-link :href="route('profile.edit')">
                                     {{ __('Profil') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('loan.display')">
-                                    {{ __('Loan Status') }}
                                 </x-dropdown-link>
                             @endif
                             

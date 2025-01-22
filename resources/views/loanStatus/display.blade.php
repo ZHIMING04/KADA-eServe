@@ -120,27 +120,28 @@
                     <br>
                     <br>
 
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-center">
-                        <thead class="bg-gray-50 dark:bg-gray-700">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Amaun Pinjaman
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Bayaran Bulanan
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Kadar
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tarikh Pinjaman
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Tindakan
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-center">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Amaun Pinjaman
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Bayaran Bulanan
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Kadar
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Tarikh Pinjaman
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Tindakan
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         RM {{$loan->loan_amount,2 }}
@@ -155,15 +156,19 @@
                                         {{$loan->created_at}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                                        <div class="flex justify-center">
+                                        <div class="flex justify-center space-x-2">
                                             <a href="{{ route('loan.show', $loan->loan_id) }}">
-                                            <x-primary-button type="submit" class="bg-blue-500 hover:bg-blue-700">{{ __('BUTIRAN') }}</x-primary-button>
+                                                <x-primary-button type="submit" class="bg-blue-500 hover:bg-blue-700">{{ __('BUTIRAN') }}</x-primary-button>
+                                            </a>
+                                            <a href="{{ route('loan.export', $loan->loan_id) }}">
+                                                <x-primary-button type="submit" class="bg-green-500 hover:bg-green-700">{{ __('EXPORT') }}</x-primary-button>
                                             </a>
                                         </div>
                                     </td>
                                 </tr>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             @empty
                 <div class="info-card">
