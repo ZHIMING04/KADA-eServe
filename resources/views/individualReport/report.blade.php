@@ -13,6 +13,12 @@
         @import url('https://rsms.me/inter/inter.css');
         :root {
             --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+            --primary-blue: #0066cc;
+            --secondary-blue: #4d94ff;
+            --light-blue: #e6f2ff;
+            --accent-blue: #00a3ff;
+            --deep-blue: #004d99;
+            --text-gray: #666;
         }
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
@@ -23,6 +29,12 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 102, 204, 0.1);
+        }
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 102, 204, 0.1);
         }
         .info-card h3 {
             font-size: 1.25rem;
@@ -32,6 +44,9 @@
         .info-card p {
             font-size: 1rem;
             margin-bottom: 0.5rem;
+        }
+        .py-12 {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
         }
     </style>
 
