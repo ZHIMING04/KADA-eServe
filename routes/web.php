@@ -162,7 +162,7 @@ Route::post('/admin/members/batch-transaction', [AdminMemberController::class, '
 Route::middleware(['auth'])->group(function () {
     Route::get('/email/verify', function () {
         // Don't generate URL here, let the notification handle it
-        return view('emails.verify-email');
+        return view('auth.verify-email');
     })->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
