@@ -113,7 +113,9 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
 
 // Annual Reports routes
 Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
-    Route::get('/admin/annual-reports', [AnnualReportController::class, 'adminIndex'])->name('admin.annual-reports.index');
+    Route::get('/admin/annual-reports', [AnnualReportController::class, 'adminIndex'])
+        ->middleware('can:view-annual-reports')
+        ->name('admin.annual-reports.index');
     Route::get('/admin/annual-reports/create', [AnnualReportController::class, 'create'])->name('admin.annual-reports.create');
     Route::post('/admin/annual-reports', [AnnualReportController::class, 'store'])->name('admin.annual-reports.store');
     Route::get('/admin/annual-reports/{report}/edit', [AnnualReportController::class, 'edit'])->name('admin.annual-reports.edit');
