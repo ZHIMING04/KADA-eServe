@@ -21,6 +21,7 @@ use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
+use App\Http\Controllers\AnnualReportController;
 
 
 require __DIR__.'/auth.php';
@@ -33,6 +34,10 @@ Route::get('/', function () {
 Route::get('/hubungi-kami', function () {
     return view('profile.contact');
 })->name('contact');
+
+Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports');
+Route::get('/annual-report/search', [AnnualReportController::class, 'search'])->name('annual-report.search');
+
 
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -104,6 +109,16 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
+});
+
+// Annual Reports routes
+Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
+    Route::get('/admin/annual-reports', [AnnualReportController::class, 'adminIndex'])->name('admin.annual-reports.index');
+    Route::get('/admin/annual-reports/create', [AnnualReportController::class, 'create'])->name('admin.annual-reports.create');
+    Route::post('/admin/annual-reports', [AnnualReportController::class, 'store'])->name('admin.annual-reports.store');
+    Route::get('/admin/annual-reports/{report}/edit', [AnnualReportController::class, 'edit'])->name('admin.annual-reports.edit');
+    Route::put('/admin/annual-reports/{report}', [AnnualReportController::class, 'update'])->name('admin.annual-reports.update');
+    Route::delete('/admin/annual-reports/{report}', [AnnualReportController::class, 'destroy'])->name('admin.annual-reports.destroy');
 });
 
 // Add new admin loan management routes
