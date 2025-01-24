@@ -28,6 +28,12 @@
                 </svg>
                 <span class="mx-4 font-medium">Kewangan</span>
             </a>
+            <a href="{{ route('admin.annual-reports.index') }}" class="flex items-center px-4 py-3 text-gray-600 rounded-lg hover:bg-gray-100 {{ request()->routeIs('admin.finance.*') ? 'bg-gray-100 text-gray-700' : '' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2zM6 6h12M6 10h12M6 14h12M6 18h12"/>
+                </svg>
+                <span class="mx-4 font-medium">Laporan Tahunan</span>
+            </a>
         </div>
     </nav>
 </aside> 

@@ -10,18 +10,20 @@ use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
 use App\Http\Controllers\LoanStatusController;
 use App\Http\Controllers\MemberStatusController;
+use App\Http\Controllers\AnnualReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;;
 use App\Providers\RouteServiceProvider;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
 
+main
 
 require __DIR__.'/auth.php';
 
@@ -30,9 +32,9 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::get('/hubungi-kami', function () {
-    return view('profile.contact');
-})->name('contact');
+// Public route for viewing annual reports - accessible to all
+Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports');
+Route::get('/annual-report/search', [AnnualReportController::class, 'search'])->name('annual-report.search');
 
 // Guest routes (for authenticated users with guest role)
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -103,6 +105,16 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::get('/admin/registrations/{id}/show', 'showRegistration')->name('admin.registrations.show');
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
+    });
+
+    // Annual Reports routes
+    Route::middleware(['auth', 'can:manage-annual-reports'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports.index');
+        Route::get('/annual-reports/create', [AnnualReportController::class, 'create'])->name('annual-reports.create');
+        Route::post('/annual-reports', [AnnualReportController::class, 'store'])->name('annual-reports.store');
+        Route::get('/annual-reports/{id}/edit', [AnnualReportController::class, 'edit'])->name('annual-reports.edit');
+        Route::put('/annual-reports/{id}', [AnnualReportController::class, 'update'])->name('annual-reports.update');
+        Route::delete('/annual-reports/{id}', [AnnualReportController::class, 'destroy'])->name('annual-reports.destroy');
     });
 });
 

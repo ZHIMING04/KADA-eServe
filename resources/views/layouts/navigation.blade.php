@@ -51,6 +51,11 @@
                         @endif
 
                     @endauth
+
+                    <!-- Add this new link - accessible to everyone -->
+                    <x-nav-link :href="route('annual-reports')" :active="request()->routeIs('annual-reports')">
+                        {{ __('Laporan Tahunan') }}
+                    </x-nav-link>
                 </div>
             </div>
 
