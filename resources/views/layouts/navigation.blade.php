@@ -30,6 +30,10 @@
                                 {{ __('Permohonan Ahli') }}
                             </x-nav-link>
 
+                            <x-nav-link :href="route('guest.status')" :active="request()->routeIs('guest.status')">
+                                {{ __('Member Registration Status') }}
+                            </x-nav-link>
+
                         @elseif(auth()->user()->isA('member'))
                             <x-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
                                 {{ __('Dashboard Ahli') }}
@@ -37,9 +41,13 @@
                             <x-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
                                 {{ __('Permohonan Pinjaman') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('loan.display')" :active="request()->routeIs('loan.display')">
+                                {{ __('Status Pinjaman') }}
+                            </x-nav-link>
                             <x-nav-link :href="route('report.display')" :active="request()->routeIs('report.display')">
                                 {{ __('Laporan Individu') }}
                             </x-nav-link>
+
                         @endif
 
                     @endauth
@@ -68,19 +76,10 @@
                     <x-slot name="content">
                         @auth
                             @if(auth()->user()->isA('guest'))
-                                <x-dropdown-link :href="route('guest.register')">
-                                    {{ __('Permohonan Ahli') }}
-                                </x-dropdown-link>
                                 
                             @elseif(auth()->user()->isA('member'))
                                 <x-dropdown-link :href="route('profile.edit')">
                                     {{ __('Profil') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('loan.create')">
-                                    {{ __('Permohonan Pinjaman') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('report.display')">
-                                    {{ __('Laporan Individu') }}
                                 </x-dropdown-link>
                             @endif
                             

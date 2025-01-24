@@ -6,13 +6,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
+use App\Models\Member;
+use App\Notifications\LoanApproved;
+
 
 class FinanceController extends Controller
 {
     public function index()
     {
         $loans = Loan::with('member')->get();
-        return view('admin.finance', compact('loans'));
+        
+        // Get current interest rate from settings
+        $currentInterestRate = Setting::where('key', 'interest_rate')->first()->value ?? 5.00;
+
+        return view('admin.finance', compact('loans', 'currentInterestRate'));
     }
 
     public function show($loanId)
@@ -58,21 +66,28 @@ class FinanceController extends Controller
     {
         try {
             $loan = Loan::findOrFail($loanId);
-            
-            if ($loan->status !== 'pending') {
-                return redirect()->back()
-                    ->with('error', 'Hanya permohonan yang dalam status menunggu boleh diluluskan.');
-            }
+            $member = Member::findOrFail($loan->member_id);
 
+            // Update loan status
             $loan->update([
-                'status' => 'approved'
+                'status' => 'approved',
+                'approved_at' => now()
             ]);
 
-            return redirect()->route('admin.finance.index')
-                ->with('success', 'Permohonan pinjaman telah diluluskan.');
-        } catch (\Exception $e) {
+            // Send approval notification
+            $member->notify(new LoanApproved());
+
+            DB::commit();
+
             return redirect()->back()
-                ->with('error', 'Ralat semasa meluluskan pinjaman: ' . $e->getMessage());
+                ->with('success', 'Pinjaman diluluskan dan emel pemberitahuan telah dihantar');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Loan approval error: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', 'Ralat: ' . $e->getMessage());
         }
     }
 

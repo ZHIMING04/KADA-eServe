@@ -15,26 +15,36 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
 use App\Models\Loan;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\MembershipApproved;
+use App\Models\Setting;
+
 
 class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::whereHas('user', function($query) {
-                $query->whereIs('member');
-            })
+        // Get approved members with specific attributes
+        $members = Member::where('status', 'approved')
             ->select([
                 'id',
                 'no_anggota',
                 'name',
-                'email',
                 'ic',
-                'phone'
+                'phone',
+                'email',
+                'address',
+                'city',
+                'postcode',
+                'state',
+                'status',
+                'created_at'
             ])
-            ->orderBy('no_anggota')
             ->get();
 
-        return view('admin.members', compact('members'));
+        return view('admin.members', [
+            'members' => $members,
+            'currentDividendRate' => Setting::where('key', 'dividend_rate')->value('value') ?? 0
+        ]);
     }
 
     public function show($id)
@@ -201,14 +211,28 @@ class MemberController extends Controller
                 Bouncer::assign('member')->to($user);
             }
 
+            // Force refresh user roles cache
+            Bouncer::refresh();
+            
             // Update member status
-            $member->update(['status' => 'approved']);
+            $member->update([
+                'status' => 'approved',
+                'approved_at' => now()
+            ]);
+
+            // Send approval notification
+            $member->notify(new MembershipApproved());
 
             DB::commit();
 
+            // Clear user's cached permissions
+            if (auth()->id() === $user->id) {
+                auth()->user()->fresh();
+            }
+
             // Redirect to members list with success message
             return redirect()->route('admin.members.index')
-                            ->with('success', 'Ahli berjaya diluluskan');
+                            ->with('success', 'Ahli berjaya diluluskan dan emel pemberitahuan telah dihantar');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -245,6 +269,7 @@ class MemberController extends Controller
     {
         $loans = Loan::where('member_id', $memberId)
             ->where('loan_amount', '>', 0)
+            ->where('status', 'approved')
             ->get(['loan_id', 'loan_type_id', 'loan_amount']);
         
         return response()->json($loans);

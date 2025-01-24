@@ -8,14 +8,22 @@ use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Auth\MemberController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\AdminRegistrationController;
+use App\Http\Controllers\LoanStatusController;
+use App\Http\Controllers\MemberStatusController;
+use App\Http\Controllers\AnnualReportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\AnnualReportController;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;;
+use App\Providers\RouteServiceProvider;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\BotManController;
+
+main
 
 require __DIR__.'/auth.php';
 
@@ -25,14 +33,16 @@ Route::get('/', function () {
 })->name('welcome');
 
 // Public route for viewing annual reports - accessible to all
-Route::get('/reports', [AnnualReportController::class, 'index'])->name('annual-reports');
+Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual-reports');
+Route::get('/annual-report/search', [AnnualReportController::class, 'search'])->name('annual-report.search');
 
 // Guest routes (for authenticated users with guest role)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/guest/dashboard', function () {
         return view('guest.dashboard');
     })->name('guest.dashboard');
 
+    Route::get('/guest/status', [MemberStatusController::class, 'display'])->name('guest.status');
     Route::get('/guest/register', [MemberController::class, 'create'])->name('guest.register');
     Route::post('/guest/register', [MemberController::class, 'store'])->name('guest.register.store');
     Route::get('/guest/success', function () {
@@ -54,6 +64,11 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
     });
+
+    //Loan Status
+    Route::get('/status', [LoanStatusController::class, 'display'])->name('loan.display');
+    Route::get('/status/{id}', [LoanStatusController::class, 'show'])->name('loan.show');
+    Route::get('/status/{id}/export', [LoanStatusController::class, 'export'])->name('loan.export');
 
     // Loans and reports
     
@@ -150,25 +165,48 @@ Route::post('/admin/members/batch-transaction', [AdminMemberController::class, '
     })->name('send.mail');
 
 
-// Add this route with auth and verified middleware
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware(['auth'])->name('verification.notice');
+// Remove or comment out the default verification routes
+// Route::get('/email/verify', function () {
+//     return view('auth.verify-email');
+// })->middleware(['auth'])->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
- 
-    return redirect('/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+// Add these custom verification routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/email/verify', function () {
+        // Don't generate URL here, let the notification handle it
+        return view('emails.verify-email');
+    })->name('verification.notice');
 
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
- 
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        
+        // Redirect based on user's role after verification
+        if ($request->user()->can('access-admin-dashboard')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($request->user()->can('apply-loan')) {
+            return redirect()->route('member.dashboard');
+        } else {
+            return redirect()->route('guest.dashboard');
+        }
+    })->middleware(['auth', 'signed'])->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Link pengesahan telah dihantar!');
+    })->middleware(['throttle:6,1'])->name('verification.send');
+});
 
 Route::get('/profile', function () {
     // Only verified users may access this route...
 })->middleware(['auth', 'verified']);
+
+// Add these routes
+Route::post('/admin/settings/dividend-rate', [SettingController::class, 'updateDividendRate']);
+Route::post('/admin/settings/interest-rate', [SettingController::class, 'updateInterestRate']);
+
+Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
+Route::get('/botman/widget', function () {
+    return view('vendor.botman.widget');
+});
 
 

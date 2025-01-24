@@ -37,4 +37,27 @@ class ConfirmablePasswordController extends Controller
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
+
+    /**
+     * Confirm the user's password for rate updates.
+     */
+    public function confirmRateUpdate(Request $request): \Illuminate\Http\JsonResponse
+    {
+        if (!Auth::guard('web')->validate([
+            'email' => $request->user()->email,
+            'password' => $request->password,
+        ])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kata laluan tidak sah'
+            ]);
+        }
+
+        $request->session()->put('auth.password_confirmed_at', time());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kata laluan disahkan'
+        ]);
+    }
 }

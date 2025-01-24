@@ -17,7 +17,10 @@ module.exports = {
             },
             opacity: {
                 '65': '0.65',
-            }
+            },
+            backgroundImage: {
+                'paddy': "url('/images/paddy.jpg')",
+            },
         },
     },
 
