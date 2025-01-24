@@ -1,191 +1,118 @@
 @extends('layouts.admin')
 
+@section('title', 'Edit Laporan Tahunan')
+
 @section('content')
-<div class="container py-6">
-    <h1 class="text-2xl font-semibold text-blue-600 mb-4">EDIT ANNUAL REPORT</h1>
-    <form action="{{ route('admin.annual-reports.update', $report->id) }}" method="POST" enctype="multipart/form-data" id="editForm">
-        @csrf
-        @method('PUT')
-        <div class="space-y-6 mb-6">
-            <!-- Title Input -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Purple Header Section - matched with index -->
+    <div class="text-white p-4 rounded-lg mb-6" style="background: linear-gradient(135deg, #8e5cbf 0%, #6c3baa 100%);">
+        <div class="flex items-center gap-3">
+            <div class="header-icon">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2zM6 6h12M6 10h12M6 14h12M6 18h12"/>
+                </svg>
+            </div>
             <div>
-                <label for="title" class="block text-sm font-medium text-gray-700">Tajuk</label>
-                <input 
-                    type="text" 
-                    id="title" 
-                    name="title" 
-                    value="{{ $report->title }}"
-                    required 
-                    class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-            </div>
-
-            <!-- Description Input -->
-            <div>
-                <label for="description" class="block text-sm font-medium text-gray-700">Penerangan</label>
-                <textarea 
-                    id="description" 
-                    name="description" 
-                    rows="3" 
-                    required 
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >{{ $report->description }}</textarea>
-            </div>
-
-            <!-- Year Input -->
-            <div>
-                <label for="year" class="block text-sm font-medium text-gray-700">Tahun</label>
-                <select 
-                    id="year" 
-                    name="year" 
-                    required 
-                    class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                    @for($i = date('Y'); $i >= 2000; $i--)
-                        <option value="{{ $i }}" {{ $report->year == $i ? 'selected' : '' }}>{{ $i }}</option>
-                    @endfor
-                </select>
-            </div>
-
-            <!-- Current Thumbnail -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Current Thumbnail</label>
-                @if($report->thumbnail)
-                    <img src="{{ asset('storage/' . $report->thumbnail) }}" alt="Current Thumbnail" class="mt-2 h-32 object-cover">
-                @else
-                    <p class="mt-2 text-gray-500">No thumbnail uploaded</p>
-                @endif
-            </div>
-
-            <!-- New Thumbnail Input -->
-            <div>
-                <label for="thumbnail" class="block text-sm font-medium text-gray-700">New Thumbnail Image (optional)</label>
-                <input 
-                    type="file" 
-                    id="thumbnail" 
-                    name="thumbnail" 
-                    accept="image/*" 
-                    class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-            </div>
-
-            <!-- Current PDF -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Current PDF</label>
-                @if($report->file_path)
-                    <a href="{{ asset('storage/' . $report->file_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800">
-                        View Current PDF
-                    </a>
-                @else
-                    <p class="mt-2 text-gray-500">No PDF uploaded</p>
-                @endif
-            </div>
-
-            <!-- New PDF File Input -->
-            <div>
-                <label for="file_path" class="block text-sm font-medium text-gray-700">New PDF File (optional)</label>
-                <input 
-                    type="file" 
-                    id="file_path" 
-                    name="file_path" 
-                    accept=".pdf" 
-                    class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-            </div>
-
-            <!-- Progress bar -->
-            <div class="progress mt-3 mb-3 d-none" id="progress-bar-container">
-                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-            </div>
-
-            <!-- Status message -->
-            <div id="status-message" class="alert d-none"></div>
-
-            <!-- Submit Button -->
-            <div class="flex justify-end gap-4 mt-6">
-                <a 
-                    href="{{ route('admin.annual-reports.index') }}" 
-                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-                >
-                    Cancel
-                </a>
-                <button 
-                    type="submit" 
-                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    Update Report
-                </button>
+                <h1 class="text-xl font-semibold">Edit Laporan Tahunan</h1>
+                <p class="text-sm text-white/80">Kemaskini laporan tahunan</p>
             </div>
         </div>
-    </form>
+    </div>
+
+    @if(session('warning'))
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('warning') }}</span>
+        </div>
+    @endif
+
+    @if(session('update_error'))
+        <div class="bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('update_error') }}</span>
+        </div>
+    @endif
+
+    <!-- Form Section - matched with index card size -->
+    <div class="bg-white rounded-lg shadow-sm p-4">
+        <h2 class="text-lg font-semibold text-blue-600 mb-4">KEMASKINI FAIL</h2>
+        
+        <form method="POST" action="{{ route('admin.annual-reports.update', $report->id) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="space-y-6 mb-6">
+                <!-- Title Input -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Tajuk</label>
+                    <input type="text" 
+                           id="title" 
+                           name="title" 
+                           value="{{ old('title', $report->title) }}" 
+                           required 
+                           class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
+                </div>
+
+                <!-- Description Input -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Penerangan</label>
+                    <textarea id="description" 
+                              name="description" 
+                              rows="3" 
+                              required 
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2 pt-2">{{ old('description', $report->description) }}</textarea>
+                </div>
+
+                <!-- Year Input -->
+                <div>
+                    <label for="year" class="block text-sm font-medium text-gray-700">Tahun</label>
+                    <select id="year" 
+                            name="year" 
+                            required 
+                            class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
+                        @for($i = date('Y'); $i >= 2000; $i--)
+                            <option value="{{ $i }}" {{ (old('year', $report->year) == $i) ? 'selected' : '' }}>{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <!-- Thumbnail Input -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Thumbnail (Imej)</label>
+                    @if($report->thumbnail)
+                        <div class="mb-2">
+                            <a href="{{ asset($report->thumbnail) }}" target="_blank" class="text-blue-600 hover:underline">Lihat Thumbnail Semasa</a>
+                        </div>
+                    @endif
+                    <input type="file" 
+                           name="thumbnail" 
+                           accept="image/*"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-500 mt-1">Biarkan kosong jika tidak mahu menukar thumbnail</p>
+                </div>
+
+                <!-- PDF File Input -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">Fail Laporan (PDF)</label>
+                    @if($report->file_path)
+                        <div class="mb-2">
+                            <a href="{{ asset($report->file_path) }}" target="_blank" class="text-blue-600 hover:underline">Lihat PDF Semasa</a>
+                        </div>
+                    @endif
+                    <input type="file" 
+                           name="file_path" 
+                           accept=".pdf"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                    <p class="text-sm text-gray-500 mt-1">Biarkan kosong jika tidak mahu menukar fail PDF</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        Kemaskini Laporan
+                    </button>
+                    <a href="{{ route('admin.annual-reports.index') }}" class="text-gray-600 hover:text-gray-800">
+                        Batal
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    $('#editForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const progressBar = $('.progress-bar');
-        const progressContainer = $('#progress-bar-container');
-        const statusMessage = $('#status-message');
-        const submitButton = $(this).find('button[type="submit"]');
-        
-        // Show progress bar
-        progressContainer.removeClass('d-none');
-        statusMessage.addClass('d-none');
-        submitButton.prop('disabled', true);
-        
-        $.ajax({
-            url: $(this).attr('action'),
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            xhr: function() {
-                const xhr = new window.XMLHttpRequest();
-                xhr.upload.addEventListener('progress', function(e) {
-                    if (e.lengthComputable) {
-                        const percent = Math.round((e.loaded / e.total) * 100);
-                        progressBar.css('width', percent + '%').text(percent + '%');
-                    }
-                });
-                return xhr;
-            },
-            success: function(response) {
-                statusMessage
-                    .removeClass('d-none alert-danger')
-                    .addClass('alert-success')
-                    .text('Report updated successfully!')
-                    .show();
-                
-                // Redirect after 2 seconds
-                setTimeout(() => {
-                    window.location.href = "{{ route('admin.annual-reports.index') }}";
-                }, 2000);
-            },
-            error: function(xhr) {
-                let errorMessage = 'An error occurred during update.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                }
-                
-                statusMessage
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
-                    .text(errorMessage)
-                    .show();
-                
-                progressBar.css('width', '0%').text('0%');
-            },
-            complete: function() {
-                submitButton.prop('disabled', false);
-            }
-        });
-    });
-});
-</script>
-@endpush
-
 @endsection 

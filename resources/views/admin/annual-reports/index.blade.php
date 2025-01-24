@@ -132,29 +132,38 @@
     </style>
 @endpush
 
-<!-- Add this section for required scripts -->
-@prepend('scripts')
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    
-    <script>
-        // Setup CSRF token for all Ajax requests
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-    </script>
-@endprepend
-
 @section('content')
 <div class="container py-6">
-    <!-- Enhanced Header -->
-    <div class="page-header mb-1">
-        <div class="header-content">
+    @if(session()->has('update_success') || session()->has('delete_success'))
+        <div id="alert-message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">
+                @if(session()->has('update_success'))
+                    Laporan berjaya dikemaskini!
+                @else(session()->has('delete_success'))
+                    Laporan berjaya dipadam!
+                @endif
+            </span>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const alert = document.getElementById('alert-message');
+                if (alert) {
+                    setTimeout(function() {
+                        alert.style.transition = 'opacity 1s';
+                        alert.style.opacity = '0';
+                        setTimeout(function() {
+                            alert.style.display = 'none';
+                        }, 1000);
+                    }, 3000);
+                }
+            });
+        </script>
+    @endif
+
+    <!-- Purple Header Section -->
+    <div class="text-white p-6 rounded-lg mb-6" style="background: linear-gradient(135deg, #8e5cbf 0%, #6c3baa 100%);">
+        <div class="flex items-center">
             <div class="header-icon">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2zM6 6h12M6 10h12M6 14h12M6 18h12"/>
@@ -166,62 +175,46 @@
             </div>
         </div>
     </div>
-    
-    <div class="py-6">
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6">
-            <div class="flex items-center justify-between">
-                <h1 class="text-xl font-semibold text-blue-600 mb-4">MUAT NAIK FAIL</h1>
-            </div>
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+
+    <!-- Form Section - NO green border -->
+    <div class="bg-white rounded-lg p-6">
+        <h2 class="text-xl font-semibold text-blue-600 mb-4">MUAT NAIK FAIL</h2>
+        
+        <form action="{{ route('admin.annual-reports.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="space-y-6 mb-6">
+                <!-- Title Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tajuk</label>
+                    <input type="text" name="title" required class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
                 </div>
-            @endif
 
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
+                <!-- Description Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Penerangan</label>
+                    <textarea name="description" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2 pt-2"></textarea>
                 </div>
-            @endif
 
-            <form action="{{ route('admin.annual-reports.store') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
-                @csrf
-                <div class="space-y-6 mb-6">
-                    <!-- Title Input -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Tajuk</label>
-                        <input type="text" name="title" required class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
-                    </div>
+                <!-- Year Input -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tahun</label>
+                    <select name="year" required class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
+                        @for($i = date('Y'); $i >= 2000; $i--)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
 
-                    <!-- Description Input -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Penerangan</label>
-                        <textarea name="description" rows="3" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2 pt-2"></textarea>
-                    </div>
-
-                    <!-- Year Input -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Tahun</label>
-                        <select name="year" required class="mt-1 block w-full h-12 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-2">
-                            @for($i = date('Y'); $i >= 2000; $i--)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    <!-- File Upload Area -->
-                    <div id="uploadContainer" class="space-y-4 p-6 border-2 border-dashed rounded-lg transition-colors duration-300">
+                <!-- File Upload Area - ONLY green for upload success, not delete -->
+                <div class="border-2 border-dashed {{ session()->has('success') && !session()->has('delete_success') ? 'border-green-500 bg-green-50' : 'border-gray-300' }} rounded-lg p-4" id="outerFrame">
+                    <div id="uploadContainer" class="space-y-4">
                         <!-- Thumbnail Upload -->
-                        <div class="file-upload-frame">
+                        <div class="file-upload-frame p-4 bg-gray-50 border border-gray-300 rounded-lg" id="thumbnailFrame">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <input type="file" name="thumbnail" accept="image/*" class="hidden" id="thumbnailInput" required>
-                                    <label for="thumbnailInput" class="cursor-pointer flex items-center">
-                                        <span class="text-gray-600 ml-2">Pilih Imej Muka Depan</span>
+                                    <label for="thumbnailInput" class="cursor-pointer">
+                                        <span class="text-gray-600">Pilih Imej Muka Depan</span>
                                         <span class="text-sm text-gray-500 ml-3">PNG, JPG sehingga 5MB</span>
                                     </label>
                                 </div>
@@ -230,12 +223,12 @@
                         </div>
 
                         <!-- PDF Upload -->
-                        <div class="file-upload-frame">
+                        <div class="file-upload-frame p-4 bg-gray-50 border border-gray-300 rounded-lg" id="pdfFrame">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <input type="file" name="file_path" accept=".pdf" class="hidden" id="pdfInput" required>
-                                    <label for="pdfInput" class="cursor-pointer flex items-center">
-                                        <span class="text-gray-600 ml-2">Pilih Fail PDF</span>
+                                    <label for="pdfInput" class="cursor-pointer">
+                                        <span class="text-gray-600">Pilih Fail PDF</span>
                                         <span class="text-sm text-gray-500 ml-3">PDF sehingga 100MB</span>
                                     </label>
                                 </div>
@@ -243,24 +236,28 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Status message -->
-                    <div id="statusMessage" class="hidden p-4 rounded-md mt-4"></div>
-
-                    <!-- Submit Button -->
-                    <div class="flex justify-center mt-6">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                            Upload Report
-                        </button>
-                    </div>
                 </div>
-            </form>
-        </div>
+
+                <!-- Status message -->
+                <div id="statusMessage" class="hidden p-4 rounded-md mt-4"></div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-center mt-6">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Upload Report
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 
+    <!-- Reports Table -->
     <div class="mt-6">
-        <h1 class="text-xl font-semibold text-blue-600 mb-2 pl-3">LAPORAN DIMUAT NAIK</h1>
+        <h1 class="text-xl font-semibold text-blue-600 mb-2">LAPORAN DIMUAT NAIK</h1>
         <div class="overflow-hidden rounded-lg shadow">
+            {{-- Debug info - temporary --}}
+            {{ count($reports) }} reports found<br>
+            
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-yellow-200">
                     <tr>
@@ -275,16 +272,19 @@
                             <td colspan="2" class="px-6 py-4 text-center text-gray-500">Tiada maklumat laporan</td>
                         </tr>
                     @else
-                        @foreach($reports as $report)
+                        @foreach($reports->sortByDesc('year') as $report)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->year }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <a href="{{ route('admin.annual-reports.edit', $report->id) }}" class="text-yellow-600 hover:text-yellow-800">Edit</a>
-                                    <form action="{{ route('admin.annual-reports.destroy', $report->id) }}" method="POST" class="inline-block">
+                                    <form action="{{ route('admin.annual-reports.destroy', $report->id) }}" 
+                                          method="POST" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('Adakah anda pasti mahu memadamkan laporan ini?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                                        <button type="submit" class="text-danger border-0 bg-transparent">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -293,13 +293,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
-
-<!-- Flash Message -->
-<div id="flashMessage" class="fixed inset-0 hidden z-50"> <!-- Centered in the viewport -->
-    <div class="bg-red-100 text-red-700 text-center px-4 py-3 rounded-lg shadow-lg"> <!-- Adjusted background and text color -->
-        {{ session('message') }} <!-- Display the message -->
     </div>
 </div>
 
@@ -320,20 +313,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadContainer = document.getElementById('uploadContainer');
     const thumbnailInput = document.getElementById('thumbnailInput');
     const pdfInput = document.getElementById('pdfInput');
-    const thumbnailName = document.getElementById('thumbnailName');
-    const pdfName = document.getElementById('pdfName');
+    const thumbnailFrame = document.getElementById('thumbnailFrame');
+    const pdfFrame = document.getElementById('pdfFrame');
     const statusMessage = document.getElementById('statusMessage');
 
     // Show file names when selected
     thumbnailInput.addEventListener('change', function() {
+        const frame = this.closest('.file-upload-frame');
         if (this.files[0]) {
-            thumbnailName.textContent = this.files[0].name;
+            const fileSize = this.files[0].size / (1024 * 1024); // Convert to MB
+            if (fileSize > 5) {
+                frame.style.border = '2px dashed #ef4444'; // red-500
+                frame.style.backgroundColor = '#fef2f2'; // red-50
+                document.getElementById('thumbnailName').textContent = 'File size exceeds 5MB';
+            } else {
+                frame.style.border = '2px dashed #22c55e'; // green-500
+                frame.style.backgroundColor = '#f0fdf4'; // green-50
+                document.getElementById('thumbnailName').textContent = this.files[0].name;
+            }
+        } else {
+            frame.style.border = '1px solid #d1d5db'; // gray-300
+            frame.style.backgroundColor = '#f9fafb'; // gray-50
+            document.getElementById('thumbnailName').textContent = '';
         }
     });
 
     pdfInput.addEventListener('change', function() {
+        const frame = this.closest('.file-upload-frame');
         if (this.files[0]) {
-            pdfName.textContent = this.files[0].name;
+            const fileSize = this.files[0].size / (1024 * 1024); // Convert to MB
+            if (fileSize > 100) {
+                frame.style.border = '2px dashed #ef4444'; // red-500
+                frame.style.backgroundColor = '#fef2f2'; // red-50
+                document.getElementById('pdfName').textContent = 'File size exceeds 100MB';
+            } else {
+                frame.style.border = '2px dashed #22c55e'; // green-500
+                frame.style.backgroundColor = '#f0fdf4'; // green-50
+                document.getElementById('pdfName').textContent = this.files[0].name;
+            }
+        } else {
+            frame.style.border = '1px solid #d1d5db'; // gray-300
+            frame.style.backgroundColor = '#f9fafb'; // gray-50
+            document.getElementById('pdfName').textContent = '';
         }
     });
 
@@ -352,40 +373,14 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.message || 'Server error');
-                });
+                throw new Error('Server error');
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Success state
-                uploadContainer.classList.add('border-green-500', 'bg-green-50');
-                statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
-                statusMessage.classList.add('bg-green-100', 'text-green-700');
-                statusMessage.textContent = data.message;
-                
-                // Reset form
-                form.reset();
-                thumbnailName.textContent = '';
-                pdfName.textContent = '';
-                
-                // Reload page after success
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            } else {
-                throw new Error(data.message || 'Upload failed');
-            }
+            // Handle success without JSON
+            alert('Files uploaded successfully!');
         })
         .catch(error => {
             console.error('Upload error:', error);
-            // Error state
-            uploadContainer.classList.add('border-red-500', 'bg-red-50');
-            statusMessage.classList.remove('hidden', 'bg-green-100', 'text-green-700');
-            statusMessage.classList.add('bg-red-100', 'text-red-700');
-            statusMessage.textContent = error.message || 'An error occurred during upload';
+            alert('Upload failed: ' + error.message);
         });
     });
 
@@ -393,6 +388,24 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('closeMessage').addEventListener('click', function() {
         document.getElementById('uploadMessage').classList.add('hidden');
     });
+
+    // Flash message handling
+    const flashMessage = document.getElementById('flashMessage');
+    if (flashMessage && "{{ session()->has('success') }}" || "{{ session()->has('delete_success') }}") {
+        flashMessage.classList.remove('hidden');
+        setTimeout(() => {
+            flashMessage.classList.add('hidden');
+        }, 3000);
+    }
+
+    // Only handle green frame for upload success, never for delete
+    if ("{{ session()->has('success') }}" && !"{{ session()->has('delete_success') }}") {
+        setTimeout(() => {
+            const outerFrame = document.getElementById('outerFrame');
+            outerFrame.classList.remove('border-green-500', 'bg-green-50');
+            outerFrame.classList.add('border-gray-300');
+        }, 3000);
+    }
 });
 </script>
 
@@ -443,17 +456,9 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 let errorMessage = 'An error occurred during upload.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
-                }
-                
-                statusMessage
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
-                    .text(errorMessage)
-                    .show();
-                
-                progressBar.css('width', '0%').text('0%');
+                // You can log the response text directly
+                console.error('Upload error:', xhr.responseText);
+                alert('Upload failed: ' + errorMessage);
             },
             complete: function() {
                 submitButton.prop('disabled', false);
@@ -461,6 +466,101 @@ $(document).ready(function() {
         });
     });
 });
+</script>
+
+<script>
+    // Auto hide alert after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alert = document.getElementById('alert-message');
+        if (alert) {
+            setTimeout(function() {
+                alert.style.transition = 'opacity 1s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 1000);
+            }, 3000);
+        }
+    });
+</script>
+
+<script>
+    // Optional: Add animation to the success border
+    document.addEventListener('DOMContentLoaded', function() {
+        const formBox = document.querySelector('.border-green-500');
+        if (formBox) {
+            setTimeout(() => {
+                formBox.classList.remove('border-green-500');
+                formBox.style.transition = 'border-color 0.5s ease';
+            }, 3000); // Remove green border after 3 seconds
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnailInput = document.getElementById('thumbnailInput');
+        const pdfInput = document.getElementById('pdfInput');
+        const outerFrame = document.getElementById('outerFrame');
+
+        thumbnailInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                document.getElementById('thumbnailName').textContent = this.files[0].name;
+            }
+        });
+
+        pdfInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                document.getElementById('pdfName').textContent = this.files[0].name;
+            }
+        });
+
+        // Remove success styling after 3 seconds if it exists
+        if (outerFrame.classList.contains('border-green-500')) {
+            setTimeout(() => {
+                outerFrame.classList.remove('border-green-500', 'bg-green-50');
+                outerFrame.classList.add('border-gray-300');
+            }, 3000);
+        }
+    });
+</script>
+
+<script>
+    function closeFlashMessage() {
+        const flashMessage = document.getElementById('flashMessage');
+        if (flashMessage) {
+            flashMessage.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMessage = document.getElementById('flashMessage');
+        if (flashMessage && !flashMessage.classList.contains('hidden')) {
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                flashMessage.style.transition = 'opacity 0.5s ease-out';
+                flashMessage.style.opacity = '0';
+                setTimeout(() => {
+                    flashMessage.classList.add('hidden');
+                    flashMessage.style.opacity = '1';
+                }, 500);
+            }, 3000);
+
+            // Close on click outside
+            flashMessage.addEventListener('click', function(e) {
+                if (e.target === flashMessage) {
+                    closeFlashMessage();
+                }
+            });
+
+            // Close on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeFlashMessage();
+                }
+            });
+        }
+    });
 </script>
 @endpush
 
