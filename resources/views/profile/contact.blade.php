@@ -107,7 +107,7 @@
                         <a class="nav-link" href="{{ route('welcome') }}">Utama</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Laporan Tahunan</a>
+                        <a class="nav-link" href="{{ route('annual-reports') }}">Laporan Tahunan</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="#">Hubungi Kami</a>

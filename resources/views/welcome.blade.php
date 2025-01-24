@@ -360,7 +360,7 @@
                     <a class="nav-link" href="#visi-misi" onclick="smoothScroll(event, 'visi-misi')">Visi & Misi</a>
                     </li>
                     <li class="nav-item">
-                    <a class="nav-link" href="#">Laporan Tahunan</a>
+                        <a class="nav-link" href="{{ route('annual-reports') }}">Laporan Tahunan</a>
                     </li>
                     <li class="nav-item">
                     <a class="nav-link" href="{{ route('contact') }}">Hubungi Kami</a>
