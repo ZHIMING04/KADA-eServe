@@ -407,7 +407,7 @@
      <!-- Updated Hero Section -->
      <div class="hero-section">
         <div class="hero-content">
-            <h1>Selamat Datang ke KADA</h1>
+            <h1>Selamat Datang ke Koperasi Kakitangan KADA Kelantan Berhad</h1>
             <p class="lead">Memacu Pembangunan Pertanian dan Kesejahteraan Komuniti</p>
             <a href="#tentang-kami" class="btn btn-success" onclick="smoothScroll(event, 'tentang-kami')">Tentang Kami</a>
         </div>

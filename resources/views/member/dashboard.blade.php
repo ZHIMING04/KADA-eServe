@@ -431,7 +431,7 @@
     <section class="loan-promo-section">
         <div class="container">
             <div class="text-center mb-4">
-                <h2 class="promo-title">Memohon pinjaman dengan KADA</h2>
+                <h2 class="promo-title">Permohonan Pinjaman dengan Koperasi KADA</h2>
             </div>
 
             <div class="row g-4 justify-content-center">
