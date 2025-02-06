@@ -206,7 +206,7 @@
                     <div class="p-6">
                         <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
                             <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
-                                <i class="fas fa-coins mr-2"></i> Sejarah Transaksi
+                                <i class="fas fa-coins mr-2"></i>Transaksi
                             </h3>
                             <!-- Sorting Form -->
                             <form method="GET" class="flex items-center space-x-2 ml-auto" id="filterForm">
@@ -225,6 +225,11 @@
                                             <option value="{{ $i }}" {{ request('year') == $i ? 'selected' : '' }}>{{ $i }}</option>
                                         @endfor
                                     </select>
+                                </div>
+                                <div>
+                                    <x-primary-button>
+                                        <a href="{{ route('individualReport.exportTransactions', ['month' => request('month'), 'year' => request('year')]) }}" class="text-white">{{ __('Muat Turun') }}</a>
+                                    </x-primary-button>
                                 </div>
                             </form>
                         </div>
@@ -379,4 +384,5 @@
             </div>
         </div>
     </div>
+    
 </x-app-layout>

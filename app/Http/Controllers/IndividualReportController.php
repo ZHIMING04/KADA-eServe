@@ -94,5 +94,30 @@ class IndividualReportController extends Controller
 
     }
 
+    public function exportTransactions(Request $request)
+    {
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+
+        // Simplified transaction query
+        $transactionsQuery = DB::table('transactions')
+            ->select('transactions.*')  // Select all from transactions
+            ->where('transactions.member_id', $member->id);
+
+        // Apply sorting based on the request
+        if ($request->filled('month') && $request->filled('year')) {
+            $transactionsQuery->whereMonth('transactions.created_at', $request->month)
+                              ->whereYear('transactions.created_at', $request->year);
+        }
+
+        $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')->get();
+
+        // Generate PDF
+        $pdf = PDF::loadView('individualReport.exportTransactions', compact('member', 'transactions'));
+
+        // Download PDF file
+        return $pdf->download('Transaction-Report-'.$member->no_anggota.'.pdf');
+    }
+
+    
 }
 
