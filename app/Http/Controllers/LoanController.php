@@ -221,7 +221,18 @@ class LoanController extends Controller
                     'monthly_gross_salary' => $validated['monthly_gross_salary'],
                     'monthly_net_salary' => $validated['monthly_net_salary'],
                     'loan_period' => $validated['loan_period'],
-                    'status' => 'pending'
+                    'status' => 'pending',
+                    'loan_balance' => $this->calculateTotalLoanRepayment(
+                        $validated['loan_amount'], 
+                        $interestRate, 
+                        $validated['loan_period']
+                    ),
+                    'loan_total_repayment' => $this->calculateTotalLoanRepayment(
+                        $validated['loan_amount'], 
+                        $interestRate, 
+                        $validated['loan_period']
+                    )
+
                 ]);
 
                 // Create guarantors
@@ -253,7 +264,7 @@ class LoanController extends Controller
         }
     }
 
-    private function calculateMonthlyRepayment($principal, $interestRate, $period)
+    public function calculateMonthlyRepayment($principal, $interestRate, $period)
     {
         $monthlyRate = ($interestRate / 100) / 12;
         
@@ -262,6 +273,11 @@ class LoanController extends Controller
             (pow(1 + $monthlyRate, $period) - 1);
             
         return round($monthlyPayment, 2);
+    }
+
+    private function calculateTotalLoanRepayment($principal, $interestRate, $period)
+    {
+        return round(($this->calculateMonthlyRepayment($principal, $interestRate, $period) * $period),2);
     }
 
     private function getBankName($bankId)

@@ -12,15 +12,22 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class IndividualReportController extends Controller
 {
-    public function display()
+    public function display(Request $request)
     {
         $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
  
         // Simplified transaction query
-        $transactions = DB::table('transactions')
+        $transactionsQuery = DB::table('transactions')
             ->select('transactions.*')  // Select all from transactions
-            ->where('transactions.member_id', $member->id)
-            ->orderBy('transactions.created_at', 'desc')
+            ->where('transactions.member_id', $member->id);
+        
+        // Apply sorting based on the request
+        if ($request->filled('month') && $request->filled('year')) {
+            $transactionsQuery->whereMonth('transactions.created_at', $request->month)
+                            ->whereYear('transactions.created_at', $request->year);
+        }
+   
+        $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')
             ->get()
             ->map(function ($transaction) {
                 // Transform the transaction type display
