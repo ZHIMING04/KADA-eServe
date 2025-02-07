@@ -49,6 +49,8 @@ class CreateLoanManagementTable extends Migration
             $table->unsignedBigInteger('bank_id');
             $table->date('date_apply');
             $table->double('loan_amount', 10, 2);
+            $table->double('loan_total_repayment', 10, 2);
+            $table->double('loan_balance', 10, 2);
             $table->double('interest_rate', 5, 2);
             $table->double('monthly_repayment', 10, 2);
             $table->double('monthly_gross_salary', 10, 2);
@@ -56,6 +58,7 @@ class CreateLoanManagementTable extends Migration
             $table->integer('loan_period');
             $table->string('status')->default('pending');
             $table->timestamps();
+            
 
             // Foreign Key Constraints
             $table->foreign('member_id')

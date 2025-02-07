@@ -3,11 +3,8 @@
         <div class="flex justify-between items-center">
             <div class="flex items-center">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Pinjaman') }} <strong>{{$loan->loan_type->loan_type}}</strong></h2>
-                <a href="{{ route('loan.export', $loan->loan_id) }}" class="ml-4">
-                    <x-primary-button type="submit" class="bg-green-500 hover:bg-green-700">{{ __('EXPORT') }}</x-primary-button>
-                </a>
             </div>
-            <a href="{{ route('loan.display') }}">
+            <a href="{{ url()->previous() }}">
                 <x-primary-button type="submit" class="bg-blue-100 hover:bg-blue-700">{{ __('KEMBALI') }}</x-primary-button>
             </a>
         </div>
