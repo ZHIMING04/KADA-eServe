@@ -52,6 +52,11 @@
                             <x-nav-link :href="route('annual-reports')" :active="request()->routeIs('annual-reports')">
                                 {{ __('Laporan Tahunan') }}
                             </x-nav-link>
+
+                            <!-- Add this inside the member navigation links section -->
+                            <x-nav-link :href="route('member.transactions.create')" :active="request()->routeIs('member.transactions.create')">
+                                {{ __('Buat Transaksi') }}
+                            </x-nav-link>
                         @endif
 
                     @endauth

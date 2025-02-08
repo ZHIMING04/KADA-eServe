@@ -9,9 +9,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <!-- Add Font Awesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4 }">
+        <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4, paymentMethod: 'cash' }">
             <!-- Return Button - Minimalist dark arrow -->
             <div class="fixed top-6 left-6 z-50">
                 <a href="{{ route('guest.dashboard') }}" 
@@ -34,7 +36,9 @@
                     class="w-full h-full object-cover">
             </div>
 
-            <form method="POST" action="{{ route('guest.register.store') }}" class="relative z-10">
+            <form method="POST" action="{{ route('guest.register.store') }}" 
+                  class="relative z-10" 
+                  enctype="multipart/form-data">
                 @csrf
                 <!-- Content -->
                 <div class="relative z-10">
@@ -467,6 +471,135 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Method and Proof Upload -->
+                                        <div class="mt-8 p-6 bg-white rounded-lg shadow">
+                                            <h4 class="text-lg font-semibold mb-6">Kaedah Pembayaran</h4>
+                                            
+                                            <!-- Payment Method Selection -->
+                                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                                <div class="relative">
+                                                    <input type="radio" id="payment_cash" name="payment_method" value="cash" 
+                                                           class="peer hidden" x-model="paymentMethod" required>
+                                                    <label for="payment_cash" 
+                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
+                                                                  peer-checked:border-green-500 peer-checked:bg-green-50
+                                                                  hover:border-gray-300
+                                                                  relative overflow-hidden">
+                                                        <div class="relative z-10">
+                                                            <i class="fas fa-money-bill-wave text-3xl mb-3" 
+                                                               :class="paymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'"></i>
+                                                            <div class="font-medium" :class="paymentMethod === 'cash' ? 'text-green-700' : 'text-gray-600'">
+                                                                Tunai
+                                                            </div>
+                                                        </div>
+                                                        <!-- Selected indicator -->
+                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'cash'">
+                                                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                                
+                                                <div class="relative">
+                                                    <input type="radio" id="payment_online" name="payment_method" value="online" 
+                                                           class="peer hidden" x-model="paymentMethod">
+                                                    <label for="payment_online" 
+                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
+                                                                  peer-checked:border-blue-500 peer-checked:bg-blue-50
+                                                                  hover:border-gray-300
+                                                                  relative overflow-hidden">
+                                                        <div class="relative z-10">
+                                                            <i class="fas fa-credit-card text-3xl mb-3" 
+                                                               :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"></i>
+                                                            <div class="font-medium" :class="paymentMethod === 'online' ? 'text-blue-700' : 'text-gray-600'">
+                                                                Pembayaran Dalam Talian
+                                                            </div>
+                                                        </div>
+                                                        <!-- Selected indicator -->
+                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'online'">
+                                                            <i class="fas fa-check-circle text-blue-500 text-xl"></i>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cash Payment Message -->
+                                            <div x-show="paymentMethod === 'cash'"
+                                                 x-transition:enter="transition ease-out duration-300"
+                                                 x-transition:enter-start="opacity-0 transform scale-95"
+                                                 x-transition:enter-end="opacity-100 transform scale-100"
+                                                 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+                                                 x-cloak>
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-info-circle text-green-500 text-xl mr-3"></i>
+                                                    <p class="text-green-700">
+                                                        Sila pergi ke kaunter hadapan untuk membuat pembayaran secara tunai.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Payment Proof Upload -->
+                                            <div x-show="paymentMethod === 'online'" 
+                                                 x-transition:enter="transition ease-out duration-300"
+                                                 x-transition:enter-start="opacity-0 transform scale-95"
+                                                 x-transition:enter-end="opacity-100 transform scale-100"
+                                                 x-cloak>
+                                                <div class="mt-4">
+                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                        Bukti Pembayaran <span class="text-red-500">*</span>
+                                                    </label>
+                                                    
+                                                    <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6"
+                                                         x-data="{ fileName: null }"
+                                                         @dragover.prevent="$el.classList.add('border-blue-500', 'bg-blue-50')"
+                                                         @dragleave.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')"
+                                                         @drop.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')">
+                                                        
+                                                        <!-- Hidden file input with dynamic required attribute -->
+                                                        <input type="file" 
+                                                               id="payment_proof" 
+                                                               name="payment_proof" 
+                                                               class="hidden"
+                                                               accept="image/*"
+                                                               :required="paymentMethod === 'online'"
+                                                               @change="fileName = $event.target.files[0].name">
+                                                        
+                                                        <!-- Upload Interface -->
+                                                        <div class="text-center" x-show="!fileName">
+                                                            <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+                                                                <i class="fas fa-cloud-upload-alt text-5xl"></i>
+                                                            </div>
+                                                            <div class="flex flex-col items-center">
+                                                                <label for="payment_proof" 
+                                                                       class="mb-2 px-6 py-2.5 bg-blue-500 text-white rounded-md cursor-pointer 
+                                                                      hover:bg-blue-600 transition-colors duration-200 font-medium">
+                                                                    Pilih Fail
+                                                                </label>
+                                                                <p class="text-xs text-gray-400 mt-2">PNG, JPG, GIF sehingga 5MB</p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- File Selected State -->
+                                                        <div class="text-center" x-show="fileName">
+                                                            <div class="flex items-center justify-center space-x-2">
+                                                                <i class="fas fa-file-image text-blue-500 text-xl"></i>
+                                                                <span class="text-sm text-gray-600" x-text="fileName"></span>
+                                                            </div>
+                                                            <button type="button" 
+                                                                    class="mt-4 px-4 py-2 text-sm text-red-600 hover:text-red-800 
+                                                                   hover:bg-red-50 rounded-md transition-colors duration-200"
+                                                                    @click="fileName = null; document.getElementById('payment_proof').value = ''">
+                                                                <i class="fas fa-trash-alt mr-1"></i> Buang Fail
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Error message -->
+                                                    <div class="mt-1 text-sm text-red-600" x-show="paymentMethod === 'online' && !fileName">
+                                                        Sila muat naik bukti pembayaran
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 

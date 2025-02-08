@@ -63,11 +63,24 @@ class MemberController extends Controller
             'fees.member_deposit' => 'required|numeric|min:0',
             'fees.welfare_fund' => 'required|numeric|min:0',
             'fees.fixed_savings' => 'required|numeric|min:0',
+
+            // Add payment validation rules
+            'payment_method' => 'required|in:cash,online',
+            'payment_proof' => 'required_if:payment_method,online|file|image|mimes:jpeg,png,gif|max:5120',
         ]);
 
         try {
             DB::beginTransaction();
             
+            // Handle payment proof upload if online payment
+            $paymentProofPath = null;
+            if ($request->payment_method === 'online' && $request->hasFile('payment_proof')) {
+                $proofFile = $request->file('payment_proof');
+                $proofName = time() . '_' . $proofFile->getClientOriginalName();
+                $proofFile->move(public_path('uploads/payment_proofs'), $proofName);
+                $paymentProofPath = 'uploads/payment_proofs/' . $proofName;
+            }
+
             // 1. Insert member data into member_register table
             $member = DB::table('member_register')->insertGetId([
                 'no_anggota' => $request->no_anggota,
@@ -90,6 +103,8 @@ class MemberController extends Controller
                 'office_postcode' => $request->office_postcode,
                 'office_state' => $request->office_state,
                 'guest_id' => auth()->id(),
+                'payment_method' => $request->payment_method,
+                'payment_proof' => $paymentProofPath,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -149,6 +164,11 @@ class MemberController extends Controller
                 ->with('success', 'Pendaftaran anda telah berjaya dihantar!');
 
         } catch (\Exception $e) {
+            // If there's an error and we uploaded a file, clean it up
+            if (isset($paymentProofPath) && file_exists(public_path($paymentProofPath))) {
+                unlink(public_path($paymentProofPath));
+            }
+            
             DB::rollBack();
             Log::error('Registration Error: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());

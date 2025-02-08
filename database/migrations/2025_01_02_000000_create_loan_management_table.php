@@ -9,22 +9,6 @@ class CreateLoanManagementTable extends Migration
 {
     public function up()
     {
-        // Create Members Table
-        Schema::create('members', function (Blueprint $table) {
-            $table->id('member_id');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('phone', 15)->nullable();
-            $table->text('address')->nullable();
-            $table->string('city', 100)->nullable();
-            $table->string('postcode', 10)->nullable();
-            $table->string('state', 100)->nullable();
-            $table->text('office_address')->nullable();
-            $table->string('office_city', 100)->nullable();
-            $table->string('office_postcode', 10)->nullable();
-            $table->timestamps();
-        });
 
         // Create LoanTypes Table
         Schema::create('loan_types', function (Blueprint $table) {

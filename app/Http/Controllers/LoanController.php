@@ -53,7 +53,11 @@ class LoanController extends Controller
 
         \Log::info('Loan application submitted', $request->all());
 
-        $interestRate = Setting::where('key', 'interest_rate')->first()->value ?? 5.00;
+        // Modified to get latest interest rate
+        $interestRate = Setting::where('key', 'interest_rate')
+            ->latest()
+            ->first()
+            ->value ?? 5.00;
 
         $validated = $request->validate([
             // Loan Details

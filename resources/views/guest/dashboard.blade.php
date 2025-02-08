@@ -353,7 +353,7 @@
             <div class="hero-content text-center animate-fadeInUp">
                 <h1 class="main-title">
                     <span class="welcome-text">Nikmati Faedah</span><br>
-                    <span class="membership-text">Keahlian Koperasi KADA!</span>
+                    <span class="membership-text">Keahlian Koperasi Kakitangan KADA!</span>
                 </h1>
                 <p class="hero-description mx-auto">Platform digital untuk meningkatkan kemajuan sektor pertanian di Kemubu.</p>
                 <a href="http://kada-eserve.test/guest/register" class="btn apply-now-btn animate-fadeInUp delay-1">Sertai Kami</a>

@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
+use App\Http\Controllers\MemberTransactionController;
+use App\Http\Controllers\Admin\TransactionController;
 
 
 require __DIR__.'/auth.php';
@@ -85,6 +87,14 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
     Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
+
+    // Member Transaction routes
+    Route::controller(MemberTransactionController::class)->group(function () {
+        Route::get('/member/transactions/create', 'create')->name('member.transactions.create');
+        Route::post('/member/transactions/store', 'store')->name('member.transactions.store');
+        Route::get('/member/transactions', 'index')->name('member.transactions.index');
+        Route::get('/member/loans', 'getMemberLoans')->name('member.loans');
+    });
 });
 
 // Admin routes
@@ -109,6 +119,16 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
+
+    // Transaction routes
+    Route::get('/admin/transactions', [TransactionController::class, 'index'])
+        ->name('admin.transactions.index');
+    Route::get('/admin/transactions/{transactionId}', [TransactionController::class, 'show'])
+        ->name('admin.transactions.show');
+    Route::post('/admin/transactions/{transactionId}/approve', [TransactionController::class, 'approve'])
+        ->name('admin.transactions.approve');
+    Route::post('/admin/transactions/{transactionId}/reject', [TransactionController::class, 'reject'])
+        ->name('admin.transactions.reject');
 });
 
 // Annual Reports routes
@@ -212,6 +232,11 @@ Route::post('/admin/settings/interest-rate', [SettingController::class, 'updateI
 Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
 Route::get('/botman/widget', function () {
     return view('vendor.botman.widget');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/member/transactions', [MemberTransactionController::class, 'store'])
+        ->name('member.transactions.store');
 });
 
 
