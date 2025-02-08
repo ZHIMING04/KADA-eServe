@@ -304,7 +304,7 @@ class MemberController extends Controller
                 $savings->save();
             } else {
                 $loan = Loan::where('loan_id', $validated['loan_id'])->firstOrFail();
-                $loan->loan_amount -= $validated['amount'];
+                $loan->loan_balance -= $validated['amount'];
                 $loan->save();
             }
 

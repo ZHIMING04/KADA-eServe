@@ -22,7 +22,9 @@ class Loan extends Model
         'monthly_gross_salary',
         'monthly_net_salary',
         'loan_period',
-        'status'
+        'status',
+        'loan_balance',
+        'loan_total_repayment'
     ];
 
     public const STATUS_PENDING = 'pending';
