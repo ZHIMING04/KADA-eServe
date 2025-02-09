@@ -10,6 +10,8 @@ use App\Models\Bank;
 use App\Models\Guarantor;
 use Illuminate\Support\Facades\DB;
 use App\Models\Setting;
+use Bouncer;
+use App\Models\User;
 
 class LoanController extends Controller
 {
@@ -60,8 +62,10 @@ class LoanController extends Controller
             ->value ?? 5.00;
 
         $validated = $request->validate([
-            // Loan Details
-            'loan_type_id' => 'required|exists:loan_types,loan_type_id',
+            'loan_type_id' => [
+                'required',
+                'exists:loan_types,loan_type_id'
+            ],
             'bank_id' => 'required',
             'bank_account' => [
                 'required',
@@ -72,20 +76,20 @@ class LoanController extends Controller
             'loan_amount' => [
                 'required',
                 'numeric',
-                'min:1000', // Minimum loan amount
-                'max:100000' // Maximum loan amount
+                'min:1000',
+                'max:100000'
             ],
             'loan_period' => [
                 'required',
                 'integer',
                 'min:1',
-                'max:60' // Maximum 60 months
+                'max:60'
             ],
             'monthly_gross_salary' => [
                 'required',
                 'numeric',
                 'min:0',
-                'gt:monthly_net_salary' // Must be greater than net salary
+                'gt:monthly_net_salary'
             ],
             'monthly_net_salary' => [
                 'required',
@@ -109,7 +113,35 @@ class LoanController extends Controller
                 'required',
                 'string',
                 'max:20',
-                'different:guarantor2_pf'
+                'different:guarantor2_pf',
+                function ($attribute, $value, $fail) {
+                    $member = Member::where('no_pf', $value)->first();
+                    
+                    if (!$member) {
+                        $fail('No. PF penjamin tidak dijumpai dalam sistem.');
+                        return;
+                    }
+
+                    if (!$member->user || !$member->user->isA('member')) {
+                        $fail('Penjamin mestilah ahli yang berdaftar.');
+                        return;
+                    }
+
+                    // Get the current user's member record
+                    $currentMember = DB::table('member_register')
+                        ->where('guest_id', auth()->id())
+                        ->first();
+
+                    if (!$currentMember) {
+                        $fail('Maklumat ahli tidak dijumpai.');
+                        return;
+                    }
+
+                    // Check if guarantor is the same as applicant
+                    if ($member->id === $currentMember->id) {
+                        $fail('Anda tidak boleh menjadi penjamin untuk pinjaman anda sendiri.');
+                    }
+                }
             ],
             'guarantor1_phone' => [
                 'required',
@@ -140,7 +172,35 @@ class LoanController extends Controller
                 'required',
                 'string',
                 'max:20',
-                'different:guarantor1_pf'
+                'different:guarantor1_pf',
+                function ($attribute, $value, $fail) {
+                    $member = Member::where('no_pf', $value)->first();
+                    
+                    if (!$member) {
+                        $fail('No. PF penjamin tidak dijumpai dalam sistem.');
+                        return;
+                    }
+
+                    if (!$member->user || !$member->user->isA('member')) {
+                        $fail('Penjamin mestilah ahli yang berdaftar.');
+                        return;
+                    }
+
+                    // Get the current user's member record
+                    $currentMember = DB::table('member_register')
+                        ->where('guest_id', auth()->id())
+                        ->first();
+
+                    if (!$currentMember) {
+                        $fail('Maklumat ahli tidak dijumpai.');
+                        return;
+                    }
+
+                    // Check if guarantor is the same as applicant
+                    if ($member->id === $currentMember->id) {
+                        $fail('Anda tidak boleh menjadi penjamin untuk pinjaman anda sendiri.');
+                    }
+                }
             ],
             'guarantor2_phone' => [
                 'required',
@@ -163,8 +223,26 @@ class LoanController extends Controller
             // Terms and Conditions
             'terms_agreed' => 'required|accepted'
         ], [
-            // Custom error messages
-            'required' => 'Ruangan :attribute perlu diisi',
+            // Custom error messages for required fields
+            'loan_type_id.required' => 'Sila pilih jenis pembiayaan',
+            'bank_id.required' => 'Sila pilih bank',
+            'bank_account.required' => 'Sila masukkan nombor akaun bank',
+            'loan_amount.required' => 'Sila masukkan jumlah pinjaman',
+            'loan_period.required' => 'Sila masukkan tempoh pinjaman',
+            'monthly_gross_salary.required' => 'Sila masukkan gaji kasar bulanan',
+            'monthly_net_salary.required' => 'Sila masukkan gaji bersih bulanan',
+            'guarantor1_name.required' => 'Sila masukkan nama penjamin pertama',
+            'guarantor1_pf.required' => 'Sila masukkan No. PF penjamin pertama',
+            'guarantor1_phone.required' => 'Sila masukkan nombor telefon penjamin pertama',
+            'guarantor1_address.required' => 'Sila masukkan alamat penjamin pertama',
+            'guarantor1_relationship.required' => 'Sila pilih hubungan dengan penjamin pertama',
+            'guarantor2_name.required' => 'Sila masukkan nama penjamin kedua',
+            'guarantor2_pf.required' => 'Sila masukkan No. PF penjamin kedua',
+            'guarantor2_phone.required' => 'Sila masukkan nombor telefon penjamin kedua',
+            'guarantor2_address.required' => 'Sila masukkan alamat penjamin kedua',
+            'guarantor2_relationship.required' => 'Sila pilih hubungan dengan penjamin kedua',
+            
+            // Other validation messages
             'numeric' => 'Ruangan :attribute mestilah nombor',
             'min' => 'Ruangan :attribute mestilah sekurang-kurangnya :min',
             'max' => 'Ruangan :attribute tidak boleh melebihi :max',
@@ -175,12 +253,8 @@ class LoanController extends Controller
             'accepted' => 'Anda perlu bersetuju dengan terma dan syarat',
             'before_or_equal' => ':attribute mestilah tarikh hari ini atau sebelumnya',
             
-            // Custom attribute names
-            'loan_type_id.required' => 'Sila pilih jenis pembiayaan',
-            'bank_id.required' => 'Sila pilih bank',
+            // Format-specific messages
             'bank_account.regex' => 'Nombor akaun bank tidak sah',
-            'guarantor1_pf.regex' => 'Nombor PF penjamin 1 tidak sah',
-            'guarantor2_pf.regex' => 'Nombor PF penjamin 2 tidak sah',
             'guarantor1_phone.regex' => 'Nombor telefon penjamin 1 tidak sah',
             'guarantor2_phone.regex' => 'Nombor telefon penjamin 2 tidak sah'
         ]);
@@ -317,6 +391,74 @@ class LoanController extends Controller
     public function success()
     {
         return view('loan.success')->with('success', 'Permohonan pinjaman anda telah berjaya dihantar!');
+    }
+
+    public function checkMemberRole(Request $request)
+    {
+        $noPF = $request->input('no_pf');
+        
+        $member = DB::table('member_register')
+            ->where('no_pf', $noPF)
+            ->first();
+
+        if (!$member) {
+            return response()->json([
+                'isValid' => false,
+                'message' => 'No. PF tidak dijumpai dalam sistem.'
+            ]);
+        }
+
+        $user = User::find($member->guest_id);
+        
+        if (!$user || !$user->isA('member')) {
+            return response()->json([
+                'isValid' => false,
+                'message' => 'Penjamin mestilah ahli yang berdaftar.'
+            ]);
+        }
+
+        return response()->json([
+            'isValid' => true
+        ]);
+    }
+
+    public function validateGuarantorPF($pf)
+    {
+        // Get current user's PF number
+        $currentUserPF = DB::table('member_register')
+            ->where('guest_id', auth()->id())
+            ->value('no_pf');
+
+        // Check if guarantor is using their own PF
+        if ($pf === $currentUserPF) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Anda tidak boleh menggunakan No. PF anda sendiri sebagai penjamin.'
+            ]);
+        }
+
+        // Check if PF exists in member_register and is a member
+        $guarantor = DB::table('member_register')
+            ->where('no_pf', $pf)
+            ->first();
+
+        if (!$guarantor) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'No. PF penjamin tidak dijumpai dalam sistem.'
+            ]);
+        }
+
+        // Check if guarantor is a registered member
+        $user = User::find($guarantor->guest_id);
+        if (!$user || !$user->isA('member')) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Penjamin mestilah ahli yang berdaftar.'
+            ]);
+        }
+
+        return response()->json(['valid' => true]);
     }
 
 }
