@@ -50,6 +50,12 @@ class AnnualReportController extends Controller
         return view('admin.annual-reports.create');
     }
 
+    public function adminView()
+    {
+        $reports = AnnualReport::orderBy('year', 'desc')->get();
+        return view('admin.annual-reports.view', compact('reports'));
+    }
+
     // Store new report (Upload)
     public function store(Request $request)
     {

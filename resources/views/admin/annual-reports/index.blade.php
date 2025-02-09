@@ -53,7 +53,7 @@
             box-shadow: 0 2px 4px rgba(59,130,246,0.3) !important;
         }
         .page-header {
-            background: linear-gradient(135deg, #6c3baa 0%, #8e5cbf 100%);
+            background: linear-gradient(135deg, #8e5cbf 0%, #6c3baa 100%);
             border-radius: 15px;
             padding: 1.5rem;
             margin-bottom: 2rem;
@@ -74,19 +74,18 @@
             max-width: 95% !important;
             margin: 0 auto;
         }
-        #membersTable {
+        #annualReportsTable {
             width: 100% !important;
         }
-        #membersTable th, 
-        #membersTable td {
+        #annualReportsTable th, 
+        #annualReportsTable td {
             padding: 1rem 1.5rem !important;
         }
-        #membersTable thead th {
+        #annualReportsTable thead th {
             font-weight: 600;
-            font-size: 0.875rem;
             white-space: nowrap;
         }
-        #membersTable tbody td {
+        #annualReportsTable tbody td {
             font-size: 0.95rem;
         }
         .dataTables_wrapper .dataTables_length {
@@ -139,7 +138,7 @@
             <span class="block sm:inline">
                 @if(session()->has('update_success'))
                     Laporan berjaya dikemaskini!
-                @else(session()->has('delete_success'))
+                @elseif(session()->has('delete_success'))
                     Laporan berjaya dipadam!
                 @endif
             </span>
@@ -162,11 +161,11 @@
     @endif
 
     <!-- Purple Header Section -->
-    <div class="text-white p-6 rounded-lg mb-6" style="background: linear-gradient(135deg, #8e5cbf 0%, #6c3baa 100%);">
-        <div class="flex items-center">
+    <div class="page-header mb-6">
+        <div class="header-content">
             <div class="header-icon">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 2h12a2 2 0 012 2v16a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2zM6 6h12M6 10h12M6 14h12M6 18h12"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l4-4m0 0l4 4m-4-4v12M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                 </svg>
             </div>
             <div>
@@ -177,7 +176,7 @@
     </div>
 
     <!-- Form Section - NO green border -->
-    <div class="bg-white rounded-lg p-6">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6">
         <h2 class="text-xl font-semibold text-blue-600 mb-4">MUAT NAIK FAIL</h2>
         
         <form action="{{ route('admin.annual-reports.store') }}" method="POST" enctype="multipart/form-data">
@@ -244,7 +243,7 @@
                 <!-- Submit Button -->
                 <div class="flex justify-center mt-6">
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Upload Report
+                        Muat Naik
                     </button>
                 </div>
             </div>
@@ -277,14 +276,18 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->year }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $report->title }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('admin.annual-reports.edit', $report->id) }}" class="text-yellow-600 hover:text-yellow-800">Edit</a>
+                                    <a href="{{ route('admin.annual-reports.edit', $report->id) }}"
+                                       class="bg-yellow-500 text-white hover:bg-yellow-600 font-semibold py-1 px-2 rounded inline-block">
+                                        Kemaskini
+                                    </a>
+                                    <span class="mx-2 text-gray-600">|</span>
                                     <form action="{{ route('admin.annual-reports.destroy', $report->id) }}" 
                                           method="POST" 
                                           class="d-inline"
                                           onsubmit="return confirm('Adakah anda pasti mahu memadamkan laporan ini?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-danger border-0 bg-transparent">Delete</button>
+                                        <button type="submit" class="text-red-600 hover:bg-gray-800 hover:text-red-800 border-0 bg-transparent">Padam</button>
                                     </form>
                                 </td>
                             </tr>
@@ -564,4 +567,4 @@ $(document).ready(function() {
 </script>
 @endpush
 
-@endsection 
+@endsection

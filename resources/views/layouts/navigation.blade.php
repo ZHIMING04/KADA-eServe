@@ -34,6 +34,10 @@
                                 {{ __('Status Permohonan Ahli') }}
                             </x-nav-link>
 
+                            <x-nav-link :href="route('annual-reports')" :active="request()->routeIs('annual-reports')">
+                                {{ __('Laporan Tahunan') }}
+                            </x-nav-link>
+
                         @elseif(auth()->user()->isA('member'))
                             <x-nav-link :href="route('member.dashboard')" :active="request()->routeIs('member.dashboard')">
                                 {{ __('Dashboard Ahli') }}
@@ -48,11 +52,11 @@
                                 {{ __('Laporan Individu') }}
                             </x-nav-link>
 
-                            <!-- Add this new link - accessible to everyone -->
+                            <!-- Annual Reports link - accessible to everyone -->
                             <x-nav-link :href="route('annual-reports')" :active="request()->routeIs('annual-reports')">
                                 {{ __('Laporan Tahunan') }}
                             </x-nav-link>
-
+                            
                             <!-- Add this inside the member navigation links section -->
                             <x-nav-link :href="route('member.transactions.create')" :active="request()->routeIs('member.transactions.create')">
                                 {{ __('Buat Transaksi') }}
