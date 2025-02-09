@@ -103,14 +103,13 @@ class LoanController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'different:guarantor2_name' // Must be different from guarantor 2
+                'different:guarantor2_name'
             ],
-            'guarantor1_ic' => [
+            'guarantor1_pf' => [
                 'required',
                 'string',
                 'max:20',
-                'regex:/^[0-9-]+$/',
-                'different:guarantor2_ic'
+                'different:guarantor2_pf'
             ],
             'guarantor1_phone' => [
                 'required',
@@ -137,12 +136,11 @@ class LoanController extends Controller
                 'max:255',
                 'different:guarantor1_name'
             ],
-            'guarantor2_ic' => [
+            'guarantor2_pf' => [
                 'required',
                 'string',
                 'max:20',
-                'regex:/^[0-9-]+$/',
-                'different:guarantor1_ic'
+                'different:guarantor1_pf'
             ],
             'guarantor2_phone' => [
                 'required',
@@ -181,8 +179,8 @@ class LoanController extends Controller
             'loan_type_id.required' => 'Sila pilih jenis pembiayaan',
             'bank_id.required' => 'Sila pilih bank',
             'bank_account.regex' => 'Nombor akaun bank tidak sah',
-            'guarantor1_ic.regex' => 'Nombor KP penjamin 1 tidak sah',
-            'guarantor2_ic.regex' => 'Nombor KP penjamin 2 tidak sah',
+            'guarantor1_pf.regex' => 'Nombor PF penjamin 1 tidak sah',
+            'guarantor2_pf.regex' => 'Nombor PF penjamin 2 tidak sah',
             'guarantor1_phone.regex' => 'Nombor telefon penjamin 1 tidak sah',
             'guarantor2_phone.regex' => 'Nombor telefon penjamin 2 tidak sah'
         ]);
@@ -244,7 +242,7 @@ class LoanController extends Controller
                     Guarantor::create([
                         'loan_id' => $loan->loan_id,
                         'name' => $validated["guarantor{$order}_name"],
-                        'ic' => $validated["guarantor{$order}_ic"],
+                        'no_pf' => $validated["guarantor{$order}_pf"],
                         'phone' => $validated["guarantor{$order}_phone"],
                         'address' => $validated["guarantor{$order}_address"],
                         'relationship' => $validated["guarantor{$order}_relationship"],
