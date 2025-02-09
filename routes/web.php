@@ -24,6 +24,7 @@ use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
 use App\Http\Controllers\MemberTransactionController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Service\SmsService;
 
 
 require __DIR__.'/auth.php';
@@ -68,6 +69,10 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
+        Route::post('/profile/update-phone', 'updatePhone')->name('profile.updatePhone');
+        Route::post('/profile/update-email', 'updateEmail')->name('profile.updateEmail');
+        Route::post('/profile/verify-phone', 'verifyPhone')->name('profile.verifyPhone');
+        Route::post('/profile/verify-email', 'verifyEmail')->name('profile.verifyEmail');
     });
 
     //Loan Status
@@ -220,6 +225,23 @@ Route::middleware(['auth'])->group(function () {
         return back()->with('message', 'Link pengesahan telah dihantar!');
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
+
+// Custom email verification routes for change email
+Route::middleware(['auth'])->group(function () {
+    Route::get('/email/change-verify', function () {
+        return view('auth.verify-email');
+    })->name('change.verification.notice');
+
+    Route::get('/email/change-verify/{id}/{hash}', [ProfileController::class, 'verifyNewEmail'])
+        ->middleware(['auth', 'signed'])
+        ->name('change.verification.verify');
+
+    Route::post('/email/change-verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Link pengesahan telah dihantar!');
+    })->middleware(['throttle:6,1'])->name('change.verification.send');
+});
+
 
 Route::get('/profile', function () {
     // Only verified users may access this route...
