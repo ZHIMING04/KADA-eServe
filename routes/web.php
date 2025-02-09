@@ -146,6 +146,7 @@ Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
     Route::get('/admin/annual-reports/{report}/edit', [AnnualReportController::class, 'edit'])->name('admin.annual-reports.edit');
     Route::put('/admin/annual-reports/{report}', [AnnualReportController::class, 'update'])->name('admin.annual-reports.update');
     Route::delete('/admin/annual-reports/{report}', [AnnualReportController::class, 'destroy'])->name('admin.annual-reports.destroy');
+    Route::get('/admin/annual-reports/view', [AnnualReportController::class, 'adminView'])->name('admin.annual-reports.view');
 });
 
 // Add new admin loan management routes
