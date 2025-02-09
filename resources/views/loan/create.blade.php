@@ -19,12 +19,12 @@
                     },
                     guarantorData: {
                         guarantor1_name: '',
-                        guarantor1_ic: '',
+                        guarantor1_pf: '',
                         guarantor1_phone: '',
                         guarantor1_address: '',
                         guarantor1_relationship: '',
                         guarantor2_name: '',
-                        guarantor2_ic: '',
+                        guarantor2_pf: '',
                         guarantor2_phone: '',
                         guarantor2_address: '',
                         guarantor2_relationship: ''
@@ -286,9 +286,10 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
-                                        <input type="text" name="guarantor1_ic" 
-                                               x-model="guarantorData.guarantor1_ic"
+                                        <label class="block text-sm font-medium text-gray-700">No. PF</label>
+                                        <input type="text" name="guarantor1_pf" 
+                                               x-model="guarantorData.guarantor1_pf"
+                                               placeholder="Contoh: A001"
                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
@@ -334,9 +335,10 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">No. Kad Pengenalan</label>
-                                        <input type="text" name="guarantor2_ic" 
-                                               x-model="guarantorData.guarantor2_ic"
+                                        <label class="block text-sm font-medium text-gray-700">No. PF</label>
+                                        <input type="text" name="guarantor2_pf" 
+                                               x-model="guarantorData.guarantor2_pf"
+                                               placeholder="Contoh: A001"
                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
                                     </div>
 
@@ -460,10 +462,9 @@
                                                     <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor1_name"></dd>
                                                 </div>
                                                 <div>
-                                                    <dt class="text-sm font-medium text-gray-500">No. KP</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor1_ic"></dd>
+                                                    <dt class="text-sm font-medium text-gray-500">No. PF</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor1_pf"></dd>
                                                 </div>
-                                                <!-- ... other guarantor1 details ... -->
                                             </dl>
                                         </div>
 
@@ -476,10 +477,9 @@
                                                     <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor2_name"></dd>
                                                 </div>
                                                 <div>
-                                                    <dt class="text-sm font-medium text-gray-500">No. KP</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor2_ic"></dd>
+                                                    <dt class="text-sm font-medium text-gray-500">No. PF</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900" x-text="guarantorData.guarantor2_pf"></dd>
                                                 </div>
-                                                <!-- ... other guarantor2 details ... -->
                                             </dl>
                                         </div>
                                     </div>

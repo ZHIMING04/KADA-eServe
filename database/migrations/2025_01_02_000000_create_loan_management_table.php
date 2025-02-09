@@ -64,7 +64,7 @@ class CreateLoanManagementTable extends Migration
             $table->id('guarantor_id');
             $table->string('loan_id', 50);
             $table->string('name');
-            $table->string('ic', 20);
+            $table->string('no_pf', 20);
             $table->string('phone', 15);
             $table->text('address');
             $table->enum('relationship', ['parent', 'spouse', 'sibling', 'relative', 'friend']);

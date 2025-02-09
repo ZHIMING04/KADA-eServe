@@ -9,7 +9,7 @@ class Guarantor extends Model
     protected $fillable = [
         'loan_id',
         'name',
-        'ic',
+        'no_pf',
         'phone',
         'address',
         'relationship',
