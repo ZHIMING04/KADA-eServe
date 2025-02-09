@@ -10,12 +10,15 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl rounded-xl">
                 <div class="p-8" x-data="{ 
                     currentStep: 1,
+                    errors: {},
                     loanData: {
-                        loan_type: '',
+                        loan_type_id: '',
                         bank_id: '',
                         bank_account: '',
                         loan_amount: '',
-                        loan_period: ''
+                        loan_period: '',
+                        monthly_gross_salary: '',
+                        monthly_net_salary: ''
                     },
                     guarantorData: {
                         guarantor1_name: '',
@@ -28,6 +31,186 @@
                         guarantor2_phone: '',
                         guarantor2_address: '',
                         guarantor2_relationship: ''
+                    },
+                    validateStep2() {
+                        this.errors = {};
+                        let isValid = true;
+
+                        // Validate loan type
+                        if (!this.loanData.loan_type_id) {
+                            this.errors.loan_type_id = 'Sila pilih jenis pembiayaan';
+                            isValid = false;
+                        }
+
+                        // Validate bank
+                        if (!this.loanData.bank_id) {
+                            this.errors.bank_id = 'Sila pilih bank';
+                            isValid = false;
+                        }
+
+                        // Validate bank account (must be numbers and dashes only)
+                        if (!this.loanData.bank_account) {
+                            this.errors.bank_account = 'Sila masukkan nombor akaun bank';
+                            isValid = false;
+                        } else if (!/^[0-9-]+$/.test(this.loanData.bank_account)) {
+                            this.errors.bank_account = 'Nombor akaun bank tidak sah';
+                            isValid = false;
+                        }
+
+                        // Validate loan amount
+                        if (!this.loanData.loan_amount) {
+                            this.errors.loan_amount = 'Sila masukkan jumlah pinjaman';
+                            isValid = false;
+                        } else if (this.loanData.loan_amount < 1000 || this.loanData.loan_amount > 100000) {
+                            this.errors.loan_amount = 'Jumlah pinjaman mestilah antara RM1,000 hingga RM100,000';
+                            isValid = false;
+                        }
+
+                        // Validate loan period
+                        if (!this.loanData.loan_period) {
+                            this.errors.loan_period = 'Sila masukkan tempoh pinjaman';
+                            isValid = false;
+                        } else if (this.loanData.loan_period < 1 || this.loanData.loan_period > 60) {
+                            this.errors.loan_period = 'Tempoh pinjaman mestilah antara 1 hingga 60 bulan';
+                            isValid = false;
+                        }
+
+                        // Validate salaries
+                        if (!this.loanData.monthly_gross_salary) {
+                            this.errors.monthly_gross_salary = 'Sila masukkan gaji kasar bulanan';
+                            isValid = false;
+                        }
+                        if (!this.loanData.monthly_net_salary) {
+                            this.errors.monthly_net_salary = 'Sila masukkan gaji bersih bulanan';
+                            isValid = false;
+                        }
+                        if (parseFloat(this.loanData.monthly_net_salary) >= parseFloat(this.loanData.monthly_gross_salary)) {
+                            this.errors.monthly_net_salary = 'Gaji bersih mestilah kurang daripada gaji kasar';
+                            isValid = false;
+                        }
+
+                        return isValid;
+                    },
+                    validateStep3() {
+                        this.errors = {};
+                        let isValid = true;
+
+                        // Validate first guarantor
+                        if (!this.guarantorData.guarantor1_name) {
+                            this.errors.guarantor1_name = 'Sila masukkan nama penjamin pertama';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_name.length > 255) {
+                            this.errors.guarantor1_name = 'Nama penjamin pertama tidak boleh melebihi 255 aksara';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor1_pf) {
+                            this.errors.guarantor1_pf = 'Sila masukkan No. PF penjamin pertama';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_pf === this.guarantorData.guarantor2_pf) {
+                            this.errors.guarantor1_pf = 'No. PF penjamin 1 tidak boleh sama dengan penjamin 2';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor1_phone) {
+                            this.errors.guarantor1_phone = 'Sila masukkan nombor telefon penjamin pertama';
+                            isValid = false;
+                        } else if (!/^[0-9-]+$/.test(this.guarantorData.guarantor1_phone)) {
+                            this.errors.guarantor1_phone = 'Nombor telefon penjamin 1 tidak sah';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_phone.length > 15) {
+                            this.errors.guarantor1_phone = 'Nombor telefon tidak boleh melebihi 15 aksara';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_phone === this.guarantorData.guarantor2_phone) {
+                            this.errors.guarantor1_phone = 'Nombor telefon penjamin 1 tidak boleh sama dengan penjamin 2';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor1_address) {
+                            this.errors.guarantor1_address = 'Sila masukkan alamat penjamin pertama';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_address.length > 500) {
+                            this.errors.guarantor1_address = 'Alamat tidak boleh melebihi 500 aksara';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor1_address === this.guarantorData.guarantor2_address) {
+                            this.errors.guarantor1_address = 'Alamat penjamin 1 tidak boleh sama dengan penjamin 2';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor1_relationship) {
+                            this.errors.guarantor1_relationship = 'Sila pilih hubungan dengan penjamin pertama';
+                            isValid = false;
+                        }
+
+                        // Validate second guarantor
+                        if (!this.guarantorData.guarantor2_name) {
+                            this.errors.guarantor2_name = 'Sila masukkan nama penjamin kedua';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_name.length > 255) {
+                            this.errors.guarantor2_name = 'Nama penjamin kedua tidak boleh melebihi 255 aksara';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_name === this.guarantorData.guarantor1_name) {
+                            this.errors.guarantor2_name = 'Nama penjamin 2 tidak boleh sama dengan penjamin 1';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor2_pf) {
+                            this.errors.guarantor2_pf = 'Sila masukkan No. PF penjamin kedua';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_pf === this.guarantorData.guarantor1_pf) {
+                            this.errors.guarantor2_pf = 'No. PF penjamin 2 tidak boleh sama dengan penjamin 1';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor2_phone) {
+                            this.errors.guarantor2_phone = 'Sila masukkan nombor telefon penjamin kedua';
+                            isValid = false;
+                        } else if (!/^[0-9-]+$/.test(this.guarantorData.guarantor2_phone)) {
+                            this.errors.guarantor2_phone = 'Nombor telefon penjamin 2 tidak sah';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_phone.length > 15) {
+                            this.errors.guarantor2_phone = 'Nombor telefon tidak boleh melebihi 15 aksara';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_phone === this.guarantorData.guarantor1_phone) {
+                            this.errors.guarantor2_phone = 'Nombor telefon penjamin 2 tidak boleh sama dengan penjamin 1';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor2_address) {
+                            this.errors.guarantor2_address = 'Sila masukkan alamat penjamin kedua';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_address.length > 500) {
+                            this.errors.guarantor2_address = 'Alamat tidak boleh melebihi 500 aksara';
+                            isValid = false;
+                        } else if (this.guarantorData.guarantor2_address === this.guarantorData.guarantor1_address) {
+                            this.errors.guarantor2_address = 'Alamat penjamin 2 tidak boleh sama dengan penjamin 1';
+                            isValid = false;
+                        }
+
+                        if (!this.guarantorData.guarantor2_relationship) {
+                            this.errors.guarantor2_relationship = 'Sila pilih hubungan dengan penjamin kedua';
+                            isValid = false;
+                        }
+
+                        return isValid;
+                    },
+                    async validateGuarantorPF(pfNumber, fieldName) {
+                        try {
+                            const response = await fetch(`/loan/validate-guarantor-pf/${pfNumber}`);
+                            const data = await response.json();
+                            
+                            if (!data.valid) {
+                                this.errors[fieldName] = data.message;
+                                return false;
+                            }
+                            return true;
+                        } catch (error) {
+                            console.error('Error validating PF:', error);
+                            return false;
+                        }
+                    },
+                    clearError(field) {
+                        delete this.errors[field];
                     }
                 }">
                     <!-- Step Numbers - Updated Design -->
@@ -59,31 +242,6 @@
                         @csrf
                         <input type="hidden" name="date_apply" value="{{ date('Y-m-d') }}">
                         
-                        @if ($errors->any())
-                            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">
-                                            Terdapat beberapa kesalahan:
-                                        </h3>
-                                        <div class="mt-2 text-sm text-red-700">
-                                            <ul class="list-disc pl-5 space-y-1">
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Step 1: Personal Information - Updated Design -->
                         <div x-show="currentStep === 1" class="transition-all duration-500">
                             <h2 class="text-2xl font-bold mb-8 text-gray-800 dark:text-white">Maklumat Peribadi</h2>
                             
@@ -143,7 +301,9 @@
                                 <select id="loan_type_id" 
                                         name="loan_type_id" 
                                         x-model="loanData.loan_type_id"
-                                        class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
+                                        @input="clearError('loan_type_id')"
+                                        :class="{'border-red-500': errors.loan_type_id}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                         required>
                                     <option value="">Pilih Jenis Pembiayaan</option>
                                     <option value="1">Al-Bai</option>
@@ -153,6 +313,9 @@
                                     <option value="5">Baik Pulih Kenderaan</option>
                                     <option value="6">Cukai Jalan</option>
                                 </select>
+                                <p x-show="errors.loan_type_id" 
+                                   x-text="errors.loan_type_id" 
+                                   class="mt-1 text-sm text-red-600"></p>
                             </div>
 
                             <!-- Bank -->
@@ -161,7 +324,9 @@
                                 <select id="bank_id" 
                                         name="bank_id" 
                                         x-model="loanData.bank_id"
-                                        class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600" 
+                                        @input="clearError('bank_id')"
+                                        :class="{'border-red-500': errors.bank_id}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                         required>
                                     <option value="">Pilih Bank</option>
                                     <option value="1">Affin Bank Berhad</option>
@@ -195,6 +360,9 @@
                                     <option value="29">Standard Chartered Saadiq Berhad</option>
                                     <option value="30">United Overseas Bank (Malaysia) Berhad</option>
                                 </select>
+                                <p x-show="errors.bank_id" 
+                                   x-text="errors.bank_id" 
+                                   class="mt-1 text-sm text-red-600"></p>
                             </div>
 
                             <!-- Bank Account Number -->
@@ -203,9 +371,14 @@
                                 <input type="text" 
                                        name="bank_account" 
                                        x-model="loanData.bank_account"
-                                       class="mt-1 block w-full rounded-md border border-green-500 focus:border-green-600 focus:ring-green-600"
+                                       @input="clearError('bank_account')"
+                                       :class="{'border-red-500': errors.bank_account}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                        placeholder="Contoh: 1234567890"
                                        required>
+                                <p x-show="errors.bank_account" 
+                                   x-text="errors.bank_account" 
+                                   class="mt-1 text-sm text-red-600"></p>
                             </div>
 
                             <!-- Loan Amount -->
@@ -214,8 +387,13 @@
                                 <input type="number" 
                                        name="loan_amount" 
                                        x-model="loanData.loan_amount"
+                                       @input="clearError('loan_amount')"
+                                       :class="{'border-red-500': errors.loan_amount}"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                        required>
+                                <p x-show="errors.loan_amount" 
+                                   x-text="errors.loan_amount" 
+                                   class="mt-1 text-sm text-red-600"></p>
                             </div>
 
                             <!-- Loan Period -->
@@ -226,8 +404,13 @@
                                        x-model="loanData.loan_period"
                                        min="1" 
                                        max="60"
+                                       @input="clearError('loan_period')"
+                                       :class="{'border-red-500': errors.loan_period}"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                        required>
+                                <p x-show="errors.loan_period" 
+                                   x-text="errors.loan_period" 
+                                   class="mt-1 text-sm text-red-600"></p>
                             </div>
 
                             <!-- Monthly Salaries -->
@@ -237,16 +420,26 @@
                                     <input type="number" 
                                            name="monthly_gross_salary" 
                                            x-model="loanData.monthly_gross_salary"
+                                           @input="clearError('monthly_gross_salary')"
+                                           :class="{'border-red-500': errors.monthly_gross_salary}"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                            required>
+                                    <p x-show="errors.monthly_gross_salary" 
+                                       x-text="errors.monthly_gross_salary" 
+                                       class="mt-1 text-sm text-red-600"></p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Gaji Bersih Bulanan (RM)</label>
                                     <input type="number" 
                                            name="monthly_net_salary" 
                                            x-model="loanData.monthly_net_salary"
+                                           @input="clearError('monthly_net_salary')"
+                                           :class="{'border-red-500': errors.monthly_net_salary}"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                                            required>
+                                    <p x-show="errors.monthly_net_salary" 
+                                       x-text="errors.monthly_net_salary" 
+                                       class="mt-1 text-sm text-red-600"></p>
                                 </div>
                             </div>
 
@@ -260,7 +453,7 @@
                                     Sebelumnya
                                 </button>
                                 <button type="button" 
-                                        @click="currentStep = 3"
+                                        @click="if(validateStep2()) currentStep = 3"
                                         class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Seterusnya
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,47 +464,65 @@
                         </div>
 
                         <!-- Step 3: Guarantor Information -->
-                        <div x-show="currentStep === 3" x-cloak>
-                            <h2 class="text-xl font-semibold mb-6">Maklumat Penjamin</h2>
-                            
+                        <div x-show="currentStep === 3" class="space-y-8">
+                            <h2 class="text-2xl font-bold mb-8 text-gray-800 dark:text-gray-200">Maklumat Penjamin</h2>
+
                             <!-- First Guarantor -->
-                            <div class="mb-8">
-                                <h3 class="text-lg font-medium mb-4">Penjamin Pertama</h3>
-                                <div class="space-y-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                <h3 class="text-lg font-medium mb-6">Penjamin Pertama</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Name -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
-                                        <input type="text" name="guarantor1_name" 
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama</label>
+                                        <input type="text" 
+                                               name="guarantor1_name" 
                                                x-model="guarantorData.guarantor1_name"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor1_name')"
+                                               :class="{'border-red-500': errors.guarantor1_name}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
+                                        <p x-show="errors.guarantor1_name" 
+                                           x-text="errors.guarantor1_name" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- PF Number -->
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">No. PF</label>
-                                        <input type="text" name="guarantor1_pf" 
+                                        <input type="text" 
+                                               name="guarantor1_pf" 
                                                x-model="guarantorData.guarantor1_pf"
-                                               placeholder="Contoh: A001"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor1_pf')"
+                                               @blur="validateGuarantorPF($event.target.value, 'guarantor1_pf')"
+                                               :class="{'border-red-500': errors.guarantor1_pf}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                               required>
+                                        <p x-show="errors.guarantor1_pf" 
+                                           x-text="errors.guarantor1_pf" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- Phone -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
-                                        <input type="text" name="guarantor1_phone" 
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. Telefon</label>
+                                        <input type="text" 
+                                               name="guarantor1_phone" 
                                                x-model="guarantorData.guarantor1_phone"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor1_phone')"
+                                               :class="{'border-red-500': errors.guarantor1_phone}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
+                                        <p x-show="errors.guarantor1_phone" 
+                                           x-text="errors.guarantor1_phone" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- Relationship -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                                        <textarea name="guarantor1_address" rows="3" 
-                                                  x-model="guarantorData.guarantor1_address"
-                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hubungan</label>
                                         <select name="guarantor1_relationship" 
                                                 x-model="guarantorData.guarantor1_relationship"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                                @change="clearError('guarantor1_relationship')"
+                                                :class="{'border-red-500': errors.guarantor1_relationship}"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
                                             <option value="">Pilih Hubungan</option>
                                             <option value="parent">Ibu/Bapa</option>
                                             <option value="spouse">Suami/Isteri</option>
@@ -319,48 +530,83 @@
                                             <option value="relative">Saudara</option>
                                             <option value="friend">Rakan</option>
                                         </select>
+                                        <p x-show="errors.guarantor1_relationship" 
+                                           x-text="errors.guarantor1_relationship" 
+                                           class="mt-1 text-sm text-red-600"></p>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
+                                        <textarea name="guarantor1_address" 
+                                                  x-model="guarantorData.guarantor1_address"
+                                                  @input="clearError('guarantor1_address')"
+                                                  :class="{'border-red-500': errors.guarantor1_address}"
+                                                  rows="3"
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"></textarea>
+                                        <p x-show="errors.guarantor1_address" 
+                                           x-text="errors.guarantor1_address" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Second Guarantor -->
-                            <div class="mt-12">
-                                <h3 class="text-lg font-medium mb-4">Penjamin Kedua</h3>
-                                <div class="space-y-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-sm">
+                                <h3 class="text-lg font-medium mb-6">Penjamin Kedua</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Name -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">Nama Penjamin</label>
-                                        <input type="text" name="guarantor2_name" 
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama</label>
+                                        <input type="text" 
+                                               name="guarantor2_name" 
                                                x-model="guarantorData.guarantor2_name"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor2_name')"
+                                               :class="{'border-red-500': errors.guarantor2_name}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
+                                        <p x-show="errors.guarantor2_name" 
+                                           x-text="errors.guarantor2_name" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- PF Number -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">No. PF</label>
-                                        <input type="text" name="guarantor2_pf" 
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. PF</label>
+                                        <input type="text" 
+                                               name="guarantor2_pf" 
                                                x-model="guarantorData.guarantor2_pf"
-                                               placeholder="Contoh: A001"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor2_pf')"
+                                               @blur="validateGuarantorPF($event.target.value, 'guarantor2_pf')"
+                                               :class="{'border-red-500': errors.guarantor2_pf}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                               required>
+                                        <p x-show="errors.guarantor2_pf" 
+                                           x-text="errors.guarantor2_pf" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- Phone -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">No. Telefon</label>
-                                        <input type="text" name="guarantor2_phone" 
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">No. Telefon</label>
+                                        <input type="text" 
+                                               name="guarantor2_phone" 
                                                x-model="guarantorData.guarantor2_phone"
-                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                               @input="clearError('guarantor2_phone')"
+                                               :class="{'border-red-500': errors.guarantor2_phone}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
+                                        <p x-show="errors.guarantor2_phone" 
+                                           x-text="errors.guarantor2_phone" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
 
+                                    <!-- Relationship -->
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">Alamat</label>
-                                        <textarea name="guarantor2_address" rows="3" 
-                                                  x-model="guarantorData.guarantor2_address"
-                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"></textarea>
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Hubungan dengan Pemohon</label>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hubungan</label>
                                         <select name="guarantor2_relationship" 
                                                 x-model="guarantorData.guarantor2_relationship"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                                                @change="clearError('guarantor2_relationship')"
+                                                :class="{'border-red-500': errors.guarantor2_relationship}"
+                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm">
                                             <option value="">Pilih Hubungan</option>
                                             <option value="parent">Ibu/Bapa</option>
                                             <option value="spouse">Suami/Isteri</option>
@@ -368,21 +614,40 @@
                                             <option value="relative">Saudara</option>
                                             <option value="friend">Rakan</option>
                                         </select>
+                                        <p x-show="errors.guarantor2_relationship" 
+                                           x-text="errors.guarantor2_relationship" 
+                                           class="mt-1 text-sm text-red-600"></p>
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Alamat</label>
+                                        <textarea name="guarantor2_address" 
+                                                  x-model="guarantorData.guarantor2_address"
+                                                  @input="clearError('guarantor2_address')"
+                                                  :class="{'border-red-500': errors.guarantor2_address}"
+                                                  rows="3"
+                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"></textarea>
+                                        <p x-show="errors.guarantor2_address" 
+                                           x-text="errors.guarantor2_address" 
+                                           class="mt-1 text-sm text-red-600"></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Step 3 Navigation Buttons -->
-                            <div class="mt-12 flex justify-between">
-                                <button type="button" @click="currentStep = 2"
-                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
+                            <!-- Navigation Buttons -->
+                            <div class="flex justify-between mt-8">
+                                <button type="button" 
+                                        @click="currentStep = 2"
+                                        class="inline-flex items-center px-8 py-3 bg-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-300 transition-colors duration-200">
                                     <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                     </svg>
-                                    Sebelumnya
+                                    Kembali
                                 </button>
+                                
                                 <button type="button" 
-                                        @click="currentStep = 4"
+                                        @click="if(validateStep3()) currentStep = 4"
                                         class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                     Seterusnya
                                     <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

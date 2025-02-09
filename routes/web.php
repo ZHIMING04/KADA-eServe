@@ -239,4 +239,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('member.transactions.store');
 });
 
+Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, 'checkMemberRole'])
+    ->middleware(['auth'])
+    ->name('check.member.role');
+
+Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
+
 
