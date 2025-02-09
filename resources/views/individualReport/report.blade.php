@@ -267,14 +267,10 @@
                                                 {{ number_format($transaction->amount, 2) }}
                                             </td>
                                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                @if($transaction->type == 'loan' || $transaction->type == 'loan_payment')
-                                                    @if($transaction->reference && $transaction->reference != '-')
-                                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                            {{ $transaction->reference }}
-                                                        </span>
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
+                                                @if($transaction->reference && $transaction->reference != '-')
+                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                        {{ $transaction->reference }}
+                                                    </span>
                                                 @else
                                                     <span class="text-gray-400">-</span>
                                                 @endif

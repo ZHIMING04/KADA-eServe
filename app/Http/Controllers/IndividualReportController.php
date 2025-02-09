@@ -33,11 +33,11 @@ class IndividualReportController extends Controller
                 // Transform the transaction type display
                 $transaction->type_display = match($transaction->type) {
                     'savings' => 'Simpanan',
-                    'loan' => 'Bayar Balik',  // Changed this line
+                    'loan' => 'Bayar Balik',
                     default => $transaction->type
                 };
 
-                // Format the reference (loan_id)
+                // Format the reference based on transaction type
                 if ($transaction->type == 'loan') {
                     // Get the loan details
                     $loan = DB::table('loans')
@@ -45,6 +45,18 @@ class IndividualReportController extends Controller
                         ->first();
                     
                     $transaction->reference = $loan ? 'LOAN-' . $loan->loan_id : '-';
+                } else if ($transaction->type == 'savings') {
+                    // Map savings types to their display names
+                    $savingsTypeMap = [
+                        'share_capital' => 'MS',          // Modal Syer
+                        'subscription_capital' => 'MY',    // Modal Yuran
+                        'member_deposit' => 'DA',         // Deposit Ahli
+                        'welfare_fund' => 'TK',           // Tabung Kebajikan
+                        'fixed_savings' => 'ST'           // Simpanan Tetap
+                    ];
+                    
+                    $prefix = $savingsTypeMap[$transaction->savings_type] ?? 'S';
+                    $transaction->reference = $prefix . '-' . str_pad($transaction->id, 5, '0', STR_PAD_LEFT);
                 } else {
                     $transaction->reference = '-';
                 }
