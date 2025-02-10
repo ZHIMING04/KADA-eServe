@@ -114,7 +114,7 @@ class IndividualReportController extends Controller
         $transactionsQuery = DB::table('transactions')
             ->select('transactions.*')  // Select all from transactions
             ->where('transactions.member_id', $member->id);
-
+            
         // Apply sorting based on the request
         if ($request->filled('month') && $request->filled('year')) {
             $transactionsQuery->whereMonth('transactions.created_at', $request->month)
@@ -122,6 +122,16 @@ class IndividualReportController extends Controller
         }
 
         $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')->get();
+
+        $transactions->each(function ($transaction) {
+            if ($transaction->type == 'loan') {
+                $loan = DB::table('loans')->where('loan_id', $transaction->loan_id)->first();
+                if ($loan) {
+                    $loanType = DB::table('loan_types')->where('loan_type_id', $loan->loan_type_id)->first();
+                    $transaction->loan_type = $loanType ? $loanType->loan_type : null;
+                }
+            }
+        });
 
         // Generate PDF
         $pdf = PDF::loadView('individualReport.exportTransactions', compact('member', 'transactions'));
