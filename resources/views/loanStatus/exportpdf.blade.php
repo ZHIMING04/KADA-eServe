@@ -200,9 +200,7 @@
                         <th>No</th>
                         <th>Nama</th>
                         <th>IC</th>
-                        <th>Telefon</th>
-                        <th>No Anggota</th>
-                        <th>No taktau</th>
+                        <th>No PF</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -211,9 +209,7 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $guarantor->name }}</td>
                             <td>{{ $guarantor->ic }}</td>
-                            <td>{{ $guarantor->phone }}</td>
-                            <td>{{ $guarantor->address }}</td>
-                            <td>{{ $guarantor->relationship }}</td>
+                            <td>{{ $guarantor->no_pf }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -224,7 +220,7 @@
 
         <div class="section">
             <div class="section-title">Pengakuan Pemohon</div>
-            <p>Saya {{ $member->name }}, No. K/P: {{ $member->ic }} dengan ini memberi kuasa kepada KOPERASI KAKITANGAN KADA KELANTAN BHD atau waliknya yang sah untuk mendapat apa-apa maklumat yang diperlukan
+            <p>Saya <strong>{{ $member->name }}</strong>, No. K/P:<strong> {{ $member->ic }} </strong>dengan ini memberi kuasa kepada KOPERASI KAKITANGAN KADA KELANTAN BHD atau waliknya yang sah untuk mendapat apa-apa maklumat yang diperlukan
             dan juga mendapatkan bayaran balik dari potongan gaji saya, sebagaimana yang dipinjamkan. Saya juga bersetuju menerima sebarang keputusan dari koperasi ini untuk menolak permohonan tanpa memberi sebarang alasan.</p>
         </div>
 

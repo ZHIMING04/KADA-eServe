@@ -87,11 +87,11 @@
                         <td>Simpanan Anggota</td>
                     </tr>
                     <tr>
-                        <td>{{ number_format($saving->share_capital,2) }}</td>
-                        <td>{{ number_format($saving->subscription_capital,2) }}</td>
-                        <td>{{ number_format($saving->fixed_savings,2) }}</td>
-                        <td>{{ number_format($saving->welfare_fund,2) }}</td>
-                        <td>{{ number_format($saving->member_deposit,2) }}</td>
+                        <td>RM{{ number_format($saving->share_capital,2) }}</td>
+                        <td>RM{{ number_format($saving->subscription_capital,2) }}</td>
+                        <td>RM{{ number_format($saving->fixed_savings,2) }}</td>
+                        <td>RM{{ number_format($saving->welfare_fund,2) }}</td>
+                        <td>RM{{ number_format($saving->member_deposit,2) }}</td>
                     </tr>
                 </table>
                 </div>

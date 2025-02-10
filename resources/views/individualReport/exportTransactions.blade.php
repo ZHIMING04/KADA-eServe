@@ -58,47 +58,53 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($transactions as $transaction)
+            @if ($transactions->isEmpty())
                 <tr>
-                    <td>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}</td>
-                    <td>
-                        @if ($transaction->type == 'loan')
-                            Pinjaman
-                        @elseif ($transaction->type == 'savings')
-                            Simpanan
-                        @else
-                            {{ $transaction->type }}
-                        @endif
-                    </td>
-                    <td>{{ number_format($transaction->amount, 2) }}</td>
-                    <td>
-                        @if ($transaction->type == 'loan')
-                            Bayaran Balik {{ $transaction->loan_type }}
-                            ({{ $transaction->loan_id }})
-                        @else
-                            @switch($transaction->savings_type)
-                                @case('welfare_fund')
-                                    Tabung Anggota
-                                    @break
-                                @case('subscription_capital')
-                                    Modal Yuran
-                                    @break
-                                @case('share_capital')
-                                    Modal Syer
-                                    @break
-                                @case('fixed_savings')
-                                    Simpanan Tetap
-                                    @break
-                                @case('member_deposit')
-                                    Deposit Ahli
-                                    @break
-                                @default
-                                    {{ $transaction->savings_type }}
-                            @endswitch
-                        @endif
-                    </td>
+                    <td colspan="4" style="text-align: center;">Tiada transaksi yang direkodkan untuk bulan ini</td>
                 </tr>
-            @endforeach
+            @else
+                @foreach ($transactions as $transaction)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}</td>
+                        <td>
+                            @if ($transaction->type == 'loan')
+                                Pinjaman
+                            @elseif ($transaction->type == 'savings')
+                                Simpanan
+                            @else
+                                {{ $transaction->type }}
+                            @endif
+                        </td>
+                        <td>{{ number_format($transaction->amount, 2) }}</td>
+                        <td>
+                            @if ($transaction->type == 'loan')
+                                Bayaran Balik {{ $transaction->loan_type }}
+                                ({{ $transaction->loan_id }})
+                            @else
+                                @switch($transaction->savings_type)
+                                    @case('welfare_fund')
+                                        Tabung Anggota
+                                        @break
+                                    @case('subscription_capital')
+                                        Modal Yuran
+                                        @break
+                                    @case('share_capital')
+                                        Modal Syer
+                                        @break
+                                    @case('fixed_savings')
+                                        Simpanan Tetap
+                                        @break
+                                    @case('member_deposit')
+                                        Deposit Ahli
+                                        @break
+                                    @default
+                                        {{ $transaction->savings_type }}
+                                @endswitch
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
         </tbody>
     </table>
 </body>
