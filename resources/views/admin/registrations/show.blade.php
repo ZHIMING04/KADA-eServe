@@ -151,6 +151,43 @@
             </div>
         </div>
 
+        <!-- Payment Information -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Maklumat Pembayaran</h2>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">Kaedah Pembayaran</p>
+                        <p class="font-medium flex items-center">
+                            @if($member->payment_method === 'cash')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-money-bill-wave mr-2"></i> Tunai
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    <i class="fas fa-credit-card mr-2"></i> Dalam Talian
+                                </span>
+                            @endif
+                        </p>
+                    </div>
+                    
+                    @if($member->payment_method === 'online' && $member->payment_proof)
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">Bukti Pembayaran</p>
+                        <p class="font-medium">
+                            <a href="#" 
+                               class="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                               onclick="showPaymentProof('{{ asset($member->payment_proof) }}'); return false;">
+                                <i class="fas fa-image mr-2"></i>
+                                Lihat Bukti Pembayaran
+                            </a>
+                        </p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Family Information -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Maklumat Keluarga</h2>
@@ -178,4 +215,41 @@
             </div>
         </div>
     </div>
+
+    <!-- Payment Proof Modal -->
+    <div id="paymentProofModal" 
+         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+         onclick="this.classList.add('hidden')">
+        <div class="max-w-3xl w-full bg-white rounded-lg shadow-xl overflow-hidden"
+             onclick="event.stopPropagation()">
+            <div class="p-4 bg-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">Bukti Pembayaran</h3>
+                <button onclick="document.getElementById('paymentProofModal').classList.add('hidden')"
+                        class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 flex items-center justify-center" style="max-height: 80vh;">
+                <img id="paymentProofImage" src="" alt="Bukti Pembayaran" 
+                     class="max-w-full max-h-[70vh] object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Script -->
+    <script>
+    function showPaymentProof(imageUrl) {
+        const modal = document.getElementById('paymentProofModal');
+        const image = document.getElementById('paymentProofImage');
+        image.src = imageUrl;
+        modal.classList.remove('hidden');
+    }
+
+    // Close modal when pressing ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.getElementById('paymentProofModal').classList.add('hidden');
+        }
+    });
+    </script>
 @endsection 

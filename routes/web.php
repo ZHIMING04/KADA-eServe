@@ -22,7 +22,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
-use App\Http\Controllers\AdminController;
+
 
 
 require __DIR__.'/auth.php';
@@ -67,6 +67,10 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::patch('/profile', 'update')->name('profile.update');
         Route::get('/profile/show', 'show')->name('profile.show');
+        Route::post('/profile/update-phone', 'updatePhone')->name('profile.updatePhone');
+        Route::post('/profile/update-email', 'updateEmail')->name('profile.updateEmail');
+        Route::post('/profile/verify-phone', 'verifyPhone')->name('profile.verifyPhone');
+        Route::post('/profile/verify-email', 'verifyEmail')->name('profile.verifyEmail');
     });
 
     //Loan Status
@@ -79,13 +83,21 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
     Route::resource('loans', LoanController::class);
     Route::get('/report', [IndividualReportController::class, 'display'])->name('report.display');
     Route::get('/report/export', [IndividualReportController::class, 'export'])->name('report.export');
+    Route::get('/report/export-transactions', [IndividualReportController::class, 'exportTransactions'])->name('individualReport.exportTransactions');
 
-    
 
     // Loan Routes
     Route::get('/loan/create', [LoanController::class, 'create'])->name('loan.create');
     Route::post('/loan/store', [LoanController::class, 'store'])->name('loan.store');
     Route::get('/loan/success', [LoanController::class, 'success'])->name('loan.success');
+
+    // Member Transaction routes
+    Route::controller(MemberTransactionController::class)->group(function () {
+        Route::get('/member/transactions/create', 'create')->name('member.transactions.create');
+        Route::post('/member/transactions/store', 'store')->name('member.transactions.store');
+        Route::get('/member/transactions', 'index')->name('member.transactions.index');
+        Route::get('/member/loans', 'getMemberLoans')->name('member.loans');
+    });
 });
 
 // Admin routes
@@ -113,7 +125,7 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
-});     
+
 
 // Annual Reports routes
 Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
@@ -125,6 +137,7 @@ Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
     Route::get('/admin/annual-reports/{report}/edit', [AnnualReportController::class, 'edit'])->name('admin.annual-reports.edit');
     Route::put('/admin/annual-reports/{report}', [AnnualReportController::class, 'update'])->name('admin.annual-reports.update');
     Route::delete('/admin/annual-reports/{report}', [AnnualReportController::class, 'destroy'])->name('admin.annual-reports.destroy');
+    Route::get('/admin/annual-reports/view', [AnnualReportController::class, 'adminView'])->name('admin.annual-reports.view');
 });
 
 // Add new admin loan management routes
@@ -205,6 +218,23 @@ Route::middleware(['auth'])->group(function () {
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
 
+// Custom email verification routes for change email
+Route::middleware(['auth'])->group(function () {
+    Route::get('/email/change-verify', function () {
+        return view('auth.verify-email');
+    })->name('change.verification.notice');
+
+    Route::get('/email/change-verify/{id}/{hash}', [ProfileController::class, 'verifyNewEmail'])
+        ->middleware(['auth', 'signed'])
+        ->name('change.verification.verify');
+
+    Route::post('/email/change-verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Link pengesahan telah dihantar!');
+    })->middleware(['throttle:6,1'])->name('change.verification.send');
+});
+
+
 Route::get('/profile', function () {
     // Only verified users may access this route...
 })->middleware(['auth', 'verified']);
@@ -217,6 +247,17 @@ Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
 Route::get('/botman/widget', function () {
     return view('vendor.botman.widget');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/member/transactions', [MemberTransactionController::class, 'store'])
+        ->name('member.transactions.store');
+});
+
+Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, 'checkMemberRole'])
+    ->middleware(['auth'])
+    ->name('check.member.role');
+
+Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
 
 
 

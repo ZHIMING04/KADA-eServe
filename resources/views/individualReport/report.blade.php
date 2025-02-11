@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('LAPORAN INDIVIDU') }}</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Laporan Individu') }}</h2>
             <form method="get" action="{{ route('report.export') }}">
             @csrf
             <x-primary-button type="submit">{{ __('Muat Turun Laporan Anda') }}</x-primary-button>
@@ -48,43 +48,52 @@
         .py-12 {
             background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
         }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination a, .pagination span {
+            display: inline-block;
+            padding: 4px 8px; /* Shortened the button */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #28a745;
+        }
+        .pagination a:hover {
+            background-color: #e6ffe6;
+        }
+        .pagination .active span {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .pagination .disabled span {
+            color: #ccc;
+            pointer-events: none;
+        }
+
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Members Details -->
-            <div class="info-card">
-                <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg">
-                    <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /> </svg>
-                        Maklumat Peribadi
-                    </h3>
-                </div>
-
-                <br>
-                <h3 class="text-9xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{$member->name}}</h3>
-                <div class="flex flex-wrap">
-                    <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>IC:</strong> {{$member->ic}}</p>
-                    </div>
-                    <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No PF:</strong> {{$member->no_pf}}</p>
-                    </div>
-                    <div class="w-full md:w-1/3 mb-2">
-                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No Ahli:</strong> {{$member->no_anggota}}</p>
-                    </div>
-    
-                </div>
-            </div>
-
             <!-- First row with savings information -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Existing Savings Card -->
                 <div class="bg-white rounded-2xl shadow-sm">
                     <div class="p-6">
-                        <h2 class="text-xl font-semibold mb-4">Maklumat Saham Ahli</h2>
+                        <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
+                                <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                                    <i class="fas fa-coins mr-2"></i> Maklumat Saham Ahli
+                                </h3>
+                        </div>
                         <div id="chart-demo-pie"></div>
                         <script>
                             document.addEventListener("DOMContentLoaded", function () {
@@ -200,7 +209,35 @@
                 <!-- New Transaction History Card with enhanced styling -->
                 <div class="bg-white rounded-2xl shadow-sm">
                     <div class="p-6">
-                        <h2 class="text-xl font-semibold mb-6 text-gray-800">Sejarah Transaksi</h2>
+                        <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                                <i class="fas fa-coins mr-2"></i>Transaksi
+                            </h3>
+                            <!-- Sorting Form -->
+                            <form method="GET" class="flex items-center space-x-2 ml-auto" id="filterForm">
+                                <div>
+                                    <select id="month" name="month" class="pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" onchange="document.getElementById('filterForm').submit()">
+                                        @for ($i = 1; $i <= 12; $i++)
+                                            <option value="{{ $i }}" {{ request('month', now()->month) == $i ? 'selected' : '' }}>
+                                                {{ \Carbon\Carbon::create()->month($i)->locale('ms')->translatedFormat('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div>
+                                    <select id="year" name="year" class="pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" onchange="document.getElementById('filterForm').submit()">
+                                        @for ($i = now()->year; $i >= 2025; $i--)
+                                            <option value="{{ $i }}" {{ request('year') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div>
+                                    <x-primary-button>
+                                        <a href="{{ route('individualReport.exportTransactions', ['month' => request('month'), 'year' => request('year')]) }}" class="text-white">{{ __('Muat Turun') }}</a>
+                                    </x-primary-button>
+                                </div>
+                            </form>
+                        </div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead>
@@ -235,14 +272,10 @@
                                                 {{ number_format($transaction->amount, 2) }}
                                             </td>
                                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                @if($transaction->type == 'loan' || $transaction->type == 'loan_payment')
-                                                    @if($transaction->reference && $transaction->reference != '-')
-                                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                            {{ $transaction->reference }}
-                                                        </span>
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
+                                                @if($transaction->reference && $transaction->reference != '-')
+                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                        {{ $transaction->reference }}
+                                                    </span>
                                                 @else
                                                     <span class="text-gray-400">-</span>
                                                 @endif
@@ -263,6 +296,16 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center items-bottom">
+                                <div>
+                                    {{ $transactions->links('pagination::default') }}
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    Halaman {{ $transactions->currentPage() }} daripada {{ $transactions->lastPage() }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -281,9 +324,6 @@
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Pinjaman ID
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Pinjaman Jenis
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -298,21 +338,24 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Tarikh Pinjaman
                                     </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Baki
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Tindakan
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @php
                                     $approvedLoans = $loans->filter(function ($loan) {
-                                    return $loan->status == 'approved';
-                                    });
+                                        return $loan->status == 'approved';
+                                    })->sortByDesc('created_at')->take(5);
                                 @endphp
 
                                 @forelse($approvedLoans as $loan)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                           {{$loan->loan_id}}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-500 dark:text-gray-300">
                                             {{$loan->loan_type->loan_type }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
@@ -327,10 +370,20 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                             {{$loan->created_at}}
                                         </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            <div class="bg-yellow-100 dark:bg-gray-700 p-2 rounded-lg text-center font-bold">
+                                                RM {{$loan->loan_balance}}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                            <a href="{{ route('loan.show', $loan->loan_id) }}">
+                                                <x-primary-button type="submit" class="bg-blue-500 hover:bg-blue-700">{{ __('BUTIRAN') }}</x-primary-button>
+                                            </a>
+                                        </td>
                                     </tr>
-                               @empty
+                                @empty
                                     <tr>
-                                        <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100" colspan="6">
+                                        <td class="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100 text-center" colspan="7">
                                             TIADA REKOD PINJAMAN
                                         </td>
                                     </tr>
@@ -342,4 +395,5 @@
             </div>
         </div>
     </div>
+    
 </x-app-layout>

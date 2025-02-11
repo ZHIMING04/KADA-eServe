@@ -9,7 +9,12 @@ class SavingController extends Controller
 {
     public function updateSavingsBalance()
     {
-        $rate = Setting::where('key', 'dividend_rate')->first()->value ?? 5.00;
+        // Modified to get latest dividend rate
+        $rate = Setting::where('key', 'dividend_rate')
+            ->latest()
+            ->first()
+            ->value ?? 5.00;
+
         // Retrieve all savings records from the database
         $savingsRecords = DB::table('savings')->get();
 
@@ -19,7 +24,8 @@ class SavingController extends Controller
 
             // Update the balance in the database
             DB::table('savings')
-                ->where('id', $record->id)->update(['balance' => round($newBalance,2)]);
+                ->where('id', $record->id)
+                ->update(['balance' => round($newBalance,2)]);
         }
     }
 }

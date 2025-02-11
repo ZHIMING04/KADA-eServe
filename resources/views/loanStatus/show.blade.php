@@ -3,11 +3,14 @@
         <div class="flex justify-between items-center">
             <div class="flex items-center">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Pinjaman') }} <strong>{{$loan->loan_type->loan_type}}</strong></h2>
-                <a href="{{ route('loan.export', $loan->loan_id) }}" class="ml-4">
-                    <x-primary-button type="submit" class="bg-green-500 hover:bg-green-700">{{ __('EXPORT') }}</x-primary-button>
-                </a>
+                <div class="ml-4">
+                    <span class="status-badge bg-{{ $loan->status == 'pending' ? 'yellow' : ($loan->status == 'rejected' ? 'red' : 'green') }}-100 text-{{ $loan->status == 'pending' ? 'yellow' : ($loan->status == 'rejected' ? 'red' : 'green') }}-800">
+                        {{ $loan->status == 'pending' ? 'SEDANG DIPROSES' : ($loan->status == 'rejected' ? 'DITOLAK' : 'DILULUSKAN') }}
+                    </span>
+                </div>
             </div>
-            <a href="{{ route('loan.display') }}">
+            
+            <a href="{{ url()->previous() }}">
                 <x-primary-button type="submit" class="bg-blue-100 hover:bg-blue-700">{{ __('KEMBALI') }}</x-primary-button>
             </a>
         </div>
@@ -94,9 +97,9 @@
                             <i class="fas fa-info-circle"></i>Maklumat Pinjaman
                         </h3>
                         <p class="text-white" style="margin-top: 10px;">
-                            <strong>Status:</strong>
-                            <span class="status-badge bg-{{ $loan->status == 'pending' ? 'yellow' : ($loan->status == 'rejected' ? 'red' : 'green') }}-100 text-{{ $loan->status == 'pending' ? 'yellow' : ($loan->status == 'rejected' ? 'red' : 'green') }}-800">
-                                {{ $loan->status == 'pending' ? 'SEDANG DIPROSES' : ($loan->status == 'rejected' ? 'DITOLAK' : 'DILULUSKAN') }}
+                            <strong>Baki Pinjaman / Jumlah Bayaran Balik:</strong>
+                            <span class="status-badge bg-yellow-100 text-yellow-800 text-lg">
+                            RM {{number_format($loan->loan_balance, 2)}} / RM {{number_format($loan->loan_total_repayment, 2)}}
                             </span>
                         </p>
                     </div>
@@ -107,20 +110,22 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Pinjaman ID</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:{{$loan->loan_id}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Pinjaman ID</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:{{$loan->loan_id}}</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Amaun</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:RM {{number_format($loan->loan_amount, 2)}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Amaun Pinjaman</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:RM {{number_format($loan->loan_amount, 2)}}</td>
                                     </tr>
+
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Bayaran Bulanan</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:RM {{number_format($loan->monthly_repayment, 2)}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Bayaran Bulanan</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:RM {{number_format($loan->monthly_repayment, 2)}}</td>
                                     </tr>
+                                  
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Tempoh</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:{{$loan->loan_period}} bulan</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Tempoh</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:{{$loan->loan_period}} bulan</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -129,20 +134,20 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Gaji Bersih</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:RM {{number_format($loan->monthly_net_salary, 2)}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Gaji Bersih</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:RM {{number_format($loan->monthly_net_salary, 2)}}</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Gaji Kasar</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:RM {{number_format($loan->monthly_gross_salary, 2)}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Gaji Kasar</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:RM {{number_format($loan->monthly_gross_salary, 2)}}</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Kadar</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:{{$loan->interest_rate}}%</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Kadar</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:{{$loan->interest_rate}}%</td>
                                     </tr>
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Tarikh Pinjaman</strong></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">:{{$loan->created_at}}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Tarikh Pinjaman</strong></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">:{{$loan->created_at}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -164,8 +169,8 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/2"><strong>Nama Bank</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">: {{$loan->bank->bank_name}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/2"><strong>Nama Bank</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-1/2">: {{$loan->bank->bank_name}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -174,8 +179,8 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/2"><strong>Akaun No</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-1/2">: {{$loan->bank->bank_account}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/2"><strong>Akaun No</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-1/2">: {{$loan->bank->bank_account}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -200,20 +205,16 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Nama</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[0]->name}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Nama</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->name}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>IC</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[0]->ic}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>IC</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->ic}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>No Tel</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[0]->phone}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Hubungan</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[0]->relationship}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No PF</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->no_pf}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -227,20 +228,16 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Nama</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[1]->name}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>Nama</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->name}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>IC</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[1]->ic}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>IC</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->ic}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>No Tel</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[1]->phone}}</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-1/5"><strong>Hubungan</strong></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 w-4/5">: {{$loan->guarantors[1]->relationship}}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No PF</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->no_pf}}</td>
                                 </tr>
                             </tbody>
                         </table>

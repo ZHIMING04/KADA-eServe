@@ -173,8 +173,8 @@
                                     <p class="font-medium">{{ $guarantor->name }}</p>
                                 </div>
                                 <div class="space-y-1">
-                                    <p class="text-sm text-gray-600">No. KP</p>
-                                    <p class="font-medium">{{ $guarantor->ic }}</p>
+                                    <p class="text-sm text-gray-600">No. PF</p>
+                                    <p class="font-medium">{{ $guarantor->no_pf }}</p>
                                 </div>
                                 <div class="space-y-1">
                                     <p class="text-sm text-gray-600">No. Telefon</p>
