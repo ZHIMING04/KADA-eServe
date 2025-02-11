@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="{{ asset('images/KADAlogoresize.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
             min-height: 100vh;
@@ -129,39 +128,6 @@
 
         .modal-content {
             border: none;
-        }
-
-        .custom-select {
-            transition: all 0.3s ease;
-            border-color: #198754;
-        }
-
-        .custom-select:hover {
-            border-color: #146c43;
-            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
-        }
-
-        .custom-select:focus {
-            border-color: #146c43;
-            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
-        }
-
-        #searchForm {
-            transition: all 0.3s ease;
-        }
-
-        #searchForm:hover {
-            transform: translateY(-2px);
-        }
-
-        .input-group {
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -297,36 +263,11 @@
                             <svg class="w-16 h-16 text-white me-3" style="width: 40px; height: 40px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
-                            <h1 class="display-4 mb-0 slide-down custom-title">Laporan Tahunan</h1>
+                            <h1 class="display-4 mb-0 slide-down custom-title">LAPORAN TAHUNAN</h1>
                         </div>
                         <p class="lead slide-down-delay text-blue-800 mb-2">Terokai Laporan Tahunan</p>
                         <p class="lead slide-down-delay">Akses dan muat turun laporan tahunan KADA di sini.</p>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container mx-auto px-4 py-8">
-            <div class="row justify-content-center">
-                <div class="col-md-6 text-center">
-                    <form id="searchForm" class="shadow-sm rounded-3 p-4 bg-white border">
-                        <div class="position-relative">
-                            <label for="yearOfReport" class="form-label fw-bold text-success mb-3">
-                                <i class="bi bi-calendar3"></i> Carian Laporan Tahunan
-                            </label>
-                            <div class="input-group">
-                                <select name="year" id="yearOfReport" class="form-select form-select-lg custom-select">
-                                    <option value="" disabled selected>-- Pilih Tahun --</option>
-                                    @for($i = date('Y'); $i >= 2000; $i--)
-                                        <option value="{{ $i }}">{{ $i }}</option>
-                                    @endfor
-                                </select>
-                                <button type="button" id="clearFilter" class="btn btn-outline-secondary">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
@@ -394,6 +335,13 @@
             </div>
         </div>
 
-
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function showImage(src) {
+                document.getElementById('modalImage').src = src;
+            }
+        </script>
+    @endif
 </body>
 </html>
