@@ -11,6 +11,8 @@ class Guarantor extends Model
         'name',
         'no_pf',
         'ic',
+        'phone',
+        'no_anggota',
         'guarantor_order'
     ];
 

@@ -66,6 +66,8 @@ class CreateLoanManagementTable extends Migration
             $table->string('name');
             $table->string('no_pf', 20);
             $table->string('ic', 12);
+            $table->string('phone',15);
+            $table->string('no_anggota', 20);
             $table->integer('guarantor_order'); // 1 for first guarantor, 2 for second guarantor
             $table->timestamps();
 
