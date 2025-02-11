@@ -146,6 +146,17 @@ class LoanController extends Controller
                 'regex:/^[0-9]+$/',
                 'different:guarantor2_ic'
             ],
+            'guarantor1_phone' => [
+                'required',
+                'string',
+                'regex:/^[0-9]+$/',
+                'different:guarantor2_phone'
+            ],
+            'guarantor1_no_anggota' => [
+                'required',
+                'string',
+                'different:guarantor2_no_anggota'
+            ],
 
             // Second Guarantor
             'guarantor2_name' => [
@@ -194,7 +205,17 @@ class LoanController extends Controller
                 'regex:/^[0-9]+$/',
                 'different:guarantor1_ic'
             ],
-            
+            'guarantor2_phone' => [
+                'required',
+                'string',
+                'regex:/^[0-9]+$/',
+                'different:guarantor1_phone'
+            ],
+            'guarantor2_no_anggota' => [
+                'required',
+                'string',
+                'different:guarantor1_no_anggota'
+            ],
 
             // Terms and Conditions
             'terms_agreed' => 'required|accepted'
@@ -213,7 +234,11 @@ class LoanController extends Controller
             'guarantor2_name.required' => 'Sila masukkan nama penjamin kedua',
             'guarantor2_pf.required' => 'Sila masukkan No. PF penjamin kedua',
             'guarantor2_ic.required' => 'Sila masukkan No. KP penjamin kedua',
-            
+            'guarantor1_phone.required' => 'Sila masukkan No. Telefon penjamin pertama',
+            'guarantor1_no_anggota.required' => 'Sila masukkan No. Anggota penjamin pertama',
+            'guarantor2_phone.required' => 'Sila masukkan No. Telefon penjamin kedua',
+            'guarantor2_no_anggota.required' => 'Sila masukkan No. Anggota penjamin kedua',
+                    
             // Other validation messages
             'numeric' => 'Ruangan :attribute mestilah nombor',
             'min' => 'Ruangan :attribute mestilah sekurang-kurangnya :min',
@@ -231,6 +256,8 @@ class LoanController extends Controller
             'guarantor1_ic.regex' => 'No. KP penjamin pertama mestilah nombor sahaja',
             'guarantor2_ic.size' => 'No. KP penjamin kedua mestilah 12 nombor',
             'guarantor2_ic.regex' => 'No. KP penjamin kedua mestilah nombor sahaja',
+            'guarantor1_phone.regex' => 'No. Telefon penjamin pertama mestilah nombor sahaja',
+            'guarantor2_phone.regex' => 'No. Telefon penjamin kedua mestilah nombor sahaja',
             'loan_amount.min' => 'Jumlah pinjaman mestilah antara RM1,000 hingga RM100,000',
             'loan_amount.max' => 'Jumlah pinjaman mestilah antara RM1,000 hingga RM100,000',
             'loan_period.min' => 'Tempoh pinjaman mestilah antara 1 hingga 60 bulan',
@@ -288,6 +315,8 @@ class LoanController extends Controller
                         'name' => $validated["guarantor{$order}_name"],
                         'no_pf' => $validated["guarantor{$order}_pf"],
                         'ic' => $validated["guarantor{$order}_ic"],
+                        'phone' => $validated["guarantor{$order}_phone"],
+                        'no_anggota' => $validated["guarantor{$order}_no_anggota"],
                         'guarantor_order' => $order
                     ]);
                 }
