@@ -28,8 +28,8 @@ class IndividualReportController extends Controller
         }
    
         $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')
-            ->get()
-            ->map(function ($transaction) {
+            ->paginate(7)
+            ->through(function ($transaction) {
                 // Transform the transaction type display
                 $transaction->type_display = match($transaction->type) {
                     'savings' => 'Simpanan',

@@ -48,6 +48,36 @@
         .py-12 {
             background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
         }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination a, .pagination span {
+            display: inline-block;
+            padding: 4px 8px; /* Shortened the button */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #28a745;
+        }
+        .pagination a:hover {
+            background-color: #e6ffe6;
+        }
+        .pagination .active span {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .pagination .disabled span {
+            color: #ccc;
+            pointer-events: none;
+        }
+
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -265,6 +295,16 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex justify-between items-center items-bottom">
+                                <div>
+                                    {{ $transactions->links('pagination::default') }}
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    Halaman {{ $transactions->currentPage() }} daripada {{ $transactions->lastPage() }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
