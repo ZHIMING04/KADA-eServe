@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
+use App\Http\Controllers\AdminController;
 
 
 require __DIR__.'/auth.php';
@@ -88,9 +89,12 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-        ->name('admin.dashboard');
+    Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard-data', [DashboardController::class, 'getDashboardData'])->name('admin.dashboard.data');
+    Route::get('/admin/savings-data', [DashboardController::class, 'getSavingsData'])
+    ->name('admin.savings-data');
+    
 
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
@@ -109,7 +113,7 @@ Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
         Route::get('/admin/members/{member}/loans', 'getMemberLoans')->name('admin.members.loans');
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
-});
+});     
 
 // Annual Reports routes
 Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
@@ -213,5 +217,6 @@ Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
 Route::get('/botman/widget', function () {
     return view('vendor.botman.widget');
 });
+
 
 
