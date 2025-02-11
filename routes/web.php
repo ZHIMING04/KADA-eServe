@@ -22,7 +22,9 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
-
+use App\Http\Controllers\MemberTransactionController;
+use App\Http\Controllers\Admin\TransactionController;
+use App\Service\SmsService;
 
 
 require __DIR__.'/auth.php';
@@ -101,12 +103,9 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 });
 
 // Admin routes
-    Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/dashboard-data', [DashboardController::class, 'getDashboardData'])->name('admin.dashboard.data');
-    Route::get('/admin/savings-data', [DashboardController::class, 'getSavingsData'])
-    ->name('admin.savings-data');
-    
+Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+        ->name('admin.dashboard');
 
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
@@ -126,6 +125,16 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::post('/admin/members/{member}/transaction', 'addTransaction')->name('admin.members.transaction');
     });
 
+    // Transaction routes
+    Route::get('/admin/transactions', [TransactionController::class, 'index'])
+        ->name('admin.transactions.index');
+    Route::get('/admin/transactions/{transactionId}', [TransactionController::class, 'show'])
+        ->name('admin.transactions.show');
+    Route::post('/admin/transactions/{transactionId}/approve', [TransactionController::class, 'approve'])
+        ->name('admin.transactions.approve');
+    Route::post('/admin/transactions/{transactionId}/reject', [TransactionController::class, 'reject'])
+        ->name('admin.transactions.reject');
+});
 
 // Annual Reports routes
 Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
@@ -258,6 +267,5 @@ Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, '
     ->name('check.member.role');
 
 Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
-
 
 
