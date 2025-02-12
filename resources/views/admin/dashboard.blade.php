@@ -79,61 +79,7 @@
             </div>
             </div>
 
-            <!-- Add after Header section -->
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <form id="timeFilterForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Jenis Tempoh
-                        </label>
-                        <select id="periodType" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            <option value="annually">Tahunan</option>
-                            <option value="monthly">Bulanan</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Tahun
-                        </label>
-                        <select id="yearSelect" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            @for($i = date('Y'); $i >= 2000; $i--)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
-
-                    <div id="monthSelectContainer" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Bulan
-                        </label>
-                        <select id="monthSelect" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                            @php
-                                $malayMonths = [
-                                    1 => 'Januari',
-                                    2 => 'Februari',
-                                    3 => 'Mac',
-                                    4 => 'April',
-                                    5 => 'Mei',
-                                    6 => 'Jun',
-                                    7 => 'Julai',
-                                    8 => 'Ogos',
-                                    9 => 'September',
-                                    10 => 'Oktober',
-                                    11 => 'November',
-                                    12 => 'Disember'
-                                ];
-                            @endphp
-                            @foreach($malayMonths as $monthNum => $monthName)
-                                <option value="{{ $monthNum }}">{{ $monthName }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </form>
-            </div>
-
-           
-
+        
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
                 <!-- Total Members Card -->
@@ -200,6 +146,59 @@
                         {{ $LoanApprovals->sum('total') }} diluluskan
                     </div>
                 </div>
+            </div>
+
+              <!-- Add after Header section -->
+              <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                <form id="timeFilterForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Jenis Tempoh
+                        </label>
+                        <select id="periodType" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="annually">Tahunan</option>
+                            <option value="monthly">Bulanan</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tahun
+                        </label>
+                        <select id="yearSelect" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            @for($i = date('Y'); $i >= 2000; $i--)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <div id="monthSelectContainer" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Bulan
+                        </label>
+                        <select id="monthSelect" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            @php
+                                $malayMonths = [
+                                    1 => 'Januari',
+                                    2 => 'Februari',
+                                    3 => 'Mac',
+                                    4 => 'April',
+                                    5 => 'Mei',
+                                    6 => 'Jun',
+                                    7 => 'Julai',
+                                    8 => 'Ogos',
+                                    9 => 'September',
+                                    10 => 'Oktober',
+                                    11 => 'November',
+                                    12 => 'Disember'
+                                ];
+                            @endphp
+                            @foreach($malayMonths as $monthNum => $monthName)
+                                <option value="{{ $monthNum }}">{{ $monthName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
             </div>
 
            

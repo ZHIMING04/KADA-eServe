@@ -433,23 +433,38 @@
                                                     <tbody class="bg-white divide-y divide-gray-200">
                                                         <!-- Fee rows -->
                                                         @foreach([
-                                                            'entrance' => 'Yuran Masuk',
-                                                            'share_capital' => 'Modal Syer',
-                                                            'subscription_capital' => 'Modal Yuran',
-                                                            'member_deposit' => 'Wang Deposit Anggota',
-                                                            'welfare_fund' => 'Sumbangan Tabung Kebajikan (Al-Abrar)',
-                                                            'fixed_savings' => 'Simpanan Tetap'
-                                                        ] as $key => $label)
+                                                            'entrance' => ['label' => 'Yuran Masuk', 'value' => 50, 'fixed' => true],
+                                                            'share_capital' => ['label' => 'Modal Syer', 'value' => 300, 'min' => true],
+                                                            'subscription_capital' => ['label' => 'Modal Yuran', 'value' => 35, 'min' => true],
+                                                            'member_deposit' => ['label' => 'Wang Deposit Anggota', 'value' => 20, 'min' => true],
+                                                            'welfare_fund' => ['label' => 'Sumbangan Tabung Kebajikan (Al-Abrar)', 'value' => 5, 'fixed' => true],
+                                                            'fixed_savings' => ['label' => 'Simpanan Tetap', 'value' => 5, 'fixed' => true]
+                                                        ] as $key => $fee)
                                                         <tr>
                                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loop->iteration }}</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $label }}</td>
+                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                {{ $fee['label'] }}
+                                                                @if(isset($fee['min']))
+                                                                    <span class="text-sm text-gray-500">(Minimum: RM{{ number_format($fee['value'], 2) }})</span>
+                                                                @endif
+                                                            </td>
                                                             <td class="px-6 py-4 whitespace-nowrap">
                                                                 <div class="relative">
                                                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
                                                                         RM
                                                                     </span>
-                                                                    <x-text-input type="number" step="0.01" name="fees[{{ $key }}]" 
-                                                                        class="pl-12 block w-full" required />
+                                                                    <input type="number" 
+                                                                        step="0.01" 
+                                                                        name="fees[{{ $key }}]" 
+                                                                        class="pl-12 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" 
+                                                                        required
+                                                                        value="{{ $fee['value'] }}"
+                                                                        {{ ($fee['fixed'] ?? false) ? 'readonly' : '' }}
+                                                                        {{ (!($fee['fixed'] ?? false)) ? 'min='.$fee['value'] : '' }}
+                                                                        data-min="{{ $fee['value'] }}"
+                                                                        data-fixed="{{ $fee['fixed'] ?? false }}"
+                                                                    />
+                                                                    <div class="hidden text-red-500 text-sm mt-1 error-message"></div>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -694,8 +709,71 @@
                 }
                 
                 feeInputs.forEach(input => {
-                    input.addEventListener('input', calculateTotal);
+                    const errorDiv = input.parentElement.querySelector('.error-message');
+                    // Show error div initially but keep it hidden
+                    errorDiv.style.visibility = 'hidden';
+                    errorDiv.style.height = '20px'; // Reserve space for error message
+                    errorDiv.style.margin = '4px 0';
+                    
+                    let validateTimeout;
+                    
+                    input.addEventListener('input', function() {
+                        calculateTotal();
+                        
+                        // Clear the previous timeout
+                        clearTimeout(validateTimeout);
+                        
+                        // Set a new timeout for validation
+                        validateTimeout = setTimeout(() => {
+                            const minValue = parseFloat(this.dataset.min);
+                            const isFixed = this.dataset.fixed === 'true';
+                            const value = parseFloat(this.value);
+                            
+                            if (isFixed && value !== minValue) {
+                                errorDiv.textContent = `This amount is fixed at RM${minValue.toFixed(2)}`;
+                                errorDiv.style.visibility = 'visible';
+                                this.value = minValue;
+                            } else if (!isFixed && value < minValue) {
+                                errorDiv.textContent = `Minimum amount required is RM${minValue.toFixed(2)}`;
+                                errorDiv.style.visibility = 'visible';
+                            } else {
+                                errorDiv.style.visibility = 'hidden';
+                            }
+                        }, 300); // Delay of 300ms before showing error
+                    });
                 });
+
+                // Set initial values for fixed amounts and calculate initial total
+                feeInputs.forEach(input => {
+                    const isFixed = input.dataset.fixed === 'true';
+                    if (isFixed) {
+                        input.value = input.dataset.min;
+                    }
+                });
+                calculateTotal();
+            });
+
+            // Form submission validation
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const feeInputs = document.querySelectorAll('input[name^="fees["]');
+                let hasError = false;
+
+                feeInputs.forEach(input => {
+                    const minValue = parseFloat(input.dataset.min);
+                    const value = parseFloat(input.value || 0);
+                    const errorDiv = input.parentElement.querySelector('.error-message');
+
+                    if (value < minValue) {
+                        hasError = true;
+                        errorDiv.textContent = `Minimum amount required is RM${minValue.toFixed(2)}`;
+                        errorDiv.style.visibility = 'visible';
+                    }
+                });
+
+                if (hasError) {
+                    e.preventDefault();
+                    alert('Please correct the errors in the fee amounts before proceeding.');
+                }
             });
         </script>
     </body>
