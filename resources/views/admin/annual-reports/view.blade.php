@@ -91,6 +91,33 @@
     .modal-content {
         border: none;
     }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    #yearSelector {
+        min-width: 200px;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+
+    #yearSelector:focus {
+        border-color: #5ba4fc;
+        box-shadow: 0 0 0 0.2rem rgba(91, 164, 252, 0.25);
+    }
+
+    #clearFilter {
+        transition: all 0.3s ease;
+    }
+
+    #clearFilter:hover {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
 </style>
 @endpush
 
@@ -108,6 +135,29 @@
                     </div>
                     <p class="lead slide-down-delay mb-2">Terokai Laporan Tahunan</p>
                     <p class="lead slide-down-delay">Akses dan muat turun laporan tahunan KADA di sini.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add after hero section and before Reports Grid -->
+    <div class="container mx-auto px-4 py-4">
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <select id="yearSelector" class="form-select me-2">
+                                <option value="all">Semua Tahun</option>
+                                @for($year = 2025; $year >= 2000; $year--)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
+                            </select>
+                            <button id="clearFilter" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Reset
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -183,5 +233,44 @@
     function showImage(src) {
         document.getElementById('modalImage').src = src;
     }
+
+    // Add filtering functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearSelector = document.getElementById('yearSelector');
+        const clearFilter = document.getElementById('clearFilter');
+        const reportCards = document.querySelectorAll('.card.h-100');
+
+        function filterReports(selectedYear) {
+            reportCards.forEach(card => {
+                const yearText = card.querySelector('.text-muted.mb-3.small').textContent;
+                const cardYear = yearText.match(/Tahun: (\d{4})/)[1];
+                const rowContainer = card.closest('.col-md-6').parentElement;
+                const cardContainer = card.closest('.col-md-6');
+                
+                if (selectedYear === 'all' || selectedYear === cardYear) {
+                    cardContainer.style.display = '';
+                    cardContainer.style.animation = 'fadeIn 0.5s ease-in';
+                } else {
+                    cardContainer.style.display = 'none';
+                }
+
+                // Hide empty rows
+                if (Array.from(rowContainer.children).every(col => col.style.display === 'none')) {
+                    rowContainer.style.display = 'none';
+                } else {
+                    rowContainer.style.display = '';
+                }
+            });
+        }
+
+        yearSelector.addEventListener('change', function() {
+            filterReports(this.value);
+        });
+
+        clearFilter.addEventListener('click', function() {
+            yearSelector.value = 'all';
+            filterReports('all');
+        });
+    });
 </script>
 @endpush
