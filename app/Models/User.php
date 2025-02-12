@@ -52,4 +52,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->role === $role;
     }
+
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'guest_id', 'id'); // Adjust if necessary
+    }
+
+    public function isAdmin()
+    {
+        return $this->isAn('admin'); // Checks if the user has the admin role
+    }
 }

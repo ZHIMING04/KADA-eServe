@@ -56,6 +56,21 @@ class Member extends Model
     {
         return $this->belongsTo(User::class, 'guest_id', 'id');
     }
+
+    public function resignation()
+    {
+        return $this->hasOne(Resignation::class, 'member_id', 'id');
+    }
+
+    public function resignations()
+    {
+        return $this->hasMany(Resignation::class);
+    }
+
+    public function isActive()
+    {
+        return $this->status === 'approved';
+    }
 }
 
 

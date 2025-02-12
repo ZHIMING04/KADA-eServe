@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Setting;
 use Bouncer;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class LoanController extends Controller
 {
@@ -22,6 +23,13 @@ class LoanController extends Controller
 
     public function create()
     {
+        $member = Auth::user()->member;
+
+        // Check if the member is active
+        if (!$member->isActive()) {
+            return redirect()->route('profile.edit')->with('error', 'Anda tidak boleh memohon pinjaman kerana permohonan berhenti anda telah diluluskan.');
+        }
+
         // Ensure loan types exist
         if (LoanType::count() === 0) {
             LoanType::insert([
@@ -33,10 +41,6 @@ class LoanController extends Controller
                 ['loan_type_id' => 6, 'loan_type' => 'Cukai Jalan', 'created_at' => now()]
             ]);
         }
-
-        $member = DB::table('member_register')
-            ->where('guest_id', auth()->id())
-            ->first();
 
         $loanTypes = LoanType::all();
         $banks = Bank::all();

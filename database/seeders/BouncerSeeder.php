@@ -79,6 +79,15 @@ class BouncerSeeder extends Seeder
             'title' => 'View Annual Reports',            
         ]);
         
+        Bouncer::ability()->firstOrCreate([
+            'name' => 'manage-resignations',
+            'title' => 'Manage Resignations',
+        ]);
+
+        Bouncer::ability()->firstOrCreate([
+            'name' => 'manage-status-list',
+            'title' => 'Manage Status List',
+        ]);
 
         // Assign abilities to roles
         Bouncer::allow('admin')->to('access-admin-dashboard');
@@ -89,13 +98,17 @@ class BouncerSeeder extends Seeder
         Bouncer::allow('admin')->to('approve-loan');
         Bouncer::allow('admin')->to('manage-annual-reports');
         Bouncer::allow('admin')->to('view-annual-reports');
+        Bouncer::allow('admin')->to('manage-resignations');
+        Bouncer::allow('admin')->to('manage-status-list');
 
         Bouncer::allow('member')->to('apply-loan');
         Bouncer::allow('member')->to('view-individual-report');
         Bouncer::allow('member')->to('view-annual-reports');
         Bouncer::allow('member')->to('view-individual-report');
-        Bouncer::allow('guest')->to('view-annual-reports');
+        Bouncer::allow('member')->to('manage-resignations');
 
+        Bouncer::allow('guest')->to('view-annual-reports');
+        
         // ... rest of your role and ability creation logic ...
     }
 } 

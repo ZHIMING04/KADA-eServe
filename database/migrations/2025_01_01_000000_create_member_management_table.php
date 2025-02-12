@@ -39,7 +39,7 @@ class CreateMemberManagementTable extends Migration
         $table->foreign('guest_id')->references('id')->on('users')->onDelete('cascade');
         $table->enum('payment_method', ['cash', 'online'])->default('cash');
         $table->string('payment_proof')->nullable();
-        $table->enum('status', ['pending', 'approved', 'rejected'])
+        $table->enum('status', ['pending', 'approved', 'rejected', 'resigned', 'deceased'])
               ->default('pending');
     });
 
@@ -78,6 +78,5 @@ class CreateMemberManagementTable extends Migration
         $table->foreign('no_anggota')->references('id')->on('member_register')->onDelete('cascade');
     });
 }
-
 };
 
