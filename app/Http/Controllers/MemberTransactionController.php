@@ -14,12 +14,28 @@ class MemberTransactionController extends Controller
 {
     public function create()
     {
+        // Check if user is resigned
+        $member = Member::where('guest_id', Auth::id())->first();
+        
+        if ($member && $member->status === 'resigned') {
+            return redirect()->route('profile.edit')
+                ->with('error', 'Anda tidak boleh membuat transaksi kerana permohonan berhenti anda telah diluluskan.');
+        }
+
         return view('memberTransaction.make-transaction');
     }
 
     public function store(Request $request)
     {
         try {
+            // Check if user is resigned before allowing transaction
+            $member = Member::where('guest_id', Auth::id())->first();
+            
+            if ($member && $member->status === 'resigned') {
+                return redirect()->route('profile.edit')
+                    ->with('error', 'Anda tidak boleh membuat transaksi kerana permohonan berhenti anda telah diluluskan.');
+            }
+
             Log::info('Starting transaction process', $request->all());
 
             // Get the authenticated user's member record from member_register table

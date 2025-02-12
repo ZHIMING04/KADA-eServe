@@ -24,6 +24,9 @@ use App\Http\Controllers\BotManController;
 use App\Http\Controllers\AnnualReportController;
 use App\Http\Controllers\MemberTransactionController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\ListController;
+use App\Http\Controllers\ResignationController;
+use App\Models\Resignation;
 use App\Service\SmsService;
 
 
@@ -101,6 +104,12 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/member/transactions', 'index')->name('member.transactions.index');
         Route::get('/member/loans', 'getMemberLoans')->name('member.loans');
     });
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/resignation/form', [ResignationController::class, 'showForm'])->name('resignation.form');
+        Route::post('/resignation/submit', [ResignationController::class, 'submit'])->name('resignation.submit');
+    });
+
 });
 
 // Admin routes
@@ -151,6 +160,22 @@ Route::middleware(['auth', 'can:manage-annual-reports'])->group(function () {
     Route::put('/admin/annual-reports/{report}', [AnnualReportController::class, 'update'])->name('admin.annual-reports.update');
     Route::delete('/admin/annual-reports/{report}', [AnnualReportController::class, 'destroy'])->name('admin.annual-reports.destroy');
     Route::get('/admin/annual-reports/view', [AnnualReportController::class, 'adminView'])->name('admin.annual-reports.view');
+});
+
+// Admin List Management Routes
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    Route::get('/list', [ListController::class, 'index'])->name('admin.list.index');
+    Route::get('/list/{id}', [ListController::class, 'view'])->name('admin.list.view');
+    Route::post('/list/{id}/approve', [ListController::class, 'approve'])->name('admin.list.approve');
+    Route::post('/list/{id}/reject', [ListController::class, 'reject'])->name('admin.list.reject');
+    Route::get('/admin/resignation/{id}', [ListController::class, 'resign'])->name('admin.list.resign');
+    // Fix the route definition
+    Route::post('/list/{id}/update-status', [ListController::class, 'updateStatus'])
+        ->name('admin.list.update-status');
+    Route::post('/admin/resignation/{id}/approve', [ListController::class, 'approve'])->name('admin.resignation.approve');
+    Route::post('/admin/resignation/{id}/reject', [ListController::class, 'reject'])->name('admin.resignation.reject');
+    Route::get('resignation/{id}/reasons', [ListController::class, 'getResignationReasons'])
+        ->name('admin.resignation.reasons');
 });
 
 // Add new admin loan management routes
@@ -271,5 +296,7 @@ Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, '
     ->name('check.member.role');
 
 Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
+
+
 
 
