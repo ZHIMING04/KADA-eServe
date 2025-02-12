@@ -175,6 +175,8 @@
         if (!valid) {
             event.preventDefault();
             alert('Sila isi semua maklumat dengan betul.');
+        } else {
+            alert('Semua maklumat telah dikemas kini.');
         }
     });
 
