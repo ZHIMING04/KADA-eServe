@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\TransactionController;
 use App\Service\SmsService;
 
 
+
 require __DIR__.'/auth.php';
 
 // Public routes
@@ -104,8 +105,11 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 
 // Admin routes
 Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-        ->name('admin.dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard-data', [DashboardController::class, 'getDashboardData'])->name('admin.dashboard.data');
+    Route::get('/admin/savings-data', [DashboardController::class, 'getSavingsData'])
+    ->name('admin.savings-data');
+
 
     // Member management
     Route::controller(AdminMemberController::class)->group(function () {
