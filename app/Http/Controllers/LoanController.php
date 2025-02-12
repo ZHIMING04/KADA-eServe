@@ -300,7 +300,11 @@ class LoanController extends Controller
                     'monthly_net_salary' => $validated['monthly_net_salary'],
                     'loan_period' => $validated['loan_period'],
                     'status' => 'pending',
-                    'loan_balance' => $validated['loan_amount'],
+                    'loan_balance' => $this->calculateTotalLoanRepayment(
+                        $validated['loan_amount'], 
+                        $interestRate, 
+                        $validated['loan_period']
+                    ),
                     'loan_total_repayment' => $this->calculateTotalLoanRepayment(
                         $validated['loan_amount'], 
                         $interestRate, 

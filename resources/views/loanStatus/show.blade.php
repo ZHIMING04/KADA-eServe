@@ -213,6 +213,14 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->ic}}</td>
                                 </tr>
                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No telefon</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->phone}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No Anggota</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->no_anggota}}</td>
+                                </tr>
+                                <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No PF</strong></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[0]->no_pf}}</td>
                                 </tr>
@@ -234,6 +242,14 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>IC</strong></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->ic}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No Telefon</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->phone}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No Anggota</strong></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-m text-gray-500 w-4/5">: {{$loan->guarantors[1]->no_anggota}}</td>
                                 </tr>
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-m font-medium text-gray-900 w-1/5"><strong>No PF</strong></td>

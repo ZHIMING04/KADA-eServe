@@ -200,6 +200,8 @@
                         <th>No</th>
                         <th>Nama</th>
                         <th>IC</th>
+                        <th>No Telefon</th>
+                        <th>No Anggota</th>
                         <th>No PF</th>
                     </tr>
                 </thead>
@@ -209,6 +211,8 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $guarantor->name }}</td>
                             <td>{{ $guarantor->ic }}</td>
+                            <td>{{ $guarantor->phone }}</td>
+                            <td>{{ $guarantor->no_anggota }}</td>
                             <td>{{ $guarantor->no_pf }}</td>
                         </tr>
                     @endforeach
