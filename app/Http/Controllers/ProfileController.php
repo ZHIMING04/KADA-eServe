@@ -92,7 +92,6 @@ class ProfileController extends Controller
         return back()->with('status', 'verification-sent');
     }
 
-
     public function verifyNewEmail(Request $request)
     {
         $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
@@ -100,7 +99,7 @@ class ProfileController extends Controller
 
         // Check if new email is set in the session
         if (!$newEmail) {
-            return response()->json(['status' => 'error', 'message' => 'No new email found in session.']);
+            return Redirect::route('profile.edit')->withErrors(['status' => 'No new email found in session.']);
         }
 
         // Update the email in the database
@@ -109,7 +108,7 @@ class ProfileController extends Controller
         // Clear the session
         session()->forget('new_email');
 
-        return response()->json(['status' => 'success', 'message' => 'Email updated successfully.']);
+        echo "<script>alert('Emel berjaya dikemaskini.'); window.location.href = '".route('profile.edit')."';</script>";
     }
 
 
