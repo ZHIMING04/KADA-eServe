@@ -28,16 +28,16 @@ class IndividualReportController extends Controller
         }
    
         $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')
-            ->get()
-            ->map(function ($transaction) {
+            ->paginate(7)
+            ->through(function ($transaction) {
                 // Transform the transaction type display
                 $transaction->type_display = match($transaction->type) {
                     'savings' => 'Simpanan',
-                    'loan' => 'Bayar Balik',  // Changed this line
+                    'loan' => 'Bayar Balik',
                     default => $transaction->type
                 };
 
-                // Format the reference (loan_id)
+                // Format the reference based on transaction type
                 if ($transaction->type == 'loan') {
                     // Get the loan details
                     $loan = DB::table('loans')
@@ -45,6 +45,18 @@ class IndividualReportController extends Controller
                         ->first();
                     
                     $transaction->reference = $loan ? 'LOAN-' . $loan->loan_id : '-';
+                } else if ($transaction->type == 'savings') {
+                    // Map savings types to their display names
+                    $savingsTypeMap = [
+                        'share_capital' => 'MS',          // Modal Syer
+                        'subscription_capital' => 'MY',    // Modal Yuran
+                        'member_deposit' => 'DA',         // Deposit Ahli
+                        'welfare_fund' => 'TK',           // Tabung Kebajikan
+                        'fixed_savings' => 'ST'           // Simpanan Tetap
+                    ];
+                    
+                    $prefix = $savingsTypeMap[$transaction->savings_type] ?? 'S';
+                    $transaction->reference = $prefix . '-' . str_pad($transaction->id, 5, '0', STR_PAD_LEFT);
                 } else {
                     $transaction->reference = '-';
                 }
@@ -102,7 +114,7 @@ class IndividualReportController extends Controller
         $transactionsQuery = DB::table('transactions')
             ->select('transactions.*')  // Select all from transactions
             ->where('transactions.member_id', $member->id);
-
+            
         // Apply sorting based on the request
         if ($request->filled('month') && $request->filled('year')) {
             $transactionsQuery->whereMonth('transactions.created_at', $request->month)
@@ -110,6 +122,16 @@ class IndividualReportController extends Controller
         }
 
         $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')->get();
+
+        $transactions->each(function ($transaction) {
+            if ($transaction->type == 'loan') {
+                $loan = DB::table('loans')->where('loan_id', $transaction->loan_id)->first();
+                if ($loan) {
+                    $loanType = DB::table('loan_types')->where('loan_type_id', $loan->loan_type_id)->first();
+                    $transaction->loan_type = $loanType ? $loanType->loan_type : null;
+                }
+            }
+        });
 
         // Generate PDF
         $pdf = PDF::loadView('individualReport.exportTransactions', compact('member', 'transactions'));

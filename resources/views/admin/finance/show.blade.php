@@ -76,6 +76,10 @@
                         <p class="text-sm text-gray-600">Bayaran Bulanan</p>
                         <p class="font-medium">RM {{ number_format($loan->monthly_repayment, 2) }}</p>
                     </div>
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">Jumlah Bayaran</p>
+                        <p class="font-medium">RM {{ number_format($loan->loan_total_repayment, 2) }}</p>
+                    </div>
                 </div>
             </div>
 
@@ -177,16 +181,16 @@
                                     <p class="font-medium">{{ $guarantor->no_pf }}</p>
                                 </div>
                                 <div class="space-y-1">
+                                    <p class="text-sm text-gray-600">No. Kad Pengenalan</p>
+                                    <p class="font-medium">{{ $guarantor->ic }}</p>
+                                </div>
+                                <div class="space-y-1">
                                     <p class="text-sm text-gray-600">No. Telefon</p>
                                     <p class="font-medium">{{ $guarantor->phone }}</p>
                                 </div>
                                 <div class="space-y-1">
-                                    <p class="text-sm text-gray-600">Hubungan</p>
-                                    <p class="font-medium">{{ $guarantor->getRelationshipInMalay() }}</p>
-                                </div>
-                                <div class="col-span-2 space-y-1">
-                                    <p class="text-sm text-gray-600">Alamat</p>
-                                    <p class="font-medium">{{ $guarantor->address }}</p>
+                                    <p class="text-sm text-gray-600">No. Anggota</p>
+                                    <p class="font-medium">{{ $guarantor->no_anggota }}</p>
                                 </div>
                             </div>
                         </div>

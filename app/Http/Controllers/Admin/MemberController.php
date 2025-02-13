@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\WorkingInfo;
 use App\Models\Savings;
 use App\Models\Family;
-use App\Models\Transaction;
+use App\Models\adminTransaction;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
@@ -309,7 +309,7 @@ class MemberController extends Controller
             }
 
             // Create transaction record
-            $transaction = new Transaction();
+            $transaction = new adminTransaction();
             $transaction->member_id = $memberId;
             $transaction->type = $validated['type'];
             $transaction->amount = $validated['amount'];
@@ -395,7 +395,7 @@ class MemberController extends Controller
                     $savings->save();
 
                     // Create transaction record
-                    $transaction = new Transaction();
+                    $transaction = new adminTransaction();
                     $transaction->member_id = $memberId;
                     $transaction->type = $validated['type'];
                     $transaction->amount = $validated['amount'];

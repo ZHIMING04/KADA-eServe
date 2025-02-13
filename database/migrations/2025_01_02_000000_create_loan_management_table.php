@@ -65,9 +65,9 @@ class CreateLoanManagementTable extends Migration
             $table->string('loan_id', 50);
             $table->string('name');
             $table->string('no_pf', 20);
-            $table->string('phone', 15);
-            $table->text('address');
-            $table->enum('relationship', ['parent', 'spouse', 'sibling', 'relative', 'friend']);
+            $table->string('ic', 12);
+            $table->string('phone',15);
+            $table->string('no_anggota', 20);
             $table->integer('guarantor_order'); // 1 for first guarantor, 2 for second guarantor
             $table->timestamps();
 
@@ -80,10 +80,11 @@ class CreateLoanManagementTable extends Migration
 
     public function down()
     {
-        // Drop tables in reverse order to handle foreign key constraints
-        Schema::dropIfExists('loans');
+        // Drop tables in correct order (reverse of creation)
+        Schema::dropIfExists('member_transactions');  // Drop this first as it references loans
+        Schema::dropIfExists('guarantors');          // Then drop guarantors as it references loans
+        Schema::dropIfExists('loans');               // Now we can safely drop loans
         Schema::dropIfExists('banks');
         Schema::dropIfExists('loan_types');
-        Schema::dropIfExists('members');
     }
 }

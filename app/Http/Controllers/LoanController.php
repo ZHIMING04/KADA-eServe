@@ -73,9 +73,7 @@ class LoanController extends Controller
             'bank_id' => 'required',
             'bank_account' => [
                 'required',
-                'string',
-                'max:20',
-                'regex:/^[0-9-]+$/' // Only numbers and hyphens allowed
+                'regex:/^[0-9-]+$/'  // Only numbers and dashes allowed
             ],
             'loan_amount' => [
                 'required',
@@ -85,20 +83,20 @@ class LoanController extends Controller
             ],
             'loan_period' => [
                 'required',
-                'integer',
+                'numeric',
                 'min:1',
                 'max:60'
             ],
             'monthly_gross_salary' => [
                 'required',
                 'numeric',
-                'min:0',
-                'gt:monthly_net_salary'
+                'gt:0'
             ],
             'monthly_net_salary' => [
                 'required',
                 'numeric',
-                'min:0'
+                'gt:0',
+                'lt:monthly_gross_salary'  // Must be less than gross salary
             ],
             'date_apply' => [
                 'required',
@@ -116,7 +114,6 @@ class LoanController extends Controller
             'guarantor1_pf' => [
                 'required',
                 'string',
-                'max:20',
                 'different:guarantor2_pf',
                 function ($attribute, $value, $fail) {
                     $member = Member::where('no_pf', $value)->first();
@@ -141,28 +138,28 @@ class LoanController extends Controller
                         return;
                     }
 
-                    // Check if guarantor is the same as applicant
                     if ($member->id === $currentMember->id) {
                         $fail('Anda tidak boleh menjadi penjamin untuk pinjaman anda sendiri.');
                     }
                 }
             ],
+            'guarantor1_ic' => [
+                'required',
+                'string',
+                'size:12',
+                'regex:/^[0-9]+$/',
+                'different:guarantor2_ic'
+            ],
             'guarantor1_phone' => [
                 'required',
                 'string',
-                'max:15',
-                'regex:/^[0-9-]+$/',
+                'regex:/^[0-9]+$/',
                 'different:guarantor2_phone'
             ],
-            'guarantor1_address' => [
+            'guarantor1_no_anggota' => [
                 'required',
                 'string',
-                'max:500',
-                'different:guarantor2_address'
-            ],
-            'guarantor1_relationship' => [
-                'required',
-                'in:parent,spouse,sibling,relative,friend'
+                'different:guarantor2_no_anggota'
             ],
 
             // Second Guarantor
@@ -175,7 +172,6 @@ class LoanController extends Controller
             'guarantor2_pf' => [
                 'required',
                 'string',
-                'max:20',
                 'different:guarantor1_pf',
                 function ($attribute, $value, $fail) {
                     $member = Member::where('no_pf', $value)->first();
@@ -206,22 +202,23 @@ class LoanController extends Controller
                     }
                 }
             ],
+            'guarantor2_ic' => [
+                'required',
+                'string',
+                'size:12',
+                'regex:/^[0-9]+$/',
+                'different:guarantor1_ic'
+            ],
             'guarantor2_phone' => [
                 'required',
                 'string',
-                'max:15',
-                'regex:/^[0-9-]+$/',
+                'regex:/^[0-9]+$/',
                 'different:guarantor1_phone'
             ],
-            'guarantor2_address' => [
+            'guarantor2_no_anggota' => [
                 'required',
                 'string',
-                'max:500',
-                'different:guarantor1_address'
-            ],
-            'guarantor2_relationship' => [
-                'required',
-                'in:parent,spouse,sibling,relative,friend'
+                'different:guarantor1_no_anggota'
             ],
 
             // Terms and Conditions
@@ -237,15 +234,15 @@ class LoanController extends Controller
             'monthly_net_salary.required' => 'Sila masukkan gaji bersih bulanan',
             'guarantor1_name.required' => 'Sila masukkan nama penjamin pertama',
             'guarantor1_pf.required' => 'Sila masukkan No. PF penjamin pertama',
-            'guarantor1_phone.required' => 'Sila masukkan nombor telefon penjamin pertama',
-            'guarantor1_address.required' => 'Sila masukkan alamat penjamin pertama',
-            'guarantor1_relationship.required' => 'Sila pilih hubungan dengan penjamin pertama',
+            'guarantor1_ic.required' => 'Sila masukkan No. KP penjamin pertama',
             'guarantor2_name.required' => 'Sila masukkan nama penjamin kedua',
             'guarantor2_pf.required' => 'Sila masukkan No. PF penjamin kedua',
-            'guarantor2_phone.required' => 'Sila masukkan nombor telefon penjamin kedua',
-            'guarantor2_address.required' => 'Sila masukkan alamat penjamin kedua',
-            'guarantor2_relationship.required' => 'Sila pilih hubungan dengan penjamin kedua',
-            
+            'guarantor2_ic.required' => 'Sila masukkan No. KP penjamin kedua',
+            'guarantor1_phone.required' => 'Sila masukkan No. Telefon penjamin pertama',
+            'guarantor1_no_anggota.required' => 'Sila masukkan No. Anggota penjamin pertama',
+            'guarantor2_phone.required' => 'Sila masukkan No. Telefon penjamin kedua',
+            'guarantor2_no_anggota.required' => 'Sila masukkan No. Anggota penjamin kedua',
+                    
             // Other validation messages
             'numeric' => 'Ruangan :attribute mestilah nombor',
             'min' => 'Ruangan :attribute mestilah sekurang-kurangnya :min',
@@ -259,38 +256,43 @@ class LoanController extends Controller
             
             // Format-specific messages
             'bank_account.regex' => 'Nombor akaun bank tidak sah',
-            'guarantor1_phone.regex' => 'Nombor telefon penjamin 1 tidak sah',
-            'guarantor2_phone.regex' => 'Nombor telefon penjamin 2 tidak sah'
+            'guarantor1_ic.size' => 'No. KP penjamin pertama mestilah 12 nombor',
+            'guarantor1_ic.regex' => 'No. KP penjamin pertama mestilah nombor sahaja',
+            'guarantor2_ic.size' => 'No. KP penjamin kedua mestilah 12 nombor',
+            'guarantor2_ic.regex' => 'No. KP penjamin kedua mestilah nombor sahaja',
+            'guarantor1_phone.regex' => 'No. Telefon penjamin pertama mestilah nombor sahaja',
+            'guarantor2_phone.regex' => 'No. Telefon penjamin kedua mestilah nombor sahaja',
+            'loan_amount.min' => 'Jumlah pinjaman mestilah antara RM1,000 hingga RM100,000',
+            'loan_amount.max' => 'Jumlah pinjaman mestilah antara RM1,000 hingga RM100,000',
+            'loan_period.min' => 'Tempoh pinjaman mestilah antara 1 hingga 60 bulan',
+            'loan_period.max' => 'Tempoh pinjaman mestilah antara 1 hingga 60 bulan',
+            'monthly_net_salary.lt' => 'Gaji bersih mestilah kurang daripada gaji kasar'
         ]);
 
         try {
             $loan = DB::transaction(function () use ($validated, $interestRate) {
+                // Add logging for debugging
                 \Log::info('Starting loan creation transaction');
-                
-                $member = DB::table('member_register')
-                    ->where('guest_id', auth()->id())
-                    ->first();
 
+                // 1. Get member
+                $member = Member::where('guest_id', auth()->id())->first();
                 if (!$member) {
-                    \Log::error('Member not found for user ID: ' . auth()->id());
                     throw new \Exception('Member not found');
                 }
 
-                \Log::info('Member found', ['member_id' => $member->id]);
-
-                // Create bank record without checking if it exists
+                // 2. Create bank record
                 $bank = Bank::create([
                     'bank_name' => $this->getBankName($validated['bank_id']),
                     'bank_account' => $validated['bank_account']
                 ]);
 
-                // Create loan record
+                // 3. Create loan record
                 $loan = Loan::create([
                     'loan_id' => 'LOAN-' . time(),
                     'member_id' => $member->id,
                     'loan_type_id' => $validated['loan_type_id'],
                     'bank_id' => $bank->bank_id,
-                    'date_apply' => $validated['date_apply'],
+                    'date_apply' => now(),
                     'loan_amount' => $validated['loan_amount'],
                     'interest_rate' => $interestRate,
                     'monthly_repayment' => $this->calculateMonthlyRepayment(
@@ -312,18 +314,17 @@ class LoanController extends Controller
                         $interestRate, 
                         $validated['loan_period']
                     )
-
                 ]);
 
-                // Create guarantors
+                // 4. Create guarantors
                 foreach ([1, 2] as $order) {
                     Guarantor::create([
                         'loan_id' => $loan->loan_id,
                         'name' => $validated["guarantor{$order}_name"],
                         'no_pf' => $validated["guarantor{$order}_pf"],
+                        'ic' => $validated["guarantor{$order}_ic"],
                         'phone' => $validated["guarantor{$order}_phone"],
-                        'address' => $validated["guarantor{$order}_address"],
-                        'relationship' => $validated["guarantor{$order}_relationship"],
+                        'no_anggota' => $validated["guarantor{$order}_no_anggota"],
                         'guarantor_order' => $order
                     ]);
                 }
@@ -331,15 +332,13 @@ class LoanController extends Controller
                 return $loan;
             });
 
-            \Log::info('Loan created successfully', ['loan_id' => $loan->loan_id]);
-            
             return redirect()->route('loan.success')
                 ->with('success', 'Permohonan pinjaman anda telah berjaya dihantar!');
 
         } catch (\Exception $e) {
-            \Log::error('Loan application error: ' . $e->getMessage());
+            \Log::error('Loan creation failed: ' . $e->getMessage());
             return back()
-                ->withErrors(['error' => 'Ralat semasa memproses permohonan. Sila cuba lagi.'])
+                ->withErrors(['error' => 'Ralat semasa memproses permohonan: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -397,34 +396,6 @@ class LoanController extends Controller
         return view('loan.success')->with('success', 'Permohonan pinjaman anda telah berjaya dihantar!');
     }
 
-    public function checkMemberRole(Request $request)
-    {
-        $noPF = $request->input('no_pf');
-        
-        $member = DB::table('member_register')
-            ->where('no_pf', $noPF)
-            ->first();
-
-        if (!$member) {
-            return response()->json([
-                'isValid' => false,
-                'message' => 'No. PF tidak dijumpai dalam sistem.'
-            ]);
-        }
-
-        $user = User::find($member->guest_id);
-        
-        if (!$user || !$user->isA('member')) {
-            return response()->json([
-                'isValid' => false,
-                'message' => 'Penjamin mestilah ahli yang berdaftar.'
-            ]);
-        }
-
-        return response()->json([
-            'isValid' => true
-        ]);
-    }
 
     public function validateGuarantorPF($pf)
     {
