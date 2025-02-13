@@ -44,7 +44,7 @@
         <div class="content">
             <p>Halo, {{ $user->name }},</p>
             <p>Sila klik pautan di bawah untuk mengesahkan alamat emel baru anda:</p>
-            <p><a href="{{ $verificationUrl }}" style="display: inline-block; padding: 10px 20px; background-color: #0066cc; color: #fff; text-decoration: none; border-radius: 5px;">Sahkan Emel</a></p>
+            <p><a href="{{ $verificationUrl }}">Sahkan Emel</a></p>
         </div>
     </div>
     <div class="footer">

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Laporan Individu') }}</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('LAPORAN INDIVIDU') }}</h2>
             <form method="get" action="{{ route('report.export') }}">
             @csrf
             <x-primary-button type="submit">{{ __('Muat Turun Laporan Anda') }}</x-primary-button>
@@ -48,42 +48,37 @@
         .py-12 {
             background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9fa 100%);
         }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
-        }
-        .pagination li {
-            margin: 0 5px;
-        }
-        .pagination a, .pagination span {
-            display: inline-block;
-            padding: 4px 8px; /* Shortened the button */
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #28a745;
-        }
-        .pagination a:hover {
-            background-color: #e6ffe6;
-        }
-        .pagination .active span {
-            background-color: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-        .pagination .disabled span {
-            color: #ccc;
-            pointer-events: none;
-        }
-
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <!-- Members Details -->
+            <!-- <div class="info-card">
+                <div class="bg-gradient-to-r from-green-600 to-blue-400 p-2 rounded-t-lg">
+                    <h3 class="text-xl font-semibold text-white flex items-center" style="margin-top: 10px;">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /> </svg>
+                        Maklumat Peribadi
+                    </h3>
+                </div>
+
+                <br>
+                <h3 class="text-9xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{$member->name}}</h3>
+                <div class="flex flex-wrap">
+                    <div class="w-full md:w-1/3 mb-2">
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>IC:</strong> {{$member->ic}}</p>
+                    </div>
+                    <div class="w-full md:w-1/3 mb-2">
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No PF:</strong> {{$member->no_pf}}</p>
+                    </div>
+                    <div class="w-full md:w-1/3 mb-2">
+                        <p class="text-sm text-gray-600 dark:text-gray-400"><strong>No Ahli:</strong> {{$member->no_anggota}}</p>
+                    </div>
+    
+                </div>
+            </div> -->
+
             <!-- First row with savings information -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Existing Savings Card -->
@@ -218,7 +213,7 @@
                                 <div>
                                     <select id="month" name="month" class="pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" onchange="document.getElementById('filterForm').submit()">
                                         @for ($i = 1; $i <= 12; $i++)
-                                            <option value="{{ $i }}" {{ request('month', now()->month) == $i ? 'selected' : '' }}>
+                                            <option value="{{ $i }}" {{ request('month') == $i ? 'selected' : '' }}>
                                                 {{ \Carbon\Carbon::create()->month($i)->locale('ms')->translatedFormat('F') }}
                                             </option>
                                         @endfor
@@ -272,10 +267,14 @@
                                                 {{ number_format($transaction->amount, 2) }}
                                             </td>
                                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                                                @if($transaction->reference && $transaction->reference != '-')
-                                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                                        {{ $transaction->reference }}
-                                                    </span>
+                                                @if($transaction->type == 'loan' || $transaction->type == 'loan_payment')
+                                                    @if($transaction->reference && $transaction->reference != '-')
+                                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                            {{ $transaction->reference }}
+                                                        </span>
+                                                    @else
+                                                        <span class="text-gray-400">-</span>
+                                                    @endif
                                                 @else
                                                     <span class="text-gray-400">-</span>
                                                 @endif
@@ -295,16 +294,6 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="mt-4">
-                            <div class="flex justify-between items-center items-bottom">
-                                <div>
-                                    {{ $transactions->links('pagination::default') }}
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    Halaman {{ $transactions->currentPage() }} daripada {{ $transactions->lastPage() }}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

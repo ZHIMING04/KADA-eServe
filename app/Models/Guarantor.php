@@ -10,14 +10,10 @@ class Guarantor extends Model
         'loan_id',
         'name',
         'no_pf',
-        'ic',
         'phone',
-        'no_anggota',
+        'address',
+        'relationship',
         'guarantor_order'
-    ];
-
-    protected $casts = [
-        'ic' => 'string'
     ];
 
     public function loan()
@@ -25,4 +21,16 @@ class Guarantor extends Model
         return $this->belongsTo(Loan::class, 'loan_id', 'loan_id');
     }
 
-}
+    public function getRelationshipInMalay()
+    {
+        $relationships = [
+            'parent' => 'Ibu/Bapa',
+            'spouse' => 'Suami/Isteri',
+            'sibling' => 'Adik-beradik',
+            'relative' => 'Saudara',
+            'friend' => 'Rakan'
+        ];
+
+        return $relationships[$this->relationship] ?? ucfirst($this->relationship);
+    }
+} 
