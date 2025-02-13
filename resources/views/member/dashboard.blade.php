@@ -410,6 +410,11 @@
     </style>
 </head>
 <body>
+@if (!Auth::user()->member->isActive())
+    <div class="alert alert-warning">
+        <strong>Amaran!</strong> Anda tidak boleh memohon pinjaman atau menambah simpanan kerana permohonan berhenti anda telah diluluskan.
+    </div>
+@endif
 
 <x-app-layout>
     <section class="hero-section">
@@ -495,11 +500,5 @@
         </div>
     </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-@if (!Auth::user()->member->isActive())
-    <div class="alert alert-warning">
-        <strong>Amaran!</strong> Anda tidak boleh memohon pinjaman atau menambah simpanan kerana permohonan berhenti anda telah diluluskan.
-    </div>
-@endif
 </body>
 </html>
