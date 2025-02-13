@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\ListController;
 use App\Http\Controllers\ResignationController;
 use App\Models\Resignation;
 use App\Service\SmsService;
+use App\Http\Controllers\Admin\MemberDataEntryController;
 
 
 
@@ -116,6 +117,8 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
 Route::middleware(['auth', 'can:access-admin-dashboard'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/dashboard-data', [DashboardController::class, 'getDashboardData'])->name('admin.dashboard.data');
+    Route::get('/data-entry/create', [MemberDataEntryController::class, 'create'])->name('admin.data-entry.create');
+    Route::post('/data-entry', [MemberDataEntryController::class, 'store'])->name('admin.data-entry.store');
     Route::get('/admin/savings-data', [DashboardController::class, 'getSavingsData'])
     ->name('admin.savings-data');
 
@@ -296,7 +299,6 @@ Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, '
     ->name('check.member.role');
 
 Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
-
 
 
 

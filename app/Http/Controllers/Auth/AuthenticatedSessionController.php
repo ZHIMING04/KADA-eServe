@@ -33,6 +33,11 @@ class AuthenticatedSessionController extends Controller
             // Get authenticated user
             $user = Auth::user();
 
+            // Check if email is verified for members
+            if ($user->isA('member') && !$user->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
+
             // Redirect based on role
             if ($user->isAn('admin')) {
                 return redirect()->route('admin.dashboard');

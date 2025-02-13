@@ -21,7 +21,7 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     @auth
-                        @if(auth()->user()->isA('guest'))
+                        @if(auth()->user()->isA('guest')&& !auth()->user()->isA('admin'))
                             <x-nav-link :href="route('guest.dashboard')" :active="request()->routeIs('guest.dashboard')">
                                 {{ __('Dashboard Guest') }}
                             </x-nav-link>
@@ -60,6 +60,12 @@
                             <!-- Add this inside the member navigation links section -->
                             <x-nav-link :href="route('member.transactions.create')" :active="request()->routeIs('member.transactions.create')">
                                 {{ __('Buat Transaksi') }}
+                            </x-nav-link>
+                        @endif
+
+                        @if(auth()->user()->isA('admin'))
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Admin Dashboard') }}
                             </x-nav-link>
                         @endif
 
@@ -130,6 +136,12 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('loan.create')" :active="request()->routeIs('loan.create')">
                         {{ __('Permohonan Pinjaman') }}
+                    </x-responsive-nav-link>
+                @endif
+
+                @if(auth()->user()->isA('admin'))
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                        {{ __('Admin Dashboard') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
