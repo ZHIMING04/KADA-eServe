@@ -25,9 +25,9 @@ class AppServiceProvider extends ServiceProvider
         // Define roles
         VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             return (new MailMessage)
-                ->subject('Verify Email Address')
-                ->line('Click the button below to verify your email address.')
-                ->action('Verify Email Address', $url);
+                ->subject('Pengesahan Alamat E-mel')
+                ->line('Klik butang di bawah untuk mengesahkan alamat e-mel anda.')
+                ->action('Sahkan Alamat E-mel', $url);
         });
     }
 }
