@@ -138,16 +138,27 @@
     <div class="container py-6">
         <!-- Enhanced Header -->
         <div class="page-header mb-6">
-            <div class="header-content">
-                <div class="header-icon">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            <div class="header-content flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="header-icon">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Pendaftaran Menunggu</h1>
+                        <p class="text-white/80 mt-1">Senarai pendaftaran yang menunggu kelulusan</p>
+                    </div>
+                </div>
+                
+                <!-- Add New Member Button -->
+                <a href="{{ route('admin.data-entry.create') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold">Pendaftaran Menunggu</h1>
-                    <p class="text-white/80 mt-1">Senarai pendaftaran yang menunggu kelulusan</p>
-                </div>
+                    Tambah Ahli Baru
+                </a>
             </div>
         </div>
 
