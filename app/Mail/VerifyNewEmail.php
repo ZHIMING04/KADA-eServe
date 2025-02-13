@@ -33,7 +33,7 @@ class VerifyNewEmail extends Mailable
         );
 
         return $this->view('emails.verify-new-email')
-                    ->subject('Sahkan Alamat Emel Baru Anda')
+                    ->subject('Verify Your New Email Address')
                     ->with([
                         'user' => $this->member,
                         'newEmail' => $this->newEmail,
