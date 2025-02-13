@@ -128,6 +128,19 @@
             background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
             z-index: 1000; /* Ensure it appears above other content */
         }
+        .annual-button {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .annual-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 @endpush
 
@@ -172,9 +185,11 @@
                 <h1 class="text-2xl font-bold">Laporan Tahunan</h1>
                 <p class="text-white/80 mt-1">Pengurusan laporan tahunan</p>
             </div>
-            <div class="ml-auto">
-                <a href="{{ route('admin.annual-reports.view') }}" 
-                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+            <div class="annual-button">
+                <a href="{{ route('admin.annual-reports.view') }}" class="flex items-center text-white hover:text-white">
+                    {{-- <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                    </svg> --}}
                     Paparan Laporan
                 </a>
             </div>
