@@ -172,6 +172,12 @@
                 <h1 class="text-2xl font-bold">Laporan Tahunan</h1>
                 <p class="text-white/80 mt-1">Pengurusan laporan tahunan</p>
             </div>
+            <div class="ml-auto">
+                <a href="{{ route('admin.annual-reports.view') }}" 
+                   class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Paparan Laporan
+                </a>
+            </div>
         </div>
     </div>
 
