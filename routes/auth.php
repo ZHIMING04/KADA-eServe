@@ -33,6 +33,15 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('verify-email/{id}/{hash}', [VerifyEmailController::class, 'verify'])
+        ->middleware(['signed'])
+        ->name('verification.verify');
+
+    // Add new route for initial verification
+    Route::get('initial-verify-email/{id}/{hash}', [VerifyEmailController::class, 'initialVerify'])
+        ->middleware(['signed'])
+        ->name('initial.verification.verify');
 });
 
 Route::middleware('auth')->group(function () {
