@@ -5,12 +5,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name', 'Laravel') }}</title>
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Replace Vite with direct CDN links -->
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        
         <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <!-- Add Font Awesome for icons -->
+        <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        
+        <!-- Add any custom styles -->
+        <style>
+            .bg-primary {
+                background-color: #4f46e5;
+            }
+            .hover\:bg-primary-hover:hover {
+                background-color: #3730a3;
+            }
+            /* Add any other custom styles you need */
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4, paymentMethod: 'cash' }">
