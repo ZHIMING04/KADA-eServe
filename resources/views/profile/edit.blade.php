@@ -62,36 +62,6 @@
                 </div>
             @endif
 
-             <!-- Status Display Section -->
-             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="mb-4">
-                    <!-- Status Display - Simple Pill Style -->
-                    <div class="mb-4">
-                        @php
-                            $statusClass = match(strtolower($member->status)) {
-                                'approved' => 'bg-green-100 text-green-700',
-                                'deceased' => 'bg-gray-100 text-gray-700',
-                                'resigned' => 'bg-orange-100 text-orange-700',
-                                'rejected' => 'bg-red-100 text-red-700',
-                                default => 'bg-yellow-100 text-yellow-700'
-                            };
-
-                            $statusText = match(strtolower($member->status)) {
-                                'approved' => 'Ahli',
-                                'pending' => 'Sedang Diproses',
-                                'resigned' => 'Berhenti',
-                                'deceased' => 'Wafat',
-                                'rejected' => 'Ditolak',
-                                default => 'Sedang Diproses'
-                            };
-                        @endphp
-                        <span class="inline-flex px-4 py-1.5 rounded-full text-sm font-medium {{ $statusClass }}">
-                            {{ $statusText }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div>
                     @include('profile.partials.display-user-info')

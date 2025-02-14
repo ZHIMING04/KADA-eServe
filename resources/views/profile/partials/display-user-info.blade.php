@@ -4,6 +4,11 @@
             <h3 class="text-xl font-semibold text-white flex items-center">
                 <i class="fas fa-user mr-2"></i> Maklumat Peribadi
             </h3>
+                                <div class="ml-4">
+                                    <span class="status-badge inline-block px-3 py-1 rounded-full text-sm font-semibold bg-{{ $member->status == 'pending' ? 'yellow' : ($member->status == 'rejected' ? 'red' : ($member->status == 'resigned' ? 'orange' : ($member->status == 'deceased' ? 'gray' : 'green'))) }}-100 text-{{ $member->status == 'pending' ? 'yellow' : ($member->status == 'rejected' ? 'red' : ($member->status == 'resigned' ? 'orange' : ($member->status == 'deceased' ? 'gray' : 'green'))) }}-800">
+                                        {{ $member->status == 'pending' ? 'SEDANG DIPROSES' : ($member->status == 'rejected' ? 'DITOLAK' : ($member->status == 'resigned' ? 'BERHENTI' : ($member->status == 'deceased' ? 'WAFAT' : 'AHLI'))) }}
+                                    </span>
+                                </div>
         </div>
     </header>
 
