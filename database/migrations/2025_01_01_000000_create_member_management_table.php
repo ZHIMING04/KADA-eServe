@@ -16,10 +16,10 @@ class CreateMemberManagementTable extends Migration
     Schema::create('member_register', function (Blueprint $table) {
         $table->id();
         $table->timestamps();
-        $table->string('no_anggota');
+        $table->string('no_anggota')->unique();
         $table->string('name');
-        $table->string('email');
-        $table->string('ic');
+        $table->string('email')->unique();
+        $table->string('ic', 12)->unique();
         $table->string('phone');
         $table->string('address');
         $table->string('city');
@@ -29,7 +29,7 @@ class CreateMemberManagementTable extends Migration
         $table->date('DOB');
         $table->string('agama');
         $table->string('bangsa');
-        $table->string('no_pf');
+        $table->string('no_pf')->unique();
         $table->string('salary');
         $table->string('office_address');
         $table->string('office_city');

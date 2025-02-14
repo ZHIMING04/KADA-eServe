@@ -46,595 +46,910 @@
                         <div class="max-w-3xl mx-auto">
                             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                                 <div class="p-6 text-gray-900">
-                                    <!-- Step Indicator -->
-                                    <div class="flex justify-between mb-12 relative px-6">
-                                        <!-- Progress Bar -->
-                                        <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-gray-200 w-full -z-1"></div>
-                                        <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-primary transition-all duration-500"
-                                             :style="'width: ' + ((currentStep - 1) * 25) + '%'"></div>
+                                    <div class="p-8" x-data="{
+                                    currentStep: 1,
+                                    errors: {},
+                                    hasSubmitted: false,
+                                    async checkDuplicate(field, value) {
+                                        if (!value) return true;
                                         
-                                        <!-- Step Numbers -->
-                                        <div class="relative z-10 text-center flex-1">
-                                            <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
-                                                 :class="currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
-                                                <span class="text-lg font-medium">1</span>
-                                            </div>
-                                            <p class="mt-2 text-sm font-medium" 
-                                               :class="currentStep >= 1 ? 'text-primary' : 'text-gray-400'">
-                                                Maklumat Peribadi
-                                            </p>
-                                        </div>
+                                        try {
+                                            const response = await fetch(`/guest/check-duplicate/${field}/${value}`);
+                                            const data = await response.json();
+                                            
+                                            if (!data.valid) {
+                                                this.errors[field] = data.message;
+                                            } else {
+                                                delete this.errors[field];
+                                            }
+                                            return data.valid;
+                                        } catch (error) {
+                                            console.error(`Error validating ${field}:`, error);
+                                            return false;
+                                        }
+                                    },
 
-                                        <div class="relative z-10 text-center flex-1">
-                                            <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
-                                                 :class="currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
-                                                <span class="text-lg font-medium">2</span>
-                                            </div>
-                                            <p class="mt-2 text-sm font-medium" 
-                                               :class="currentStep >= 2 ? 'text-primary' : 'text-gray-400'">
-                                                Maklumat Pekerjaan
-                                            </p>
-                                        </div>
+                                    clearError(field) {
+                                        delete this.errors[field];
+                                    },
+                                    validateStep1() {
+                                        this.errors = {};
+                                        let isValid = true;
 
-                                        <div class="relative z-10 text-center flex-1">
-                                            <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
-                                                 :class="currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
-                                                <span class="text-lg font-medium">3</span>
-                                            </div>
-                                            <p class="mt-2 text-sm font-medium" 
-                                               :class="currentStep >= 3 ? 'text-primary' : 'text-gray-400'">
-                                                Maklumat Keluarga
-                                            </p>
-                                        </div>
+                                        // Validate name
+                                        if (!document.getElementById('name').value) {
+                                            this.errors.name = 'Sila masukkan nama';
+                                            isValid = false;
+                                        }
 
-                                        <div class="relative z-10 text-center flex-1">
-                                            <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
-                                                 :class="currentStep >= 4 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
-                                                <span class="text-lg font-medium">4</span>
-                                            </div>
-                                            <p class="mt-2 text-sm font-medium" 
-                                               :class="currentStep >= 4 ? 'text-primary' : 'text-gray-400'">
-                                                Yuran dan Sumbangan
-                                            </p>
-                                        </div>
-                                    </div>
+                                        // Validate no_anggota
+                                        if (!document.getElementById('no_anggota').value) {
+                                            this.errors.no_anggota = 'Sila masukkan no anggota';
+                                            isValid = false;
+                                        }
 
-                                    <!-- Step 1: Personal Information -->
-                                    <div x-show="currentStep === 1">
-                                        <div class="bg-white shadow-md rounded-lg mb-4">
-                                            <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
-                                                <h3 class="text-xl font-semibold text-white">
+                                        // Validate IC
+                                        if (!document.getElementById('ic').value) {
+                                            this.errors.ic = 'Sila masukkan no kad pengenalan';
+                                            isValid = false;
+                                        } else if (!/^\d{12}$/.test(document.getElementById('ic').value)) {
+                                            this.errors.ic = 'No kad pengenalan mestilah 12 nombor';
+                                            isValid = false;
+                                        }
+
+                                        // Validate phone
+                                        if (!document.getElementById('phone').value) {
+                                            this.errors.phone = 'Sila masukkan no telefon';
+                                            isValid = false;
+                                        }
+
+                                        // Validate email
+                                        if (!document.getElementById('email').value) {
+                                            this.errors.email = 'Sila masukkan alamat emel';
+                                            isValid = false;
+                                        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value)) {
+                                            this.errors.email = 'Sila masukkan alamat emel yang sah';
+                                            isValid = false;
+                                        }
+
+                                        // Validate address fields
+                                        if (!document.getElementById('address').value) {
+                                            this.errors.address = 'Sila masukkan alamat';
+                                            isValid = false;
+                                        }
+
+                                        // Validate city fields
+                                        if (!document.getElementById('city').value) {
+                                            this.errors.city = 'Sila masukkan bandar';
+                                            isValid = false;
+                                        }
+
+                                        // Validate postcode fields
+                                        if (!document.getElementById('postcode').value) {
+                                            this.errors.postcode = 'Sila masukkan poskod';
+                                            isValid = false;
+                                        }
+
+                                        // Validate state fields
+                                        if (!document.getElementById('state').value) {
+                                            this.errors.state = 'Sila masukkan negeri';
+                                            isValid = false;
+                                        }
+
+                                        return isValid;
+                                    },
+                                    
+                                    validateStep2() {
+                                        this.errors = {};
+                                        let isValid = true;
+
+                                        // Validate gender
+                                        if (!document.getElementById('gender').value) {
+                                            this.errors.gender = 'Sila pilih jantina';
+                                            isValid = false;
+                                        }
+
+                                        // Validate DOB
+                                        if (!document.getElementById('DOB').value) {
+                                            this.errors.DOB = 'Sila masukkan tarikh lahir';
+                                            isValid = false;
+                                        }
+
+                                        // Validate religion
+                                        if (!document.getElementById('agama').value) {
+                                            this.errors.agama = 'Sila pilih agama';
+                                            isValid = false;
+                                        }
+
+                                        // Validate race
+                                        if (!document.getElementById('bangsa').value) {
+                                            this.errors.bangsa = 'Sila pilih bangsa';
+                                            isValid = false;
+                                        }
+
+                                        // Validate position and grade
+                                        if (!document.getElementById('jawatan').value) {
+                                            this.errors.jawatan = 'Sila masukkan jawatan';
+                                            isValid = false;
+                                        }
+
+                                        if (!document.getElementById('gred').value) {
+                                            this.errors.gred = 'Sila masukkan gred';
+                                            isValid = false;
+                                        }
+
+                                        // Validate no_pf
+                                        if (!document.getElementById('no_pf').value) {
+                                            this.errors.no_pf = 'Sila masukkan no fail peribadi';
+                                            isValid = false;
+                                        }
+                                        
+                                        // Validate salary
+                                        if (!document.getElementById('salary').value) {
+                                            this.errors.salary = 'Sila masukkan gaji';
+                                            isValid = false;
+                                        }
+                                        
+                                        // Validate office address fields
+                                        if (!document.getElementById('office_address').value) {
+                                            this.errors.office_address = 'Sila masukkan alamat pejabat';
+                                            isValid = false;
+                                        }
+
+                                        // Validate office city fields
+                                        if (!document.getElementById('office_city').value) {
+                                            this.errors.office_city = 'Sila masukkan bandar pejabat';
+                                            isValid = false;
+                                        }
+
+                                        // Validate office postcode fields
+                                        if (!document.getElementById('office_postcode').value) {
+                                            this.errors.office_postcode = 'Sila masukkan poskod pejabat';
+                                            isValid = false;
+                                        }
+                                        
+                                        // Validate office state fields
+                                        if (!document.getElementById('office_state').value) {
+                                            this.errors.office_state = 'Sila masukkan negeri pejabat';
+                                            isValid = false;
+                                        } 
+                                        return isValid;
+                                    },
+
+                                    validateStep3() {
+                                        this.errors = {};
+                                        let isValid = true;
+
+                                        // Validate family members
+                                        const familyRows = document.getElementById('familyTableBody').children;
+                                        if (familyRows.length === 0) {
+                                            alert('Sila tambah ahli keluarga');
+                                            isValid = false;
+                                        }
+
+                                        return isValid;
+                                    },
+
+                                    async handleSubmit(e) {
+                                        e.preventDefault();
+                                        this.hasSubmitted = true;
+                                        
+                                        // Check all fields that need duplicate validation
+                                        const duplicateChecks = await Promise.all([
+                                            this.checkDuplicate('no_anggota', document.getElementById('no_anggota').value),
+                                            this.checkDuplicate('ic', document.getElementById('ic').value),
+                                            this.checkDuplicate('email', document.getElementById('email').value),
+                                            this.checkDuplicate('no_pf', document.getElementById('no_pf').value)
+                                        ]);
+
+                                        // If any duplicate check failed
+                                        if (duplicateChecks.includes(false)) {
+                                            return; // Stop form submission
+                                        }
+
+                                        // If there are other validation errors
+                                        if (Object.keys(this.errors).length > 0) {
+                                            alert('Sila betulkan kesalahan sebelum menghantar borang.');
+                                            return;
+                                        }
+
+                                        // If all validations pass, submit the form
+                                        e.target.submit();
+                                    },
+
+                                
+                                    }">
+
+
+                                        <!-- Step Indicator -->
+                                        <div class="flex justify-between mb-12 relative px-6">
+                                            <!-- Progress Bar -->
+                                            <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-gray-200 w-full -z-1"></div>
+                                            <div class="absolute top-1/2 transform -translate-y-1/2 h-1 bg-primary transition-all duration-500"
+                                                :style="'width: ' + ((currentStep - 1) * 25) + '%'"></div>
+                                            
+                                            <!-- Step Numbers -->
+                                            <div class="relative z-10 text-center flex-1">
+                                                <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
+                                                    :class="currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
+                                                    <span class="text-lg font-medium">1</span>
+                                                </div>
+                                                <p class="mt-2 text-sm font-medium" 
+                                                :class="currentStep >= 1 ? 'text-primary' : 'text-gray-400'">
                                                     Maklumat Peribadi
-                                                </h3>
+                                                </p>
                                             </div>
 
-                                            <div class="p-6 space-y-6">
-                                                <!-- Name and Member Number -->
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="name" value="Nama Pendaftar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="name" name="name" type="text" 
-                                                            class="mt-1 block w-full" required autofocus 
-                                                            placeholder="Masukkan nama penuh" />
-                                                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="no_anggota" value="No. Anggota" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="no_anggota" name="no_anggota" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor anggota" />
-                                                        <x-input-error :messages="$errors->get('no_anggota')" class="mt-2" />
-                                                    </div>
+                                            <div class="relative z-10 text-center flex-1">
+                                                <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
+                                                    :class="currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
+                                                    <span class="text-lg font-medium">2</span>
                                                 </div>
-
-                                                <!-- IC and Phone -->
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="ic" value="No. K/P" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="ic" name="ic" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor kad pengenalan" />
-                                                        <x-input-error :messages="$errors->get('ic')" class="mt-2" />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="phone" value="No. Telefon" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="phone" name="phone" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor telefon" />
-                                                        <x-input-error :messages="$errors->get('phone')" class="mt-2" />
-                                                    </div>
-                                                </div>
-
-                                                <!-- Email -->
-                                                <div>
-                                                    <x-input-label for="email" value="Email" class="font-semibold text-gray-700" />
-                                                    <x-text-input id="email" name="email" type="email" 
-                                                        class="mt-1 block w-full" required 
-                                                        placeholder="Masukkan alamat email" />
-                                                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                                                </div>
-
-                                                <!-- Address -->
-                                                <div>
-                                                    <x-input-label for="address" value="Alamat" class="font-semibold text-gray-700" />
-                                                    <textarea id="address" name="address" 
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
-                                                        rows="3" required placeholder="Masukkan alamat penuh"></textarea>
-                                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
-                                                </div>
-
-                                                <!-- City, Postcode, State -->
-                                                <div class="grid grid-cols-3 gap-6">
-                                                    <div>
-                                                        <x-input-label for="city" value="Bandar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="city" name="city" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nama bandar" />
-                                                        <x-input-error :messages="$errors->get('city')" class="mt-2" />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="postcode" value="Poskod" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="postcode" name="postcode" type="text" 
-                                                            class="mt-1 block w-full" required maxlength="5"
-                                                            placeholder="Masukkan poskod" />
-                                                        <x-input-error :messages="$errors->get('postcode')" class="mt-2" />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="state" value="Negeri" class="font-semibold text-gray-700" />
-                                                        <select id="state" name="state" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-50" required>
-                                                            <option value="">Pilih Negeri</option>
-                                                            <option value="Johor">Johor</option>
-                                                            <option value="Kedah">Kedah</option>
-                                                            <option value="Kelantan">Kelantan</option>
-                                                            <option value="Melaka">Melaka</option>
-                                                            <option value="Negeri Sembilan">Negeri Sembilan</option>
-                                                            <option value="Pahang">Pahang</option>
-                                                            <option value="Perak">Perak</option>
-                                                            <option value="Perlis">Perlis</option>
-                                                            <option value="Pulau Pinang">Pulau Pinang</option>
-                                                            <option value="Sabah">Sabah</option>
-                                                            <option value="Sarawak">Sarawak</option>
-                                                            <option value="Selangor">Selangor</option>
-                                                            <option value="Terengganu">Terengganu</option>
-                                                            <option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option>
-                                                            <option value="W.P. Labuan">W.P. Labuan</option>
-                                                            <option value="W.P. Putrajaya">W.P. Putrajaya</option>
-                                                        </select>
-                                                        <x-input-error :messages="$errors->get('state')" class="mt-2" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Navigation -->
-                                        <div class="mt-6 flex justify-end">
-                                            <button type="button" @click="currentStep = 2"
-                                                    class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
-                                                Seterusnya
-                                                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <!-- Step 2: Family Information -->
-                                    <div x-show="currentStep === 2" x-cloak>
-                                        <div class="bg-white shadow-md rounded-lg mb-4">
-                                            <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
-                                                <h3 class="text-xl font-semibold text-white">
-                                                    Maklumat Pekerjaan & Peribadi
-                                                </h3>
+                                                <p class="mt-2 text-sm font-medium" 
+                                                :class="currentStep >= 2 ? 'text-primary' : 'text-gray-400'">
+                                                    Maklumat Pekerjaan
+                                                </p>
                                             </div>
 
-                                            <div class="p-6 space-y-6">
-                                                <!-- Personal Details -->
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="gender" value="Jantina" class="font-semibold text-gray-700" />
-                                                        <select id="gender" name="gender" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                                            <option value="">Pilih Jantina</option>
-                                                            <option value="Lelaki">Lelaki</option>
-                                                            <option value="Perempuan">Perempuan</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="DOB" value="Tarikh Lahir" class="font-semibold text-gray-700" />
-                                                        <x-text-input type="date" id="DOB" name="DOB" class="mt-1 block w-full" required />
-                                                    </div>
+                                            <div class="relative z-10 text-center flex-1">
+                                                <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
+                                                    :class="currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
+                                                    <span class="text-lg font-medium">3</span>
                                                 </div>
-
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="agama" value="Agama" class="font-semibold text-gray-700" />
-                                                        <select id="agama" name="agama" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                                            <option value="">Pilih Agama</option>
-                                                            <option value="Islam">Islam</option>
-                                                            <option value="Kristian">Kristian</option>
-                                                            <option value="Buddha">Buddha</option>
-                                                            <option value="Hindu">Hindu</option>
-                                                            <option value="Lain-lain">Lain-lain</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="bangsa" value="Bangsa" class="font-semibold text-gray-700" />
-                                                        <select id="bangsa" name="bangsa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                                            <option value="">Pilih Bangsa</option>
-                                                            <option value="Melayu">Melayu</option>
-                                                            <option value="Cina">Cina</option>
-                                                            <option value="India">India</option>
-                                                            <option value="Lain-lain">Lain-lain</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Work Information -->
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="jawatan" value="Jawatan" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="jawatan" name="jawatan" type="text" class="mt-1 block w-full" required />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="gred" value="Gred" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="gred" name="gred" type="text" class="mt-1 block w-full" required />
-                                                    </div>
-                                                </div>
-
-                                                <div class="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <x-input-label for="no_pf" value="No. Fail Peribadi" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="no_pf" name="no_pf" type="text" class="mt-1 block w-full" required />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="salary" value="Gaji (RM)" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="salary" name="salary" type="number" step="0.01" class="mt-1 block w-full" required />
-                                                    </div>
-                                                </div>
-
-                                                <!-- Office Address -->
-                                                <div>
-                                                    <x-input-label for="office_address" value="Alamat Pejabat" class="font-semibold text-gray-700" />
-                                                    <textarea id="office_address" name="office_address" 
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
-                                                        rows="3" required></textarea>
-                                                </div>
-
-                                                <div class="grid grid-cols-3 gap-6">
-                                                    <div>
-                                                        <x-input-label for="office_city" value="Bandar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="office_city" name="office_city" type="text" class="mt-1 block w-full" required />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="office_postcode" value="Poskod" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="office_postcode" name="office_postcode" type="text" 
-                                                            class="mt-1 block w-full" required maxlength="5" />
-                                                    </div>
-
-                                                    <div>
-                                                        <x-input-label for="office_state" value="Negeri" class="font-semibold text-gray-700" />
-                                                        <select id="office_state" name="office_state" 
-                                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                                            <option value="">Pilih Negeri</option>
-                                                            <!-- Same state options as before -->
-                                                            @foreach(['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'] as $state)
-                                                                <option value="{{ $state }}">{{ $state }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Navigation -->
-                                        <div class="mt-6 flex justify-between">
-                                            <button type="button" @click="currentStep = 1"
-                                                    class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
-                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                                </svg>
-                                                Sebelumnya
-                                            </button>
-                                            <button type="button" @click="currentStep = 3"
-                                                    class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
-                                                Seterusnya
-                                                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Step 3: Family Members -->
-                                    <div x-show="currentStep === 3" x-cloak>
-                                        <div class="bg-white shadow-md rounded-lg mb-4">
-                                            <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
-                                                <h3 class="text-xl font-semibold text-white">
+                                                <p class="mt-2 text-sm font-medium" 
+                                                :class="currentStep >= 3 ? 'text-primary' : 'text-gray-400'">
                                                     Maklumat Keluarga
-                                                </h3>
+                                                </p>
                                             </div>
 
-                                            <div class="p-6">
-                                                <!-- Family Members Table -->
-                                                <div class="overflow-x-auto">
+                                            <div class="relative z-10 text-center flex-1">
+                                                <div class="w-10 h-10 rounded-full transition-all duration-500 flex items-center justify-center mx-auto"
+                                                    :class="currentStep >= 4 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'">
+                                                    <span class="text-lg font-medium">4</span>
+                                                </div>
+                                                <p class="mt-2 text-sm font-medium" 
+                                                :class="currentStep >= 4 ? 'text-primary' : 'text-gray-400'">
+                                                    Yuran dan Sumbangan
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 1: Personal Information -->
+                                        <div x-show="currentStep === 1">
+                                            <div class="bg-white shadow-md rounded-lg mb-4">
+                                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
+                                                    <h3 class="text-xl font-semibold text-white">
+                                                        Maklumat Peribadi
+                                                    </h3>
+                                                </div>
+
+                                                <div class="p-6 space-y-6">
+                                                    <!-- Name and Member Number -->
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="name" value="Nama Pendaftar" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="name" name="name" type="text" 
+                                                                class="mt-1 block w-full" required autofocus 
+                                                                placeholder="Masukkan nama penuh" />
+                                                                <p x-show="errors.name" 
+                                                                    x-text="errors.name" 
+                                                                    class="mt-1 text-sm text-red-600"></p>               
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="no_anggota" value="No. Anggota" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="no_anggota" name="no_anggota" type="text" 
+                                                                class="mt-1 block w-full" required 
+                                                                placeholder="Masukkan nombor anggota" 
+                                                                @input="hasSubmitted ? await checkDuplicate('no_anggota', $event.target.value) : clearError('no_anggota')"  
+                                                                @blur="checkDuplicate('no_anggota', $event.target.value)" />
+                                                                <p x-show="errors.no_anggota" 
+                                                                    x-text="errors.no_anggota" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- IC and Phone -->
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="ic" value="No. K/P" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="ic" name="ic" type="text" 
+                                                                class="mt-1 block w-full" required 
+                                                                placeholder="Masukkan nombor kad pengenalan"
+                                                                @input="hasSubmitted ? await checkDuplicate('ic', $event.target.value) : clearError('ic')" 
+                                                                @blur="checkDuplicate('ic', $event.target.value)" />
+                                                                <p x-show="errors.ic" 
+                                                                    x-text="errors.ic" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="phone" value="No. Telefon" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="phone" name="phone" type="text" 
+                                                                class="mt-1 block w-full" required 
+                                                                placeholder="Masukkan nombor telefon" />
+                                                                <p x-show="errors.phone" 
+                                                                    x-text="errors.phone" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Email -->
+                                                    <div>
+                                                        <x-input-label for="email" value="Email" class="font-semibold text-gray-700" />
+                                                        <x-text-input id="email" name="email" type="email" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan alamat email"
+                                                            @input="hasSubmitted ? await checkDuplicate('email', $event.target.value) : clearError('email')"  
+                                                            @blur="checkDuplicate('email', $event.target.value)"/>
+                                                            <p x-show="errors.email" 
+                                                                    x-text="errors.email" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                    </div>
+
+                                                    <!-- Address -->
+                                                    <div>
+                                                        <x-input-label for="address" value="Alamat" class="font-semibold text-gray-700" />
+                                                        <textarea id="address" name="address" 
+                                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
+                                                            rows="3" required placeholder="Masukkan alamat penuh"></textarea>
+                                                            <p x-show="errors.address" 
+                                                                    x-text="errors.address" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                    </div>
+
+                                                    <!-- City, Postcode, State -->
+                                                    <div class="grid grid-cols-3 gap-6">
+                                                        <div>
+                                                            <x-input-label for="city" value="Bandar" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="city" name="city" type="text" 
+                                                                class="mt-1 block w-full" required 
+                                                                placeholder="Masukkan nama bandar" />
+                                                                <p x-show="errors.city" 
+                                                                    x-text="errors.city" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="postcode" value="Poskod" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="postcode" name="postcode" type="text" 
+                                                                class="mt-1 block w-full" required maxlength="5"
+                                                                placeholder="Masukkan poskod" />
+                                                                <p x-show="errors.postcode" 
+                                                                    x-text="errors.postcode" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="state" value="Negeri" class="font-semibold text-gray-700" />
+                                                            <select id="state" name="state" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-50" required>
+                                                                <option value="">Pilih Negeri</option>
+                                                                <option value="Johor">Johor</option>
+                                                                <option value="Kedah">Kedah</option>
+                                                                <option value="Kelantan">Kelantan</option>
+                                                                <option value="Melaka">Melaka</option>
+                                                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                                                <option value="Pahang">Pahang</option>
+                                                                <option value="Perak">Perak</option>
+                                                                <option value="Perlis">Perlis</option>
+                                                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                                                <option value="Sabah">Sabah</option>
+                                                                <option value="Sarawak">Sarawak</option>
+                                                                <option value="Selangor">Selangor</option>
+                                                                <option value="Terengganu">Terengganu</option>
+                                                                <option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option>
+                                                                <option value="W.P. Labuan">W.P. Labuan</option>
+                                                                <option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                                                            </select>
+                                                            <p x-show="errors.state" 
+                                                                    x-text="errors.state" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Navigation -->
+                                            <div class="mt-6 flex justify-end">
+                                                <button type="button"  
+                                                    @click="async () => {
+                                                        const duplicateChecks = await Promise.all([
+                                                            checkDuplicate('no_anggota', document.getElementById('no_anggota').value),
+                                                            checkDuplicate('ic', document.getElementById('ic').value),
+                                                            checkDuplicate('email', document.getElementById('email').value)
+                                                        ]);
+                                                        
+                                                        // Only proceed if no duplicates and validation passes
+                                                        if (!duplicateChecks.includes(false) && validateStep1()) {
+                                                            currentStep = 2;
+                                                        }
+                                                    }"
+                                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                                                    Seterusnya
+                                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Step 2: Family Information -->
+                                        <div x-show="currentStep === 2" x-cloak>
+                                            <div class="bg-white shadow-md rounded-lg mb-4">
+                                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
+                                                    <h3 class="text-xl font-semibold text-white">
+                                                        Maklumat Pekerjaan & Peribadi
+                                                    </h3>
+                                                </div>
+
+                                                <div class="p-6 space-y-6">
+                                                    <!-- Personal Details -->
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="gender" value="Jantina" class="font-semibold text-gray-700" />
+                                                            <select id="gender" name="gender" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                                <option value="">Pilih Jantina</option>
+                                                                <option value="Lelaki">Lelaki</option>
+                                                                <option value="Perempuan">Perempuan</option>
+                                                            </select>
+                                                            <p x-show="errors.gender" 
+                                                                    x-text="errors.gender" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="DOB" value="Tarikh Lahir" class="font-semibold text-gray-700" />
+                                                            <x-text-input type="date" id="DOB" name="DOB" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan tarikh lahir " />
+                                                            <p x-show="errors.DOB" 
+                                                                    x-text="errors.DOB" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="agama" value="Agama" class="font-semibold text-gray-700" />
+                                                            <select id="agama" name="agama" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                                <option value="">Pilih Agama</option>
+                                                                <option value="Islam">Islam</option>
+                                                                <option value="Kristian">Kristian</option>
+                                                                <option value="Buddha">Buddha</option>
+                                                                <option value="Hindu">Hindu</option>
+                                                                <option value="Lain-lain">Lain-lain</option>
+                                                            </select>
+                                                            <p x-show="errors.agama" 
+                                                                x-text="errors.agama" 
+                                                                class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="bangsa" value="Bangsa" class="font-semibold text-gray-700" />
+                                                            <select id="bangsa" name="bangsa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                                <option value="">Pilih Bangsa</option>
+                                                                <option value="Melayu">Melayu</option>
+                                                                <option value="Cina">Cina</option>
+                                                                <option value="India">India</option>
+                                                                <option value="Lain-lain">Lain-lain</option>
+                                                            </select>
+                                                            <p x-show="errors.bangsa" 
+                                                                x-text="errors.bangsa" 
+                                                                class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Work Information -->
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="jawatan" value="Jawatan" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="jawatan" name="jawatan" type="text" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan jawatan anda " />
+                                                            <p x-show="errors.jawatan" 
+                                                                    x-text="errors.jawatan" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="gred" value="Gred" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="gred" name="gred" type="text" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan gred anda " />
+                                                            <p x-show="errors.gred" 
+                                                                    x-text="errors.gred" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        <div>
+                                                            <x-input-label for="no_pf" value="No. Fail Peribadi" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="no_pf" name="no_pf" type="text" 
+                                                            class="mt-1 block w-full" required
+                                                            placeholder="Masukkan nombor fail peribadi" 
+                                                                @input="hasSubmitted ? await checkDuplicate('no_pf', $event.target.value) : clearError('pf')"  
+                                                                @blur="checkDuplicate('no_pf', $event.target.value)" />
+                                                            <p x-show="errors.no_pf" 
+                                                                    x-text="errors.no_pf" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="salary" value="Gaji (RM)" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="salary" name="salary" type="number" step="0.01" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan gaji(RM) anda " />
+                                                            <p x-show="errors.salary" 
+                                                                    x-text="errors.salary" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Office Address -->
+                                                    <div>
+                                                        <x-input-label for="office_address" value="Alamat Pejabat" class="font-semibold text-gray-700" />
+                                                        <textarea id="office_address" name="office_address" 
+                                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
+                                                            rows="3" required
+                                                            placeholder="Masukkan alamat pejabat"></textarea>
+                                                            <p x-show="errors.office_address" 
+                                                                    x-text="errors.office_address" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-3 gap-6">
+                                                        <div>
+                                                            <x-input-label for="office_city" value="Bandar" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="office_city" name="office_city" type="text" 
+                                                            class="mt-1 block w-full" required 
+                                                            placeholder="Masukkan nama bandar " />
+                                                            <p x-show="errors.office_city" 
+                                                                    x-text="errors.office_city" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="office_postcode" value="Poskod" class="font-semibold text-gray-700" />
+                                                            <x-text-input id="office_postcode" name="office_postcode" type="text" 
+                                                                class="mt-1 block w-full" required maxlength="5" 
+                                                                placeholder="Masukkan poskod " />
+                                                                <p x-show="errors.office_postcode" 
+                                                                    x-text="errors.office_postcode" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+
+                                                        <div>
+                                                            <x-input-label for="office_state" value="Negeri" class="font-semibold text-gray-700" />
+                                                            <select id="office_state" name="office_state" 
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                                <option value="">Pilih Negeri</option>
+                                                                <!-- Same state options as before -->
+                                                                @foreach(['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'] as $state)
+                                                                    <option value="{{ $state }}">{{ $state }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <p x-show="errors.office_state" 
+                                                                    x-text="errors.office_state" 
+                                                                    class="mt-1 text-sm text-red-600"></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Navigation -->
+                                            <div class="mt-6 flex justify-between">
+                                                <button type="button" @click="currentStep = 1"
+                                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
+                                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                                    </svg>
+                                                    Sebelumnya
+                                                </button>
+                                                <button type="button" 
+                                                    @click="async () => {
+                                                            const duplicateChecks = await Promise.all([
+                                                                checkDuplicate('no_pf', document.getElementById('no_pf').value),
+
+                                                            ]);
+                                                            
+                                                            // Only proceed if no duplicates and validation passes
+                                                            if (!duplicateChecks.includes(false) && validateStep2()) {
+                                                                currentStep = 3;
+                                                            }
+                                                        }"
+                                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                                                    Seterusnya
+                                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3: Family Members -->
+                                        <div x-show="currentStep === 3" x-cloak>
+                                            <div class="bg-white shadow-md rounded-lg mb-4">
+                                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
+                                                    <h3 class="text-xl font-semibold text-white">
+                                                        Maklumat Keluarga
+                                                    </h3>
+                                                </div>
+
+                                                <div class="p-6">
+                                                    <!-- Family Members Table -->
+                                                    <div class="overflow-x-auto">
+                                                        <table class="min-w-full divide-y divide-gray-200">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Bil</th>
+                                                                    <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                                                                    <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">No. K/P</th>
+                                                                    <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Hubungan</th>
+                                                                    <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-20">Tindakan</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="familyTableBody" class="bg-white divide-y divide-gray-200">
+                                                                <!-- Family members will be added here dynamically -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <!-- Add Family Member Button -->
+                                                    <div class="mt-4">
+                                                        <button type="button" onclick="addFamilyMember()"
+                                                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+                                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                            </svg>
+                                                            Tambah Ahli Keluarga
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Navigation -->
+                                            <div class="mt-6 flex justify-between">
+                                                <button type="button" @click="currentStep = 2"
+                                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
+                                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                                    </svg>
+                                                    Sebelumnya
+                                                </button>
+                                                <button type="button" @click="currentStep = 4"
+                                                        class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                                                    Seterusnya
+                                                    <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 4: Fees and Contributions -->
+                                        <div x-show="currentStep === 4" x-cloak>
+                                            <div class="bg-white shadow-md rounded-lg mb-4">
+                                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
+                                                    <h3 class="text-xl font-semibold text-white">
+                                                        Yuran dan Sumbangan
+                                                    </h3>
+                                                </div>
+
+                                                <div class="p-6">
                                                     <table class="min-w-full divide-y divide-gray-200">
                                                         <thead>
                                                             <tr>
-                                                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Bil</th>
-                                                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                                                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">No. K/P</th>
-                                                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Hubungan</th>
-                                                                <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-20">Tindakan</th>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-16">Bil</th>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Perkara</th>
+                                                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-48">RM</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody id="familyTableBody" class="bg-white divide-y divide-gray-200">
-                                                            <!-- Family members will be added here dynamically -->
+                                                        <tbody class="bg-white divide-y divide-gray-200">
+                                                            <!-- Fee rows -->
+                                                            @foreach([
+                                                                'entrance' => ['label' => 'Yuran Masuk', 'value' => 50, 'fixed' => true],
+                                                                'share_capital' => ['label' => 'Modal Syer', 'value' => 300, 'min' => true],
+                                                                'subscription_capital' => ['label' => 'Modal Yuran', 'value' => 35, 'min' => true],
+                                                                'member_deposit' => ['label' => 'Wang Deposit Anggota', 'value' => 20, 'min' => true],
+                                                                'welfare_fund' => ['label' => 'Sumbangan Tabung Kebajikan (Al-Abrar)', 'value' => 5, 'fixed' => true],
+                                                                'fixed_savings' => ['label' => 'Simpanan Tetap', 'value' => 5, 'fixed' => true]
+                                                            ] as $key => $fee)
+                                                            <tr>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loop->iteration }}</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    {{ $fee['label'] }}
+                                                                    @if(isset($fee['min']))
+                                                                        <span class="text-sm text-gray-500">(Minimum: RM{{ number_format($fee['value'], 2) }})</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <input type="number" 
+                                                                            step="0.01" 
+                                                                            name="fees[{{ $key }}]" 
+                                                                            class="pl-12 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" 
+                                                                            required
+                                                                            value="{{ $fee['value'] }}"
+                                                                            {{ ($fee['fixed'] ?? false) ? 'readonly' : '' }}
+                                                                            {{ (!($fee['fixed'] ?? false)) ? 'min='.$fee['value'] : '' }}
+                                                                            data-min="{{ $fee['value'] }}"
+                                                                            data-fixed="{{ $fee['fixed'] ?? false }}"
+                                                                        />
+                                                                        <div class="hidden text-red-500 text-sm mt-1 error-message"></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            @endforeach
+
+                                                            <!-- Total row -->
+                                                            <tr class="bg-gray-50 font-bold">
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">7</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">JUMLAH</td>
+                                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                                    <div class="relative">
+                                                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
+                                                                            RM
+                                                                        </span>
+                                                                        <x-text-input type="number" step="0.01" id="total_amount" 
+                                                                            class="pl-12 block w-full bg-gray-100" readonly />
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
-
-                                                <!-- Add Family Member Button -->
-                                                <div class="mt-4">
-                                                    <button type="button" onclick="addFamilyMember()"
-                                                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
-                                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                                        </svg>
-                                                        Tambah Ahli Keluarga
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Navigation -->
-                                        <div class="mt-6 flex justify-between">
-                                            <button type="button" @click="currentStep = 2"
-                                                    class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
-                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                                </svg>
-                                                Sebelumnya
-                                            </button>
-                                            <button type="button" @click="currentStep = 4"
-                                                    class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
-                                                Seterusnya
-                                                <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Step 4: Fees and Contributions -->
-                                    <div x-show="currentStep === 4" x-cloak>
-                                        <div class="bg-white shadow-md rounded-lg mb-4">
-                                            <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
-                                                <h3 class="text-xl font-semibold text-white">
-                                                    Yuran dan Sumbangan
-                                                </h3>
                                             </div>
 
-                                            <div class="p-6">
-                                                <table class="min-w-full divide-y divide-gray-200">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-16">Bil</th>
-                                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Perkara</th>
-                                                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-48">RM</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="bg-white divide-y divide-gray-200">
-                                                        <!-- Fee rows -->
-                                                        @foreach([
-                                                            'entrance' => ['label' => 'Yuran Masuk', 'value' => 50, 'fixed' => true],
-                                                            'share_capital' => ['label' => 'Modal Syer', 'value' => 300, 'min' => true],
-                                                            'subscription_capital' => ['label' => 'Modal Yuran', 'value' => 35, 'min' => true],
-                                                            'member_deposit' => ['label' => 'Wang Deposit Anggota', 'value' => 20, 'min' => true],
-                                                            'welfare_fund' => ['label' => 'Sumbangan Tabung Kebajikan (Al-Abrar)', 'value' => 5, 'fixed' => true],
-                                                            'fixed_savings' => ['label' => 'Simpanan Tetap', 'value' => 5, 'fixed' => true]
-                                                        ] as $key => $fee)
-                                                        <tr>
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $loop->iteration }}</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                {{ $fee['label'] }}
-                                                                @if(isset($fee['min']))
-                                                                    <span class="text-sm text-gray-500">(Minimum: RM{{ number_format($fee['value'], 2) }})</span>
-                                                                @endif
-                                                            </td>
-                                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                                <div class="relative">
-                                                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
-                                                                        RM
-                                                                    </span>
-                                                                    <input type="number" 
-                                                                        step="0.01" 
-                                                                        name="fees[{{ $key }}]" 
-                                                                        class="pl-12 block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" 
-                                                                        required
-                                                                        value="{{ $fee['value'] }}"
-                                                                        {{ ($fee['fixed'] ?? false) ? 'readonly' : '' }}
-                                                                        {{ (!($fee['fixed'] ?? false)) ? 'min='.$fee['value'] : '' }}
-                                                                        data-min="{{ $fee['value'] }}"
-                                                                        data-fixed="{{ $fee['fixed'] ?? false }}"
-                                                                    />
-                                                                    <div class="hidden text-red-500 text-sm mt-1 error-message"></div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-
-                                                        <!-- Total row -->
-                                                        <tr class="bg-gray-50 font-bold">
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">7</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">JUMLAH</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                                <div class="relative">
-                                                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-600">
-                                                                        RM
-                                                                    </span>
-                                                                    <x-text-input type="number" step="0.01" id="total_amount" 
-                                                                        class="pl-12 block w-full bg-gray-100" readonly />
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-
-                                        <!-- Payment Method and Proof Upload -->
-                                        <div class="mt-8 p-6 bg-white rounded-lg shadow">
-                                            <h4 class="text-lg font-semibold mb-6">Kaedah Pembayaran</h4>
-                                            
-                                            <!-- Payment Method Selection -->
-                                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                                <div class="relative">
-                                                    <input type="radio" id="payment_cash" name="payment_method" value="cash" 
-                                                           class="peer hidden" x-model="paymentMethod" required>
-                                                    <label for="payment_cash" 
-                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                  peer-checked:border-green-500 peer-checked:bg-green-50
-                                                                  hover:border-gray-300
-                                                                  relative overflow-hidden">
-                                                        <div class="relative z-10">
-                                                            <i class="fas fa-money-bill-wave text-3xl mb-3" 
-                                                               :class="paymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'"></i>
-                                                            <div class="font-medium" :class="paymentMethod === 'cash' ? 'text-green-700' : 'text-gray-600'">
-                                                                Tunai
-                                                            </div>
-                                                        </div>
-                                                        <!-- Selected indicator -->
-                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'cash'">
-                                                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                                                        </div>
-                                                    </label>
-                                                </div>
+                                            <!-- Payment Method and Proof Upload -->
+                                            <div class="mt-8 p-6 bg-white rounded-lg shadow">
+                                                <h4 class="text-lg font-semibold mb-6">Kaedah Pembayaran</h4>
                                                 
-                                                <div class="relative">
-                                                    <input type="radio" id="payment_online" name="payment_method" value="online" 
-                                                           class="peer hidden" x-model="paymentMethod">
-                                                    <label for="payment_online" 
-                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                  peer-checked:border-blue-500 peer-checked:bg-blue-50
-                                                                  hover:border-gray-300
-                                                                  relative overflow-hidden">
-                                                        <div class="relative z-10">
-                                                            <i class="fas fa-credit-card text-3xl mb-3" 
-                                                               :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"></i>
-                                                            <div class="font-medium" :class="paymentMethod === 'online' ? 'text-blue-700' : 'text-gray-600'">
-                                                                Pembayaran Dalam Talian
+                                                <!-- Payment Method Selection -->
+                                                <div class="grid grid-cols-2 gap-4 mb-6">
+                                                    <div class="relative">
+                                                        <input type="radio" id="payment_cash" name="payment_method" value="cash" 
+                                                            class="peer hidden" x-model="paymentMethod" required>
+                                                        <label for="payment_cash" 
+                                                            class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
+                                                                    peer-checked:border-green-500 peer-checked:bg-green-50
+                                                                    hover:border-gray-300
+                                                                    relative overflow-hidden">
+                                                            <div class="relative z-10">
+                                                                <i class="fas fa-money-bill-wave text-3xl mb-3" 
+                                                                :class="paymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'"></i>
+                                                                <div class="font-medium" :class="paymentMethod === 'cash' ? 'text-green-700' : 'text-gray-600'">
+                                                                    Tunai
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <!-- Selected indicator -->
-                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'online'">
-                                                            <i class="fas fa-check-circle text-blue-500 text-xl"></i>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <!-- Cash Payment Message -->
-                                            <div x-show="paymentMethod === 'cash'"
-                                                 x-transition:enter="transition ease-out duration-300"
-                                                 x-transition:enter-start="opacity-0 transform scale-95"
-                                                 x-transition:enter-end="opacity-100 transform scale-100"
-                                                 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
-                                                 x-cloak>
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-info-circle text-green-500 text-xl mr-3"></i>
-                                                    <p class="text-green-700">
-                                                        Sila pergi ke kaunter hadapan untuk membuat pembayaran secara tunai.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <!-- Payment Proof Upload -->
-                                            <div x-show="paymentMethod === 'online'" 
-                                                 x-transition:enter="transition ease-out duration-300"
-                                                 x-transition:enter-start="opacity-0 transform scale-95"
-                                                 x-transition:enter-end="opacity-100 transform scale-100"
-                                                 x-cloak>
-                                                <div class="mt-4">
-                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                        Bukti Pembayaran <span class="text-red-500">*</span>
-                                                    </label>
+                                                            <!-- Selected indicator -->
+                                                            <div class="absolute top-2 right-2" x-show="paymentMethod === 'cash'">
+                                                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                                            </div>
+                                                        </label>
+                                                    </div>
                                                     
-                                                    <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6"
-                                                         x-data="{ fileName: null }"
-                                                         @dragover.prevent="$el.classList.add('border-blue-500', 'bg-blue-50')"
-                                                         @dragleave.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')"
-                                                         @drop.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')">
-                                                        
-                                                        <!-- Hidden file input with dynamic required attribute -->
-                                                        <input type="file" 
-                                                               id="payment_proof" 
-                                                               name="payment_proof" 
-                                                               class="hidden"
-                                                               accept="image/*"
-                                                               :required="paymentMethod === 'online'"
-                                                               @change="fileName = $event.target.files[0].name">
-                                                        
-                                                        <!-- Upload Interface -->
-                                                        <div class="text-center" x-show="!fileName">
-                                                            <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
-                                                                <i class="fas fa-cloud-upload-alt text-5xl"></i>
+                                                    <div class="relative">
+                                                        <input type="radio" id="payment_online" name="payment_method" value="online" 
+                                                            class="peer hidden" x-model="paymentMethod">
+                                                        <label for="payment_online" 
+                                                            class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
+                                                                    peer-checked:border-blue-500 peer-checked:bg-blue-50
+                                                                    hover:border-gray-300
+                                                                    relative overflow-hidden">
+                                                            <div class="relative z-10">
+                                                                <i class="fas fa-credit-card text-3xl mb-3" 
+                                                                :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"></i>
+                                                                <div class="font-medium" :class="paymentMethod === 'online' ? 'text-blue-700' : 'text-gray-600'">
+                                                                    Pembayaran Dalam Talian
+                                                                </div>
                                                             </div>
-                                                            <div class="flex flex-col items-center">
-                                                                <label for="payment_proof" 
-                                                                       class="mb-2 px-6 py-2.5 bg-blue-500 text-white rounded-md cursor-pointer 
-                                                                      hover:bg-blue-600 transition-colors duration-200 font-medium">
-                                                                    Pilih Fail
-                                                                </label>
-                                                                <p class="text-xs text-gray-400 mt-2">PNG, JPG, GIF sehingga 5MB</p>
+                                                            <!-- Selected indicator -->
+                                                            <div class="absolute top-2 right-2" x-show="paymentMethod === 'online'">
+                                                                <i class="fas fa-check-circle text-blue-500 text-xl"></i>
                                                             </div>
-                                                        </div>
-                                                        
-                                                        <!-- File Selected State -->
-                                                        <div class="text-center" x-show="fileName">
-                                                            <div class="flex items-center justify-center space-x-2">
-                                                                <i class="fas fa-file-image text-blue-500 text-xl"></i>
-                                                                <span class="text-sm text-gray-600" x-text="fileName"></span>
-                                                            </div>
-                                                            <button type="button" 
-                                                                    class="mt-4 px-4 py-2 text-sm text-red-600 hover:text-red-800 
-                                                                   hover:bg-red-50 rounded-md transition-colors duration-200"
-                                                                    @click="fileName = null; document.getElementById('payment_proof').value = ''">
-                                                                <i class="fas fa-trash-alt mr-1"></i> Buang Fail
-                                                            </button>
-                                                        </div>
+                                                        </label>
                                                     </div>
-                                                    <!-- Error message -->
-                                                    <div class="mt-1 text-sm text-red-600" x-show="paymentMethod === 'online' && !fileName">
-                                                        Sila muat naik bukti pembayaran
+                                                </div>
+
+                                                <!-- Cash Payment Message -->
+                                                <div x-show="paymentMethod === 'cash'"
+                                                    x-transition:enter="transition ease-out duration-300"
+                                                    x-transition:enter-start="opacity-0 transform scale-95"
+                                                    x-transition:enter-end="opacity-100 transform scale-100"
+                                                    class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+                                                    x-cloak>
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-info-circle text-green-500 text-xl mr-3"></i>
+                                                        <p class="text-green-700">
+                                                            Sila pergi ke kaunter hadapan untuk membuat pembayaran secara tunai.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Payment Proof Upload -->
+                                                <div x-show="paymentMethod === 'online'" 
+                                                    x-transition:enter="transition ease-out duration-300"
+                                                    x-transition:enter-start="opacity-0 transform scale-95"
+                                                    x-transition:enter-end="opacity-100 transform scale-100"
+                                                    x-cloak>
+                                                    <div class="mt-4">
+                                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                            Bukti Pembayaran <span class="text-red-500">*</span>
+                                                        </label>
+                                                        
+                                                        <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6"
+                                                            x-data="{ fileName: null }"
+                                                            @dragover.prevent="$el.classList.add('border-blue-500', 'bg-blue-50')"
+                                                            @dragleave.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')"
+                                                            @drop.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')">
+                                                            
+                                                            <!-- Hidden file input with dynamic required attribute -->
+                                                            <input type="file" 
+                                                                id="payment_proof" 
+                                                                name="payment_proof" 
+                                                                class="hidden"
+                                                                accept="image/*"
+                                                                :required="paymentMethod === 'online'"
+                                                                @change="fileName = $event.target.files[0].name">
+                                                            
+                                                            <!-- Upload Interface -->
+                                                            <div class="text-center" x-show="!fileName">
+                                                                <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+                                                                    <i class="fas fa-cloud-upload-alt text-5xl"></i>
+                                                                </div>
+                                                                <div class="flex flex-col items-center">
+                                                                    <label for="payment_proof" 
+                                                                        class="mb-2 px-6 py-2.5 bg-blue-500 text-white rounded-md cursor-pointer 
+                                                                        hover:bg-blue-600 transition-colors duration-200 font-medium">
+                                                                        Pilih Fail
+                                                                    </label>
+                                                                    <p class="text-xs text-gray-400 mt-2">PNG, JPG, GIF sehingga 5MB</p>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- File Selected State -->
+                                                            <div class="text-center" x-show="fileName">
+                                                                <div class="flex items-center justify-center space-x-2">
+                                                                    <i class="fas fa-file-image text-blue-500 text-xl"></i>
+                                                                    <span class="text-sm text-gray-600" x-text="fileName"></span>
+                                                                </div>
+                                                                <button type="button" 
+                                                                        class="mt-4 px-4 py-2 text-sm text-red-600 hover:text-red-800 
+                                                                    hover:bg-red-50 rounded-md transition-colors duration-200"
+                                                                        @click="fileName = null; document.getElementById('payment_proof').value = ''">
+                                                                    <i class="fas fa-trash-alt mr-1"></i> Buang Fail
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Error message -->
+                                                        <div class="mt-1 text-sm text-red-600" x-show="paymentMethod === 'online' && !fileName">
+                                                            Sila muat naik bukti pembayaran
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Navigation -->
-                                        <div class="mt-6 flex justify-between">
-                                            <button type="button" @click="currentStep = 3"
-                                                    class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
-                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                                </svg>
-                                                Sebelumnya
-                                            </button>
-                                            
-                                            <div class="flex items-center space-x-3">
-                                                <x-secondary-button type="reset">
-                                                    {{ __('Set Semula') }}
-                                                </x-secondary-button>
-                                                <x-primary-button type="submit">
-                                                    {{ __('Hantar') }}
-                                                </x-primary-button>
+                                            <!-- Navigation -->
+                                            <div class="mt-6 flex justify-between">
+                                                <button type="button" @click="currentStep = 3"
+                                                        class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
+                                                    <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                                    </svg>
+                                                    Sebelumnya
+                                                </button>
+                                                
+                                                <div class="flex items-center space-x-3">
+                                                    <x-secondary-button type="reset">
+                                                        {{ __('Set Semula') }}
+                                                    </x-secondary-button>
+                                                    <x-primary-button type="submit">
+                                                        {{ __('Hantar') }}
+                                                    </x-primary-button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
