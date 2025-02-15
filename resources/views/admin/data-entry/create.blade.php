@@ -180,34 +180,49 @@
                     </div>
                 </div>
 
-                {{-- Maklumat Keluarga --}}
+                <!-- Family Information Section -->
                 <div class="p-6 bg-white rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:shadow-xl">
-                    <h3 class="text-lg font-medium text-gray-800">
-                        Maklumat Keluarga 
-                    </h3>
-                    <div class="mt-4">
-                        <table class="min-w-full">
-                            <thead>
+                    <div class="border-b border-gray-200 pb-4 mb-4">
+                        <h3 class="text-lg font-medium text-indigo-800">
+                            Maklumat Keluarga
+                            <span class="ml-2 text-sm text-gray-500">(Sila tambah ahli keluarga jika ada)</span>
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-indigo-50">
                                 <tr>
-                                    <th class="px-4 py-2 text-left">Bil.</th>
-                                    <th class="px-4 py-2 text-left">Nama</th>
-                                    <th class="px-4 py-2 text-left">No. KP</th>
-                                    <th class="px-4 py-2 text-left">Hubungan</th>
-                                    <th class="px-4 py-2">
-                                        <button type="button" onclick="addFamilyRow()" 
-                                                class="inline-flex items-center px-3 py-1 bg-primary text-white rounded-md hover:bg-primary-dark transition duration-300 ease-in-out">
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                            Tambah
-                                        </button>
-                                    </th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-indigo-700">Bil.</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-indigo-700">Nama</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-indigo-700">No. KP</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-indigo-700">Hubungan</th>
+                                    <th class="px-4 py-3 text-center text-sm font-semibold text-indigo-700">Tindakan</th>
                                 </tr>
                             </thead>
-                            <tbody id="familyTableBody">
+                            <tbody id="familyTableBody" class="bg-white divide-y divide-gray-200">
                                 <!-- Family members will be added here dynamically -->
                             </tbody>
                         </table>
+
+                        <!-- Empty state message -->
+                        <div id="emptyFamilyMessage" class="text-center py-6 text-gray-500 bg-gray-50 rounded-lg mt-4">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <p class="mt-2 text-sm">Tiada ahli keluarga ditambah lagi</p>
+                        </div>
+
+                        <!-- Add Family Member Button -->
+                        <div class="mt-4">
+                            <button type="button" 
+                                    onclick="addFamilyRow()"
+                                    class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Tambah Ahli Keluarga
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -498,23 +513,31 @@
         let rowCount = 0;
 
         function addFamilyRow() {
+            // Hide empty state message when adding rows
+            document.getElementById('emptyFamilyMessage').style.display = 'none';
+            
             rowCount++;
             const tbody = document.getElementById('familyTableBody');
             const newRow = document.createElement('tr');
+            newRow.className = 'hover:bg-gray-50 transition-colors duration-200';
             
             newRow.innerHTML = `
-                <td class="px-4 py-3">${rowCount}</td>
+                <td class="px-4 py-3 text-gray-900 font-medium">${rowCount}</td>
                 <td class="px-4 py-3">
-                    <input type="text" name="family[${rowCount}][name]" 
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <input type="text" 
+                           name="family[${rowCount}][name]" 
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200"
+                           placeholder="Nama ahli keluarga">
                 </td>
                 <td class="px-4 py-3">
-                    <input type="text" name="family[${rowCount}][ic]" 
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                    <input type="text" 
+                           name="family[${rowCount}][ic]" 
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200"
+                           placeholder="No. KP">
                 </td>
                 <td class="px-4 py-3">
                     <select name="family[${rowCount}][relationship]" 
-                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 transition duration-200">
                         <option value="">Pilih Hubungan</option>
                         <option value="Isteri">Isteri</option>
                         <option value="Suami">Suami</option>
@@ -525,8 +548,8 @@
                     </select>
                 </td>
                 <td class="px-4 py-3 text-center">
-                    <button type="button" onclick="this.closest('tr').remove(); updateRowNumbers()" 
-                            class="text-red-600 hover:text-red-800 transition duration-300">
+                    <button type="button" onclick="removeFamilyRow(this)" 
+                            class="text-red-600 hover:text-red-800 hover:bg-red-100 p-2 rounded-full transition duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
@@ -537,6 +560,19 @@
             tbody.appendChild(newRow);
         }
 
+        function removeFamilyRow(button) {
+            const row = button.closest('tr');
+            row.classList.add('fade-out');
+            setTimeout(() => {
+                row.remove();
+                updateRowNumbers();
+                // Show empty state message if no rows left
+                if (document.getElementById('familyTableBody').children.length === 0) {
+                    document.getElementById('emptyFamilyMessage').style.display = 'block';
+                }
+            }, 200);
+        }
+
         function updateRowNumbers() {
             const rows = document.getElementById('familyTableBody').getElementsByTagName('tr');
             for (let i = 0; i < rows.length; i++) {
@@ -544,6 +580,108 @@
             }
             rowCount = rows.length;
         }
+
+        // Add some CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            .fade-out {
+                opacity: 0;
+                transform: translateX(20px);
+                transition: opacity 200ms, transform 200ms;
+            }
+            
+            tr {
+                opacity: 1;
+                transform: translateX(0);
+                transition: opacity 200ms, transform 200ms, background-color 200ms;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
+    @endpush
+
+    @push('styles')
+    <style>
+        /* Input field styling */
+        .form-input,
+        .form-select,
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        input[type="tel"],
+        select {
+            padding: 0.75rem 1rem !important;
+            height: 3rem !important;
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
+            border-radius: 0.5rem !important;
+            border: 2px solid #e5e7eb !important;
+            background-color: #ffffff !important;
+            width: 100% !important;
+        }
+
+        /* Focus state */
+        .form-input:focus,
+        .form-select:focus,
+        input:focus,
+        select:focus {
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+            outline: none !important;
+        }
+
+        /* Label styling */
+        label {
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            color: #374151 !important;
+            margin-bottom: 0.5rem !important;
+            display: block !important;
+        }
+
+        /* Placeholder styling */
+        ::placeholder {
+            color: #9ca3af !important;
+            opacity: 1 !important;
+        }
+
+        /* Disabled state */
+        input:disabled,
+        select:disabled {
+            background-color: #f3f4f6 !important;
+            cursor: not-allowed !important;
+        }
+
+        /* Error state */
+        .error input,
+        .error select {
+            border-color: #ef4444 !important;
+        }
+
+        /* Family table specific styling */
+        #familyTableBody input,
+        #familyTableBody select {
+            height: 2.75rem !important;
+            padding: 0.5rem 0.75rem !important;
+        }
+
+        /* Section headers */
+        .section-header {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            color: #1f2937 !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* Card styling */
+        .input-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
     @endpush
 </x-app-layout> 
