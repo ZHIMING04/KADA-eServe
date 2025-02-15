@@ -116,7 +116,7 @@
                             <td colspan="5" style="text-align: center;">Tiada transaksi yang direkodkan untuk bulan ini</td>
                         </tr>
                     @else
-                        @foreach ($transactions as $transaction)
+                        @forelse ($transactions->where('status', 'approved') as $transaction)
                             <tr>
                                 <td>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}</td>
                                 <td>

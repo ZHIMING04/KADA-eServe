@@ -257,7 +257,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    @forelse ($transactions as $transaction)
+                                    @forelse ($transactions->where('status', 'approved') as $transaction)
                                         <tr class="hover:bg-gray-50 transition-colors duration-200">
                                             <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                                                 {{ \Carbon\Carbon::parse($transaction->created_at)->format('d/m/Y') }}
