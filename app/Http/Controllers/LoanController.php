@@ -436,4 +436,19 @@ class LoanController extends Controller
         return response()->json(['valid' => true]);
     }
 
+    public function reject(Request $request, $loanId)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|min:10'
+        ]);
+
+        $loan = Loan::findOrFail($loanId);
+        $loan->status = 'rejected';
+        $loan->rejection_reason = $request->rejection_reason;
+        $loan->save();
+
+        return redirect()->route('admin.finance.index')
+            ->with('success', 'Permohonan pinjaman telah ditolak.');
+    }
+
 }
