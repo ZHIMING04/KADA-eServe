@@ -272,17 +272,17 @@
         <div class="modal-dialog">
             <div class="modal-content rounded-lg shadow-xl">
                 <div class="modal-header bg-gray-50 rounded-t-lg">
-                    <h5 class="modal-title text-lg font-semibold text-gray-800">Add Transaction</h5>
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Tambah Transaksi</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-6">
                     <form id="transactionForm">
                         @csrf
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Transaction Type</label>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Jenis Transaksi</label>
                             <select class="form-select w-full rounded-md shadow-sm" id="transactionType" name="type" required>
-                                <option value="savings">Savings Deposit</option>
-                                <option value="loan">Loan Repayment</option>
+                                <option value="savings">Simpanan</option>
+                                <option value="loan">Bayaran Balik Pinjaman</option>
                             </select>
                         </div>
 
@@ -305,14 +305,14 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Amount (RM)</label>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Amaun (RM)</label>
                             <input type="number" class="form-input w-full rounded-md shadow-sm" name="amount" step="0.01" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer bg-gray-50 rounded-b-lg">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="submitTransaction()">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTransaction()">Hantar</button>
                 </div>
             </div>
         </div>
