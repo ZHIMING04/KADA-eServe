@@ -207,7 +207,319 @@
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4, paymentMethod: 'cash' }">
+        <div class="min-h-screen relative" 
+             x-data="{ 
+                currentStep: 1, 
+                totalSteps: 4,
+                errors: {},
+                memberData: {
+                    no_anggota: '',
+                    name: '',
+                    email: '',
+                    ic: '',
+                    phone: '',
+                    address: '',
+                    city: '',
+                    postcode: '',
+                    state: '',
+                    gender: '',
+                    DOB: '',
+                    agama: '',
+                    bangsa: '',
+                    jawatan: '',
+                    gred: '',
+                    no_pf: '',
+                    salary: '',
+                    office_address: '',
+                    office_city: '',
+                    office_postcode: '',
+                    office_state: ''
+                },
+                familyMembers: [],
+                fees: {
+                    entrance: 50,
+                    share_capital: 300,
+                    subscription_capital: 35,
+                    member_deposit: 20,
+                    welfare_fund: 5,
+                    fixed_savings: 5
+                },
+                paymentMethod: '',
+
+                validateStep1() {
+                    console.log('validateStep1 called');
+                    this.errors = {};
+                    let isValid = true;
+
+                    // No. Anggota validation
+                    if (!this.memberData.no_anggota) {
+                        this.errors.no_anggota = 'Sila masukkan nombor anggota';
+                        isValid = false;
+                    }
+
+                    // Name validation
+                    if (!this.memberData.name) {
+                        this.errors.name = 'Sila masukkan nama';
+                        isValid = false;
+                    }
+
+                    // Email validation
+                    if (!this.memberData.email) {
+                        this.errors.email = 'Sila masukkan alamat emel';
+                        isValid = false;
+                    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.memberData.email)) {
+                        this.errors.email = 'Alamat emel tidak sah';
+                        isValid = false;
+                    }
+
+                    // IC validation
+                    if (!this.memberData.ic) {
+                        this.errors.ic = 'Sila masukkan nombor kad pengenalan';
+                        isValid = false;
+                    } else if (!/^\d{12}$/.test(this.memberData.ic)) {
+                        this.errors.ic = 'Nombor kad pengenalan mestilah 12 nombor';
+                        isValid = false;
+                    }
+
+                    // Phone validation
+                    if (!this.memberData.phone) {
+                        this.errors.phone = 'Sila masukkan nombor telefon';
+                        isValid = false;
+                    } else if (!/^\d{10,11}$/.test(this.memberData.phone)) {
+                        this.errors.phone = 'Nombor telefon mestilah 10-11 nombor';
+                        isValid = false;
+                    }
+
+                    // Address validation
+                    if (!this.memberData.address) {
+                        this.errors.address = 'Sila masukkan alamat';
+                        isValid = false;
+                    }
+
+                    // City validation
+                    if (!this.memberData.city) {
+                        this.errors.city = 'Sila masukkan bandar';
+                        isValid = false;
+                    }
+
+                    // Postcode validation
+                    if (!this.memberData.postcode) {
+                        this.errors.postcode = 'Sila masukkan poskod';
+                        isValid = false;
+                    } else if (!/^\d{5}$/.test(this.memberData.postcode)) {
+                        this.errors.postcode = 'Poskod mestilah 5 nombor';
+                        isValid = false;
+                    }
+
+                    // State validation
+                    if (!this.memberData.state) {
+                        this.errors.state = 'Sila pilih negeri';
+                        isValid = false;
+                    }
+
+                    console.log('Validation errors:', this.errors);
+                    console.log('Validation result:', isValid);
+                    return isValid;
+                },
+
+                validateStep2() {
+                    console.log('validateStep2 called');
+                    this.errors = {};
+                    let isValid = true;
+
+                    // Gender validation
+                    if (!this.memberData.gender) {
+                        this.errors.gender = 'Sila pilih jantina';
+                        isValid = false;
+                    }
+
+                    // Date of Birth validation
+                    if (!this.memberData.DOB) {
+                        this.errors.DOB = 'Sila masukkan tarikh lahir';
+                        isValid = false;
+                    }
+
+                    // Religion validation
+                    if (!this.memberData.agama) {
+                        this.errors.agama = 'Sila pilih agama';
+                        isValid = false;
+                    }
+
+                    // Race validation
+                    if (!this.memberData.bangsa) {
+                        this.errors.bangsa = 'Sila pilih bangsa';
+                        isValid = false;
+                    }
+
+                    // Position validation
+                    if (!this.memberData.jawatan) {
+                        this.errors.jawatan = 'Sila masukkan jawatan';
+                        isValid = false;
+                    }
+
+                    // Grade validation
+                    if (!this.memberData.gred) {
+                        this.errors.gred = 'Sila masukkan gred';
+                        isValid = false;
+                    }
+
+                    // Personal File Number validation
+                    if (!this.memberData.no_pf) {
+                        this.errors.no_pf = 'Sila masukkan no. fail peribadi';
+                        isValid = false;
+                    }
+
+                    // Salary validation
+                    if (!this.memberData.salary) {
+                        this.errors.salary = 'Sila masukkan gaji';
+                        isValid = false;
+                    } else if (isNaN(this.memberData.salary) || this.memberData.salary <= 0) {
+                        this.errors.salary = 'Sila masukkan gaji yang sah';
+                        isValid = false;
+                    }
+
+                    // Office Address validation
+                    if (!this.memberData.office_address) {
+                        this.errors.office_address = 'Sila masukkan alamat pejabat';
+                        isValid = false;
+                    }
+
+                    // Office City validation
+                    if (!this.memberData.office_city) {
+                        this.errors.office_city = 'Sila masukkan bandar';
+                        isValid = false;
+                    }
+
+                    // Office Postcode validation
+                    if (!this.memberData.office_postcode) {
+                        this.errors.office_postcode = 'Sila masukkan poskod';
+                        isValid = false;
+                    } else if (!/^\d{5}$/.test(this.memberData.office_postcode)) {
+                        this.errors.office_postcode = 'Poskod mestilah 5 nombor';
+                        isValid = false;
+                    }
+
+                    // Office State validation
+                    if (!this.memberData.office_state) {
+                        this.errors.office_state = 'Sila pilih negeri';
+                        isValid = false;
+                    }
+
+                    return isValid;
+                },
+
+                validateStep3() {
+                    console.log('validateStep3 called');
+                    this.errors = {};
+                    let isValid = true;
+
+                    // Only validate if there are family members added
+                    if (this.familyMembers.length > 0) {
+                        // Validate each family member's details
+                        this.familyMembers.forEach((member, index) => {
+                            if (!member.name) {
+                                this.errors[`family.${index}.name`] = 'Sila masukkan nama';
+                                isValid = false;
+                            }
+                            if (!member.ic) {
+                                this.errors[`family.${index}.ic`] = 'Sila masukkan no. kad pengenalan';
+                                isValid = false;
+                            }
+                            if (!member.relationship) {
+                                this.errors[`family.${index}.relationship`] = 'Sila pilih hubungan';
+                                isValid = false;
+                            }
+                        });
+                    }
+
+                    console.log('Family validation result:', isValid);
+                    return isValid;
+                },
+
+                validateStep4() {
+                    console.log('validateStep4 called');
+                    this.errors = {};
+                    let isValid = true;
+
+                    // Define fee structure
+                    const feeStructure = {
+                        'entrance': { value: 50, fixed: true },
+                        'share_capital': { value: 300, min: true },
+                        'subscription_capital': { value: 35, min: true },
+                        'member_deposit': { value: 20, min: true },
+                        'welfare_fund': { value: 5, fixed: true },
+                        'fixed_savings': { value: 5, fixed: true }
+                    };
+
+                    // Validate each fee
+                    Object.entries(feeStructure).forEach(([key, config]) => {
+                        const feeValue = parseFloat(this.fees[key]);
+                        
+                        if (isNaN(feeValue)) {
+                            this.errors[`fees.${key}`] = 'Sila masukkan jumlah yang sah';
+                            isValid = false;
+                        } else if (config.fixed && feeValue !== config.value) {
+                            this.errors[`fees.${key}`] = `Jumlah tetap RM${config.value}`;
+                            isValid = false;
+                        } else if (config.min && feeValue < config.value) {
+                            this.errors[`fees.${key}`] = `Jumlah minimum RM${config.value}`;
+                            isValid = false;
+                        }
+                    });
+
+                    // Validate payment method
+                    if (!this.paymentMethod) {
+                        this.errors.paymentMethod = 'Sila pilih kaedah pembayaran';
+                        isValid = false;
+                    }
+
+                    // Validate payment proof for online payment
+                    if (this.paymentMethod === 'online') {
+                        const paymentProof = document.getElementById('payment_proof');
+                        if (!paymentProof || !paymentProof.files || paymentProof.files.length === 0) {
+                            this.errors.payment_proof = 'Sila muat naik bukti pembayaran';
+                            isValid = false;
+                        }
+                    }
+
+                    console.log('Fee validation result:', isValid);
+                    return isValid;
+                },
+
+                validateCurrentStep() {
+                    console.log('validateCurrentStep called for step:', this.currentStep);
+                    switch(this.currentStep) {
+                        case 1: return this.validateStep1();
+                        case 2: return this.validateStep2();
+                        case 3: return this.validateStep3();
+                        case 4: return this.validateStep4();
+                        default: return false;
+                    }
+                },
+
+                clearError(field) {
+                    delete this.errors[field];
+                },
+
+                nextStep() {
+                    console.log('nextStep called');
+                    if (this.validateCurrentStep()) {
+                        this.currentStep++;
+                        console.log('Moving to step:', this.currentStep);
+                    } else {
+                        console.log('Validation failed');
+                    }
+                }
+             }">
+            <!-- Add debug elements -->
+            <div class="bg-yellow-100 p-2 m-2">
+                Current Step: <span x-text="currentStep"></span>
+                <br>
+                Total Steps: <span x-text="totalSteps"></span>
+                <br>
+                Name: <span x-text="memberData.name"></span>
+            </div>
+
             <!-- Return Button - Minimalist dark arrow -->
             <div class="fixed top-6 left-6 z-50">
                 <a href="{{ route('guest.dashboard') }}" 
@@ -307,18 +619,30 @@
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="name" value="Nama Pendaftar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="name" name="name" type="text" 
-                                                            class="mt-1 block w-full" required autofocus 
-                                                            placeholder="Masukkan nama penuh" />
-                                                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                                        <x-text-input id="name" 
+                                                                     name="name" 
+                                                                     type="text"
+                                                                     x-model="memberData.name"
+                                                                     @input="clearError('name')"
+                                                                     placeholder="Masukkan nama penuh anda"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.name" 
+                                                           x-text="errors.name" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="no_anggota" value="No. Anggota" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="no_anggota" name="no_anggota" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor anggota" />
-                                                        <x-input-error :messages="$errors->get('no_anggota')" class="mt-2" />
+                                                        <x-text-input id="no_anggota" 
+                                                                     name="no_anggota" 
+                                                                     type="text"
+                                                                     x-model="memberData.no_anggota"
+                                                                     @input="clearError('no_anggota')"
+                                                                     placeholder="Contoh: A23CS0189"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.no_anggota" 
+                                                           x-text="errors.no_anggota" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
@@ -326,79 +650,108 @@
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="ic" value="No. K/P" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="ic" name="ic" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor kad pengenalan" />
-                                                        <x-input-error :messages="$errors->get('ic')" class="mt-2" />
+                                                        <x-text-input id="ic" 
+                                                                     name="ic" 
+                                                                     type="text"
+                                                                     x-model="memberData.ic"
+                                                                     @input="clearError('ic')"
+                                                                     placeholder="Contoh: 041118011233"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.ic" 
+                                                           x-text="errors.ic" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="phone" value="No. Telefon" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="phone" name="phone" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nombor telefon" />
-                                                        <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+                                                        <x-text-input id="phone" 
+                                                                     name="phone" 
+                                                                     type="text"
+                                                                     x-model="memberData.phone"
+                                                                     @input="clearError('phone')"
+                                                                     placeholder="Contoh: 0195729461"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.phone" 
+                                                           x-text="errors.phone" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
                                                 <!-- Email -->
                                                 <div>
                                                     <x-input-label for="email" value="Email" class="font-semibold text-gray-700" />
-                                                    <x-text-input id="email" name="email" type="email" 
-                                                        class="mt-1 block w-full" required 
-                                                        placeholder="Masukkan alamat email" />
-                                                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                                                    <x-text-input id="email" 
+                                                                 name="email" 
+                                                                 type="email"
+                                                                 x-model="memberData.email"
+                                                                 @input="clearError('email')"
+                                                                 placeholder="Contoh: bryanzhiming@gmail.com"
+                                                                 class="mt-1 block w-full" />
+                                                    <p x-show="errors.email" 
+                                                       x-text="errors.email" 
+                                                       class="mt-1 text-sm text-red-600"></p>
                                                 </div>
 
                                                 <!-- Address -->
                                                 <div>
                                                     <x-input-label for="address" value="Alamat" class="font-semibold text-gray-700" />
-                                                    <textarea id="address" name="address" 
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
-                                                        rows="3" required placeholder="Masukkan alamat penuh"></textarea>
-                                                    <x-input-error :messages="$errors->get('address')" class="mt-2" />
+                                                    <x-text-input id="address" 
+                                                                 name="address" 
+                                                                 type="text"
+                                                                 x-model="memberData.address"
+                                                                 @input="clearError('address')"
+                                                                 placeholder="Contoh: UTM JB"
+                                                                 class="mt-1 block w-full" />
+                                                    <p x-show="errors.address" 
+                                                       x-text="errors.address" 
+                                                       class="mt-1 text-sm text-red-600"></p>
                                                 </div>
 
-                                                <!-- City, Postcode, State -->
+                                                <!-- City, Postcode, and State -->
                                                 <div class="grid grid-cols-3 gap-6">
                                                     <div>
                                                         <x-input-label for="city" value="Bandar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="city" name="city" type="text" 
-                                                            class="mt-1 block w-full" required 
-                                                            placeholder="Masukkan nama bandar" />
-                                                        <x-input-error :messages="$errors->get('city')" class="mt-2" />
+                                                        <x-text-input id="city" 
+                                                                     name="city" 
+                                                                     type="text"
+                                                                     x-model="memberData.city"
+                                                                     @input="clearError('city')"
+                                                                     placeholder="Contoh: JOHOR"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.city" 
+                                                           x-text="errors.city" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="postcode" value="Poskod" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="postcode" name="postcode" type="text" 
-                                                            class="mt-1 block w-full" required maxlength="5"
-                                                            placeholder="Masukkan poskod" />
-                                                        <x-input-error :messages="$errors->get('postcode')" class="mt-2" />
+                                                        <x-text-input id="postcode" 
+                                                                     name="postcode" 
+                                                                     type="text"
+                                                                     x-model="memberData.postcode"
+                                                                     @input="clearError('postcode')"
+                                                                     placeholder="Contoh: 84040"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.postcode" 
+                                                           x-text="errors.postcode" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="state" value="Negeri" class="font-semibold text-gray-700" />
-                                                        <select id="state" name="state" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm bg-gray-50" required>
+                                                        <select id="state" 
+                                                                name="state" 
+                                                                x-model="memberData.state"
+                                                                @change="clearError('state')"
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                                             <option value="">Pilih Negeri</option>
-                                                            <option value="Johor">Johor</option>
-                                                            <option value="Kedah">Kedah</option>
-                                                            <option value="Kelantan">Kelantan</option>
-                                                            <option value="Melaka">Melaka</option>
-                                                            <option value="Negeri Sembilan">Negeri Sembilan</option>
-                                                            <option value="Pahang">Pahang</option>
-                                                            <option value="Perak">Perak</option>
-                                                            <option value="Perlis">Perlis</option>
-                                                            <option value="Pulau Pinang">Pulau Pinang</option>
-                                                            <option value="Sabah">Sabah</option>
-                                                            <option value="Sarawak">Sarawak</option>
-                                                            <option value="Selangor">Selangor</option>
-                                                            <option value="Terengganu">Terengganu</option>
-                                                            <option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option>
-                                                            <option value="W.P. Labuan">W.P. Labuan</option>
-                                                            <option value="W.P. Putrajaya">W.P. Putrajaya</option>
+                                                            @foreach(['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'] as $state)
+                                                                <option value="{{ $state }}">{{ $state }}</option>
+                                                            @endforeach
                                                         </select>
-                                                        <x-input-error :messages="$errors->get('state')" class="mt-2" />
+                                                        <p x-show="errors.state" 
+                                                           x-text="errors.state" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -406,7 +759,9 @@
 
                                         <!-- Navigation -->
                                         <div class="mt-6 flex justify-end">
-                                            <button type="button" @click="currentStep = 2"
+                                            <button type="button" 
+                                                    x-show="currentStep < totalSteps"
+                                                    @click="nextStep()"
                                                     class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                                 Seterusnya
                                                 <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -415,8 +770,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <!-- Step 2: Family Information -->
-                                    <div x-show="currentStep === 2" x-cloak>
+                                    <!-- Step 2: Work Information -->
+                                    <div x-show="currentStep === 2">
                                         <div class="bg-white shadow-md rounded-lg mb-4">
                                             <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
                                                 <h3 class="text-xl font-semibold text-white">
@@ -429,23 +784,42 @@
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="gender" value="Jantina" class="font-semibold text-gray-700" />
-                                                        <select id="gender" name="gender" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                        <select id="gender" 
+                                                                name="gender" 
+                                                                x-model="memberData.gender"
+                                                                @change="clearError('gender')"
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                                             <option value="">Pilih Jantina</option>
                                                             <option value="Lelaki">Lelaki</option>
                                                             <option value="Perempuan">Perempuan</option>
                                                         </select>
+                                                        <p x-show="errors.gender" 
+                                                           x-text="errors.gender" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="DOB" value="Tarikh Lahir" class="font-semibold text-gray-700" />
-                                                        <x-text-input type="date" id="DOB" name="DOB" class="mt-1 block w-full" required />
+                                                        <x-text-input type="date" 
+                                                                     id="DOB" 
+                                                                     name="DOB"
+                                                                     x-model="memberData.DOB"
+                                                                     @input="clearError('DOB')"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.DOB" 
+                                                           x-text="errors.DOB" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="agama" value="Agama" class="font-semibold text-gray-700" />
-                                                        <select id="agama" name="agama" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                        <select id="agama" 
+                                                                name="agama" 
+                                                                x-model="memberData.agama"
+                                                                @change="clearError('agama')"
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                                             <option value="">Pilih Agama</option>
                                                             <option value="Islam">Islam</option>
                                                             <option value="Kristian">Kristian</option>
@@ -453,17 +827,27 @@
                                                             <option value="Hindu">Hindu</option>
                                                             <option value="Lain-lain">Lain-lain</option>
                                                         </select>
+                                                        <p x-show="errors.agama" 
+                                                           x-text="errors.agama" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="bangsa" value="Bangsa" class="font-semibold text-gray-700" />
-                                                        <select id="bangsa" name="bangsa" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                        <select id="bangsa" 
+                                                                name="bangsa" 
+                                                                x-model="memberData.bangsa"
+                                                                @change="clearError('bangsa')"
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                                             <option value="">Pilih Bangsa</option>
                                                             <option value="Melayu">Melayu</option>
                                                             <option value="Cina">Cina</option>
                                                             <option value="India">India</option>
                                                             <option value="Lain-lain">Lain-lain</option>
                                                         </select>
+                                                        <p x-show="errors.bangsa" 
+                                                           x-text="errors.bangsa" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
@@ -471,57 +855,123 @@
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="jawatan" value="Jawatan" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="jawatan" name="jawatan" type="text" class="mt-1 block w-full" required />
+                                                        <x-text-input id="jawatan" 
+                                                                     name="jawatan" 
+                                                                     type="text"
+                                                                     x-model="memberData.jawatan"
+                                                                     @input="clearError('jawatan')"
+                                                                     placeholder="Masukkan jawatan anda"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.jawatan" 
+                                                           x-text="errors.jawatan" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="gred" value="Gred" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="gred" name="gred" type="text" class="mt-1 block w-full" required />
+                                                        <x-text-input id="gred" 
+                                                                     name="gred" 
+                                                                     type="text"
+                                                                     x-model="memberData.gred"
+                                                                     @input="clearError('gred')"
+                                                                     placeholder="Contoh: N41"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.gred" 
+                                                           x-text="errors.gred" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
                                                 <div class="grid grid-cols-2 gap-6">
                                                     <div>
                                                         <x-input-label for="no_pf" value="No. Fail Peribadi" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="no_pf" name="no_pf" type="text" class="mt-1 block w-full" required />
+                                                        <x-text-input id="no_pf" 
+                                                                     name="no_pf" 
+                                                                     type="text"
+                                                                     x-model="memberData.no_pf"
+                                                                     @input="clearError('no_pf')"
+                                                                     placeholder="Masukkan no. fail peribadi"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.no_pf" 
+                                                           x-text="errors.no_pf" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="salary" value="Gaji (RM)" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="salary" name="salary" type="number" step="0.01" class="mt-1 block w-full" required />
+                                                        <x-text-input id="salary" 
+                                                                     name="salary" 
+                                                                     type="number"
+                                                                     step="0.01"
+                                                                     x-model="memberData.salary"
+                                                                     @input="clearError('salary')"
+                                                                     placeholder="Contoh: 3500.00"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.salary" 
+                                                           x-text="errors.salary" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
 
                                                 <!-- Office Address -->
                                                 <div>
                                                     <x-input-label for="office_address" value="Alamat Pejabat" class="font-semibold text-gray-700" />
-                                                    <textarea id="office_address" name="office_address" 
-                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" 
-                                                        rows="3" required></textarea>
+                                                    <x-text-input id="office_address" 
+                                                                 name="office_address" 
+                                                                 type="text"
+                                                                 x-model="memberData.office_address"
+                                                                 @input="clearError('office_address')"
+                                                                 placeholder="Masukkan alamat pejabat"
+                                                                 class="mt-1 block w-full" />
+                                                    <p x-show="errors.office_address" 
+                                                       x-text="errors.office_address" 
+                                                       class="mt-1 text-sm text-red-600"></p>
                                                 </div>
 
                                                 <div class="grid grid-cols-3 gap-6">
                                                     <div>
                                                         <x-input-label for="office_city" value="Bandar" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="office_city" name="office_city" type="text" class="mt-1 block w-full" required />
+                                                        <x-text-input id="office_city" 
+                                                                     name="office_city" 
+                                                                     type="text"
+                                                                     x-model="memberData.office_city"
+                                                                     @input="clearError('office_city')"
+                                                                     placeholder="Masukkan bandar"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.office_city" 
+                                                           x-text="errors.office_city" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="office_postcode" value="Poskod" class="font-semibold text-gray-700" />
-                                                        <x-text-input id="office_postcode" name="office_postcode" type="text" 
-                                                            class="mt-1 block w-full" required maxlength="5" />
+                                                        <x-text-input id="office_postcode" 
+                                                                     name="office_postcode" 
+                                                                     type="text"
+                                                                     x-model="memberData.office_postcode"
+                                                                     @input="clearError('office_postcode')"
+                                                                     placeholder="Contoh: 81310"
+                                                                     class="mt-1 block w-full" />
+                                                        <p x-show="errors.office_postcode" 
+                                                           x-text="errors.office_postcode" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
 
                                                     <div>
                                                         <x-input-label for="office_state" value="Negeri" class="font-semibold text-gray-700" />
-                                                        <select id="office_state" name="office_state" 
-                                                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                                                        <select id="office_state" 
+                                                                name="office_state" 
+                                                                x-model="memberData.office_state"
+                                                                @change="clearError('office_state')"
+                                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                                             <option value="">Pilih Negeri</option>
-                                                            <!-- Same state options as before -->
                                                             @foreach(['Johor', 'Kedah', 'Kelantan', 'Melaka', 'Negeri Sembilan', 'Pahang', 'Perak', 'Perlis', 'Pulau Pinang', 'Sabah', 'Sarawak', 'Selangor', 'Terengganu', 'W.P. Kuala Lumpur', 'W.P. Labuan', 'W.P. Putrajaya'] as $state)
                                                                 <option value="{{ $state }}">{{ $state }}</option>
                                                             @endforeach
                                                         </select>
+                                                        <p x-show="errors.office_state" 
+                                                           x-text="errors.office_state" 
+                                                           class="mt-1 text-sm text-red-600"></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -536,7 +986,9 @@
                                                 </svg>
                                                 Sebelumnya
                                             </button>
-                                            <button type="button" @click="currentStep = 3"
+                                            <button type="button" 
+                                                    x-show="currentStep < totalSteps"
+                                                    @click="nextStep()"
                                                     class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                                 Seterusnya
                                                 <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -547,7 +999,7 @@
                                     </div>
 
                                     <!-- Step 3: Family Members -->
-                                    <div x-show="currentStep === 3" x-cloak>
+                                    <div x-show="currentStep === 3">
                                         <div class="bg-white shadow-md rounded-lg mb-4">
                                             <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
                                                 <h3 class="text-xl font-semibold text-white">
@@ -568,16 +1020,65 @@
                                                                 <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase w-20">Tindakan</th>
                                                             </tr>
                                                         </thead>
-                                                        <tbody id="familyTableBody" class="bg-white divide-y divide-gray-200">
-                                                            <!-- Family members will be added here dynamically -->
+                                                        <tbody class="bg-white divide-y divide-gray-200">
+                                                            <template x-for="(member, index) in familyMembers" :key="index">
+                                                                <tr>
+                                                                    <td class="px-4 py-3" x-text="index + 1"></td>
+                                                                    <td class="px-4 py-3">
+                                                                        <input type="text" 
+                                                                               x-model="member.name"
+                                                                               @input="clearError(`family.${index}.name`)"
+                                                                               class="border-gray-300 rounded-md shadow-sm w-full"
+                                                                               placeholder="Nama ahli keluarga">
+                                                                        <p x-show="errors[`family.${index}.name`]" 
+                                                                           x-text="errors[`family.${index}.name`]"
+                                                                           class="mt-1 text-sm text-red-600"></p>
+                                                                    </td>
+                                                                    <td class="px-4 py-3">
+                                                                        <input type="text" 
+                                                                               x-model="member.ic"
+                                                                               @input="clearError(`family.${index}.ic`)"
+                                                                               class="border-gray-300 rounded-md shadow-sm w-full"
+                                                                               placeholder="No. K/P">
+                                                                        <p x-show="errors[`family.${index}.ic`]" 
+                                                                           x-text="errors[`family.${index}.ic`]"
+                                                                           class="mt-1 text-sm text-red-600"></p>
+                                                                    </td>
+                                                                    <td class="px-4 py-3">
+                                                                        <select x-model="member.relationship"
+                                                                                @change="clearError(`family.${index}.relationship`)"
+                                                                                class="border-gray-300 rounded-md shadow-sm w-full">
+                                                                            <option value="">Pilih Hubungan</option>
+                                                                            <option value="Suami">Suami</option>
+                                                                            <option value="Isteri">Isteri</option>
+                                                                            <option value="Anak">Anak</option>
+                                                                            <option value="Ibu">Ibu</option>
+                                                                            <option value="Bapa">Bapa</option>
+                                                                        </select>
+                                                                        <p x-show="errors[`family.${index}.relationship`]" 
+                                                                           x-text="errors[`family.${index}.relationship`]"
+                                                                           class="mt-1 text-sm text-red-600"></p>
+                                                                    </td>
+                                                                    <td class="px-4 py-3">
+                                                                        <button type="button" 
+                                                                                @click="familyMembers.splice(index, 1)"
+                                                                                class="text-red-600 hover:text-red-800">
+                                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                            </svg>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </template>
                                                         </tbody>
                                                     </table>
                                                 </div>
 
                                                 <!-- Add Family Member Button -->
                                                 <div class="mt-4">
-                                                    <button type="button" onclick="addFamilyMember()"
-                                                        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
+                                                    <button type="button" 
+                                                            @click="familyMembers.push({name: '', ic: '', relationship: ''})"
+                                                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700">
                                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                                         </svg>
@@ -587,7 +1088,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Navigation -->
+                                        <!-- Navigation Buttons -->
                                         <div class="mt-6 flex justify-between">
                                             <button type="button" @click="currentStep = 2"
                                                     class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
@@ -596,7 +1097,9 @@
                                                 </svg>
                                                 Sebelumnya
                                             </button>
-                                            <button type="button" @click="currentStep = 4"
+                                            <button type="button" 
+                                                    x-show="currentStep < totalSteps"
+                                                    @click="nextStep()"
                                                     class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
                                                 Seterusnya
                                                 <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -607,7 +1110,7 @@
                                     </div>
 
                                     <!-- Step 4: Fees and Contributions -->
-                                    <div x-show="currentStep === 4" x-cloak>
+                                    <div x-show="currentStep === 4">
                                         <div class="bg-white shadow-md rounded-lg mb-4">
                                             <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 rounded-t-lg">
                                                 <h3 class="text-xl font-semibold text-white">
@@ -625,7 +1128,6 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody class="bg-white divide-y divide-gray-200">
-                                                        <!-- Fee rows -->
                                                         @foreach([
                                                             'entrance' => ['label' => 'Yuran Masuk', 'value' => 50, 'fixed' => true],
                                                             'share_capital' => ['label' => 'Modal Syer', 'value' => 300, 'min' => true],
@@ -643,168 +1145,85 @@
                                                                 @endif
                                                             </td>
                                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                                <div class="currency-input">
+                                                                <div class="relative">
                                                                     <input type="number" 
                                                                            name="fees[{{ $key }}]" 
-                                                                           class="form-input" 
-                                                                           value="{{ $fee['value'] }}"
-                                                                           data-min="{{ $fee['value'] }}"
-                                                                           data-fixed="{{ $fee['fixed'] ?? false }}"
+                                                                           x-model="fees.{{ $key }}"
+                                                                           @input="clearError(`fees.${key}`)"
+                                                                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                                                            step="0.01" 
-                                                                           required
-                                                                           {{ ($fee['fixed'] ?? false) ? 'readonly' : '' }}
-                                                                    />
+                                                                           :readonly="{{ $fee['fixed'] ?? 'false' }}"
+                                                                           value="{{ $fee['value'] }}">
+                                                                    <p x-show="errors[`fees.${key}`]" 
+                                                                       x-text="errors[`fees.${key}`]"
+                                                                       class="mt-1 text-sm text-red-600"></p>
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                         @endforeach
-
-                                                        <!-- Total row -->
-                                                        <tr class="bg-gray-50 font-bold">
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">7</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">JUMLAH</td>
-                                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                                <div class="currency-input">
-                                                                    <x-text-input type="number" step="0.01" id="total_amount" 
-                                                                        class="form-input" readonly />
-                                                                </div>
-                                                            </td>
-                                                        </tr>
                                                     </tbody>
                                                 </table>
-                                            </div>
-                                        </div>
 
-                                        <!-- Payment Method and Proof Upload -->
-                                        <div class="mt-8 p-6 bg-white rounded-lg shadow">
-                                            <h4 class="text-lg font-semibold mb-6">Kaedah Pembayaran</h4>
-                                            
-                                            <!-- Payment Method Selection -->
-                                            <div class="grid grid-cols-2 gap-4 mb-6">
-                                                <div class="relative">
-                                                    <input type="radio" id="payment_cash" name="payment_method" value="cash" 
-                                                           class="peer hidden" x-model="paymentMethod" required>
-                                                    <label for="payment_cash" 
-                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                  peer-checked:border-green-500 peer-checked:bg-green-50
-                                                                  hover:border-gray-300
-                                                                  relative overflow-hidden">
-                                                        <div class="relative z-10">
-                                                            <i class="fas fa-money-bill-wave text-3xl mb-3" 
-                                                               :class="paymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'"></i>
-                                                            <div class="font-medium" :class="paymentMethod === 'cash' ? 'text-green-700' : 'text-gray-600'">
-                                                                Tunai
-                                                            </div>
+                                                <!-- Payment Method -->
+                                                <div class="mt-8">
+                                                    <h4 class="text-lg font-semibold mb-4">Kaedah Pembayaran</h4>
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div class="relative">
+                                                            <input type="radio" 
+                                                                   id="payment_cash" 
+                                                                   name="payment_method" 
+                                                                   value="cash" 
+                                                                   x-model="paymentMethod"
+                                                                   @change="clearError('paymentMethod')"
+                                                                   class="peer hidden">
+                                                            <label for="payment_cash" 
+                                                                   class="block p-4 text-center border-2 rounded-lg cursor-pointer
+                                                                          peer-checked:border-green-500 peer-checked:bg-green-50
+                                                                          hover:border-gray-300">
+                                                                <i class="fas fa-money-bill-wave text-3xl mb-2"></i>
+                                                                <div class="font-medium">Tunai</div>
+                                                            </label>
                                                         </div>
-                                                        <!-- Selected indicator -->
-                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'cash'">
-                                                            <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                                
-                                                <div class="relative">
-                                                    <input type="radio" id="payment_online" name="payment_method" value="online" 
-                                                           class="peer hidden" x-model="paymentMethod">
-                                                    <label for="payment_online" 
-                                                           class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                  peer-checked:border-blue-500 peer-checked:bg-blue-50
-                                                                  hover:border-gray-300
-                                                                  relative overflow-hidden">
-                                                        <div class="relative z-10">
-                                                            <i class="fas fa-credit-card text-3xl mb-3" 
-                                                               :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"></i>
-                                                            <div class="font-medium" :class="paymentMethod === 'online' ? 'text-blue-700' : 'text-gray-600'">
-                                                                Pembayaran Dalam Talian
-                                                            </div>
-                                                        </div>
-                                                        <!-- Selected indicator -->
-                                                        <div class="absolute top-2 right-2" x-show="paymentMethod === 'online'">
-                                                            <i class="fas fa-check-circle text-blue-500 text-xl"></i>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            </div>
 
-                                            <!-- Cash Payment Message -->
-                                            <div x-show="paymentMethod === 'cash'"
-                                                 x-transition:enter="transition ease-out duration-300"
-                                                 x-transition:enter-start="opacity-0 transform scale-95"
-                                                 x-transition:enter-end="opacity-100 transform scale-100"
-                                                 class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
-                                                 x-cloak>
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-info-circle text-green-500 text-xl mr-3"></i>
-                                                    <p class="text-green-700">
-                                                        Sila pergi ke kaunter hadapan untuk membuat pembayaran secara tunai.
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <!-- Payment Proof Upload -->
-                                            <div x-show="paymentMethod === 'online'" 
-                                                 x-transition:enter="transition ease-out duration-300"
-                                                 x-transition:enter-start="opacity-0 transform scale-95"
-                                                 x-transition:enter-end="opacity-100 transform scale-100"
-                                                 x-cloak>
-                                                <div class="mt-4">
-                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                        Bukti Pembayaran <span class="text-red-500">*</span>
-                                                    </label>
-                                                    
-                                                    <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6"
-                                                         x-data="{ fileName: null }"
-                                                         @dragover.prevent="$el.classList.add('border-blue-500', 'bg-blue-50')"
-                                                         @dragleave.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')"
-                                                         @drop.prevent="$el.classList.remove('border-blue-500', 'bg-blue-50')">
-                                                        
-                                                        <!-- Hidden file input with dynamic required attribute -->
-                                                        <input type="file" 
-                                                               id="payment_proof" 
-                                                               name="payment_proof" 
-                                                               class="hidden"
-                                                               accept="image/*"
-                                                               :required="paymentMethod === 'online'"
-                                                               @change="fileName = $event.target.files[0].name">
-                                                        
-                                                        <!-- Upload Interface -->
-                                                        <div class="text-center" x-show="!fileName">
-                                                            <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
-                                                                <i class="fas fa-cloud-upload-alt text-5xl"></i>
-                                                            </div>
-                                                            <div class="flex flex-col items-center">
-                                                                <label for="payment_proof" 
-                                                                       class="mb-2 px-6 py-2.5 bg-blue-500 text-white rounded-md cursor-pointer 
-                                                                      hover:bg-blue-600 transition-colors duration-200 font-medium">
-                                                                    Pilih Fail
-                                                                </label>
-                                                                <p class="text-xs text-gray-400 mt-2">PNG, JPG, GIF sehingga 5MB</p>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <!-- File Selected State -->
-                                                        <div class="text-center" x-show="fileName">
-                                                            <div class="flex items-center justify-center space-x-2">
-                                                                <i class="fas fa-file-image text-blue-500 text-xl"></i>
-                                                                <span class="text-sm text-gray-600" x-text="fileName"></span>
-                                                            </div>
-                                                            <button type="button" 
-                                                                    class="mt-4 px-4 py-2 text-sm text-red-600 hover:text-red-800 
-                                                                   hover:bg-red-50 rounded-md transition-colors duration-200"
-                                                                    @click="fileName = null; document.getElementById('payment_proof').value = ''">
-                                                                <i class="fas fa-trash-alt mr-1"></i> Buang Fail
-                                                            </button>
+                                                        <div class="relative">
+                                                            <input type="radio" 
+                                                                   id="payment_online" 
+                                                                   name="payment_method" 
+                                                                   value="online" 
+                                                                   x-model="paymentMethod"
+                                                                   @change="clearError('paymentMethod')"
+                                                                   class="peer hidden">
+                                                            <label for="payment_online" 
+                                                                   class="block p-4 text-center border-2 rounded-lg cursor-pointer
+                                                                          peer-checked:border-green-500 peer-checked:bg-green-50
+                                                                          hover:border-gray-300">
+                                                                <i class="fas fa-credit-card text-3xl mb-2"></i>
+                                                                <div class="font-medium">Online</div>
+                                                            </label>
                                                         </div>
                                                     </div>
-                                                    <!-- Error message -->
-                                                    <div class="mt-1 text-sm text-red-600" x-show="paymentMethod === 'online' && !fileName">
-                                                        Sila muat naik bukti pembayaran
-                                                    </div>
+                                                    <p x-show="errors.paymentMethod" 
+                                                       x-text="errors.paymentMethod"
+                                                       class="mt-2 text-sm text-red-600"></p>
+                                                </div>
+
+                                                <!-- Payment Proof Upload (shown only for online payment) -->
+                                                <div x-show="paymentMethod === 'online'" class="mt-6">
+                                                    <x-input-label for="payment_proof" value="Bukti Pembayaran" class="font-semibold text-gray-700" />
+                                                    <input type="file" 
+                                                           id="payment_proof" 
+                                                           name="payment_proof"
+                                                           @change="clearError('payment_proof')"
+                                                           class="mt-1 block w-full"
+                                                           accept="image/*,.pdf">
+                                                    <p x-show="errors.payment_proof" 
+                                                       x-text="errors.payment_proof"
+                                                       class="mt-1 text-sm text-red-600"></p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Navigation -->
+                                        <!-- Navigation Buttons -->
                                         <div class="mt-6 flex justify-between">
                                             <button type="button" @click="currentStep = 3"
                                                     class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
@@ -813,15 +1232,14 @@
                                                 </svg>
                                                 Sebelumnya
                                             </button>
-                                            
-                                            <div class="flex items-center space-x-3">
-                                                <x-secondary-button type="reset">
-                                                    {{ __('Set Semula') }}
-                                                </x-secondary-button>
-                                                <x-primary-button type="submit">
-                                                    {{ __('Hantar') }}
-                                                </x-primary-button>
-                                            </div>
+                                            <button type="submit" 
+                                                    @click="validateStep4()"
+                                                    class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
+                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                Hantar
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -857,11 +1275,11 @@
                             <option value="Anak">Anak</option>
                             <option value="Ibu">Ibu</option>
                             <option value="Bapa">Bapa</option>
-                            <option value="Adik-beradik">Adik-beradik</option>
                         </select>
                     </td>
                     <td class="px-4 py-3">
-                        <button type="button" onclick="this.closest('tr').remove(); updateRowNumbers()"
+                        <button type="button" 
+                                @click="familyMembers.splice(index, 1)"
                                 class="text-red-600 hover:text-red-800">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -958,6 +1376,13 @@
                     e.preventDefault();
                     alert('Please correct the errors in the fee amounts before proceeding.');
                 }
+            });
+        </script>
+
+        <!-- Add this at the bottom of your file to check if Alpine.js is loaded -->
+        <script>
+            document.addEventListener('alpine:init', () => {
+                console.log('Alpine.js initialized');
             });
         </script>
     </body>

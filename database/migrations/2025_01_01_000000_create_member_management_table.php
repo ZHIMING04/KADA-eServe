@@ -21,10 +21,10 @@ class CreateMemberManagementTable extends Migration
         $table->string('email');
         $table->string('ic');
         $table->string('phone');
-        $table->string('address');
-        $table->string('city');
-        $table->string('postcode'); // Make sure column name matches
-        $table->string('state');
+        $table->string('address')->nullable(false);
+        $table->string('city')->nullable(false);
+        $table->string('postcode')->nullable(false);
+        $table->string('state')->nullable(false);
         $table->string('gender');
         $table->date('DOB');
         $table->string('agama');

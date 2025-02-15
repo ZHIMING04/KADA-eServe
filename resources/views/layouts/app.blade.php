@@ -23,6 +23,18 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        
+        <!-- Add debug script -->
+        <script>
+            window.addEventListener('load', () => {
+                console.log('Page loaded');
+                if (window.Alpine) {
+                    console.log('Alpine.js is available');
+                } else {
+                    console.log('Alpine.js is NOT available');
+                }
+            });
+        </script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">

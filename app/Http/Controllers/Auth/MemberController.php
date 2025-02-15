@@ -43,28 +43,71 @@ class MemberController extends Controller
             ->first();
 
         if ($existingApplication) {
-            $message = $existingApplication->status === 'pending' 
-                ? 'Anda mempunyai permohonan yang sedang diproses.'
-                : 'Anda telah menjadi ahli yang diluluskan.';
-
-            return back()
-                ->withInput()
-                ->with('warning', $message);
+            return redirect()->route('guest.dashboard')
+                ->with('warning', 'Anda mempunyai permohonan yang sedang diproses.');
         }
 
-        // Updated validation rules
+        // Custom validation rules for existing records
+        $uniqueWithStatus = function($attribute, $value, $fail) use ($request) {
+            $exists = DB::table('member_register')
+                ->where($attribute, $value)
+                ->whereIn('status', ['pending', 'approved'])
+                ->exists();
+            
+            if ($exists) {
+                $messages = [
+                    'no_anggota' => 'Nombor anggota telah digunakan dan masih aktif/tengah proses',
+                    'ic' => 'Nombor kad pengenalan telah digunakan dan masih aktif/tengah proses',
+                    'email' => 'Alamat emel telah digunakan dan masih aktif/tengah proses'
+                ];
+                $fail($messages[$attribute] ?? 'Field telah digunakan dan masih aktif/tengah proses');
+            }
+        };
+
+        // Validate request
         $validated = $request->validate([
             // Personal Information
-            'no_anggota' => 'required|string|max:255',
+            'no_anggota' => [
+                'required',
+                'string',
+                'max:255',
+                $uniqueWithStatus
+            ],
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'ic' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
-            'address' => 'required|string',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                $uniqueWithStatus
+            ],
+            'ic' => [
+                'required',
+                'string',
+                'size:12',
+                'regex:/^[0-9]+$/',
+                $uniqueWithStatus
+            ],
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^[0-9]+$/',
+                'min:10',
+                'max:11'
+            ],
+            // Address fields
+            'address' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'postcode' => 'required|string|max:5',
-            'state' => 'required|string',
-
+            'postcode' => [
+                'required',
+                'string',
+                'size:5',
+                'regex:/^[0-9]+$/'
+            ],
+            'state' => [
+                'required',
+                'string',
+                'in:Johor,Kedah,Kelantan,Melaka,Negeri Sembilan,Pahang,Perak,Perlis,Pulau Pinang,Sabah,Sarawak,Selangor,Terengganu,Wilayah Persekutuan Kuala Lumpur,Wilayah Persekutuan Labuan,Wilayah Persekutuan Putrajaya'
+            ],
             // Work & Personal Information
             'gender' => 'required|in:Lelaki,Perempuan',
             'DOB' => 'required|date',
@@ -97,6 +140,27 @@ class MemberController extends Controller
             // Add payment validation rules
             'payment_method' => 'required|in:cash,online',
             'payment_proof' => 'required_if:payment_method,online|file|image|mimes:jpeg,png,gif|max:5120',
+        ], [
+            // Custom error messages
+            'no_anggota.required' => 'Sila masukkan nombor anggota',
+            'name.required' => 'Sila masukkan nama',
+            'email.required' => 'Sila masukkan alamat emel',
+            'email.email' => 'Alamat emel tidak sah',
+            'ic.required' => 'Sila masukkan nombor kad pengenalan',
+            'ic.size' => 'Nombor kad pengenalan mestilah 12 nombor',
+            'ic.regex' => 'Nombor kad pengenalan mestilah nombor sahaja',
+            'phone.required' => 'Sila masukkan nombor telefon',
+            'phone.regex' => 'Nombor telefon mestilah nombor sahaja',
+            'phone.min' => 'Nombor telefon mestilah sekurang-kurangnya 10 nombor',
+            'phone.max' => 'Nombor telefon tidak boleh melebihi 11 nombor',
+            // Address error messages
+            'address.required' => 'Sila masukkan alamat',
+            'city.required' => 'Sila masukkan bandar',
+            'postcode.required' => 'Sila masukkan poskod',
+            'postcode.size' => 'Poskod mestilah 5 nombor',
+            'postcode.regex' => 'Poskod mestilah nombor sahaja',
+            'state.required' => 'Sila pilih negeri',
+            'state.in' => 'Negeri tidak sah',
         ]);
 
         try {
