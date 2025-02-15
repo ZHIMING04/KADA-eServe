@@ -23,7 +23,17 @@ class ListController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Member::query()->with('resignations');
+        // Start with a subquery to get the latest records
+        $latestRecords = DB::table('member_register')
+            ->select('email', DB::raw('MAX(updated_at) as latest_update'))
+            ->groupBy('email');
+
+        $query = Member::query()
+            ->joinSub($latestRecords, 'latest_records', function ($join) {
+                $join->on('member_register.email', '=', 'latest_records.email')
+                     ->on('member_register.updated_at', '=', 'latest_records.latest_update');
+            })
+            ->with('resignations');
 
         // Search by name
         if ($request->has('search')) {
@@ -35,8 +45,8 @@ class ListController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Get all members
-        $members = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Get all members with pagination
+        $members = $query->orderBy('member_register.created_at', 'desc')->paginate(10);
 
         // Separate members with pending resignations
         $pendingResignations = $members->filter(function ($member) {
@@ -51,10 +61,10 @@ class ListController extends Controller
 
         // Create a new paginator for the sorted members
         $sortedMembers = new \Illuminate\Pagination\LengthAwarePaginator(
-            $sortedMembers->forPage(1, 10), // Adjust the page size as needed
+            $sortedMembers->forPage($request->get('page', 1), 10),
             $sortedMembers->count(),
             10,
-            1,
+            $request->get('page', 1),
             ['path' => $request->url(), 'query' => $request->query()]
         );
 

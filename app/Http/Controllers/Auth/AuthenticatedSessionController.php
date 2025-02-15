@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use App\Http\Controllers\Auth\MemberController;
+use Illuminate\Support\Facades\DB;
+use Bouncer;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -33,16 +35,30 @@ class AuthenticatedSessionController extends Controller
             // Get authenticated user
             $user = Auth::user();
 
+            // Get the latest member application for this user
+            $latestMember = DB::table('member_register')
+                ->where('email', $user->email)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+
             // Check if email is verified for members
             if ($user->isA('member') && !$user->hasVerifiedEmail()) {
                 return redirect()->route('verification.notice');
             }
 
-            // Redirect based on role
+            // Redirect based on latest application status and role
             if ($user->isAn('admin')) {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->isA('member')) {
-                return redirect()->route('member.dashboard');
+                if ($latestMember && $latestMember->status === 'approved') {
+                    return redirect()->route('member.dashboard');
+                } else {
+                    // If latest application is not approved, treat as guest
+                    Bouncer::retract('member')->from($user);
+                    Bouncer::assign('guest')->to($user);
+                    Bouncer::refresh();
+                    return redirect()->route('guest.dashboard');
+                }
             }
 
             // Default redirect for guest role
