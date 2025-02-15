@@ -24,14 +24,60 @@
                     </button>
                 </form>
                 
-                <form action="{{ route('admin.finance.reject', ['loanId' => $loan->loan_id]) }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-                        Tolak Pinjaman
-                    </button>
-                </form>
+                <button onclick="openRejectModal()" class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                    Tolak Pinjaman
+                </button>
             @endif
         </div>
+
+        <!-- Rejection Modal -->
+        <div id="rejectModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Sebab Penolakan</h3>
+                    <form action="{{ route('admin.finance.reject', ['loanId' => $loan->loan_id]) }}" method="POST">
+                        @csrf
+                        <div class="mt-2">
+                            <textarea name="rejection_reason" 
+                                    id="rejection_reason" 
+                                    rows="4" 
+                                    class="w-full border rounded-md p-2"
+                                    placeholder="Sila nyatakan sebab penolakan..."
+                                    required></textarea>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-4">
+                            <button type="button" 
+                                    onclick="closeRejectModal()" 
+                                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                                Batal
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                Hantar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Script -->
+        <script>
+            function openRejectModal() {
+                document.getElementById('rejectModal').classList.remove('hidden');
+            }
+
+            function closeRejectModal() {
+                document.getElementById('rejectModal').classList.add('hidden');
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('rejectModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeRejectModal();
+                }
+            });
+        </script>
 
         <!-- Loan Information Cards -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
