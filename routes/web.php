@@ -300,7 +300,5 @@ Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, '
 
 Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
 
-Route::prefix('guest')->group(function () {
-    Route::get('/check-duplicate/{field}/{value}', [MemberController::class, 'checkDuplicate']);
-});
+
 

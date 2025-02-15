@@ -55,10 +55,10 @@ class MemberController extends Controller
         // Updated validation rules
         $validated = $request->validate([
             // Personal Information
-            'no_anggota' => 'required|string|unique:member_register',
+            'no_anggota' => 'required|string|max:255',
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:member_register',
-            'ic' => 'required|string|size:12|unique:member_register',
+            'email' => 'required|email|max:255',
+            'ic' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'address' => 'required|string',
             'city' => 'required|string|max:255',
@@ -72,7 +72,7 @@ class MemberController extends Controller
             'bangsa' => 'required|string|max:255',
             'jawatan' => 'required|string|max:255',
             'gred' => 'required|string|max:255',
-            'no_pf' => 'required|string|unique:member_register',
+            'no_pf' => 'required|string|max:255',
             'salary' => 'required|numeric|min:0',
             'office_address' => 'required|string',
             'office_city' => 'required|string|max:255',
@@ -213,34 +213,6 @@ class MemberController extends Controller
         }
     }
 
-    public function checkDuplicate($field, $value)
-    {
-        $validFields = ['no_anggota', 'ic', 'email', 'no_pf'];
-        
-        if (!in_array($field, $validFields)) {
-            return response()->json([
-                'valid' => false,
-                'message' => 'Invalid field'
-            ]);
-        }
-    
-        $exists = DB::table('member_register')->where($field, $value)->exists();
-    
-        if ($exists) {
-            $messages = [
-                'no_anggota' => 'No. Anggota telah wujud dalam sistem.',
-                'ic' => 'No. IC telah wujud dalam sistem.',
-                'email' => 'Emel telah wujud dalam sistem.',
-                'no_pf' => 'No. PF telah wujud dalam sistem.'
-            ];
-    
-            return response()->json([
-                'valid' => false,
-                'message' => $messages[$field]
-            ]);
-        }
-    
-        return response()->json(['valid' => true]);
-    }
+   
 }
 
