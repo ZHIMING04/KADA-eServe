@@ -5,12 +5,206 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name', 'Laravel') }}</title>
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('images/KADAlogoresize.png') }}">
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        
         <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <!-- Add Font Awesome for icons -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        
+        <!-- Add any custom styles -->
+        <style>
+            [x-cloak] { display: none !important; }
+            
+            .bg-primary {
+                background-color: #4f46e5;
+            }
+            .text-primary {
+                color: #4f46e5;
+            }
+            .hover\:bg-primary-hover:hover {
+                background-color: #3730a3;
+            }
+
+            /* Form Container */
+            .max-w-3xl {
+                max-width: 48rem;
+            }
+
+            /* Currency Input Styling */
+            .currency-input {
+                position: relative;
+            }
+
+            .currency-input::before {
+                content: 'RM';
+                position: absolute;
+                left: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6B7280;
+                z-index: 10;
+            }
+
+            .currency-input input {
+                padding-left: 3rem !important; /* Make space for the RM prefix */
+            }
+
+            /* Input Fields - Updated with thicker padding */
+            .form-input,
+            .form-select,
+            .form-textarea {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border-radius: 0.375rem;
+                border: 1px solid #d1d5db;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                font-size: 0.95rem;
+                line-height: 1.5;
+                min-height: 2.75rem;
+                background-color: #fff;
+            }
+
+            .form-input:focus,
+            .form-select:focus,
+            .form-textarea:focus {
+                outline: none;
+                border-color: #4f46e5;
+                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            }
+
+            /* Specific input type adjustments */
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            input[type="number"],
+            input[type="date"],
+            select,
+            textarea {
+                padding: 0.75rem 1rem;
+                height: 3rem;
+                width: 100%;
+                border-radius: 0.375rem;
+                border: 1px solid #d1d5db;
+                background-color: #fff;
+                color: #1f2937;
+            }
+
+            /* Step Indicator */
+            .step-indicator {
+                width: 2.5rem;
+                height: 2.5rem;
+                transition: all 0.3s ease;
+            }
+
+            /* Progress Bar */
+            .progress-bar {
+                height: 0.25rem;
+                transition: width 0.5s ease-in-out;
+            }
+
+            /* File Upload */
+            .file-upload-container {
+                border: 2px dashed #d1d5db;
+                border-radius: 0.5rem;
+                padding: 2rem;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+
+            .file-upload-container:hover {
+                border-color: #4f46e5;
+                background-color: rgba(79, 70, 229, 0.05);
+            }
+
+            /* Payment Method Cards */
+            .payment-method-card {
+                border: 2px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .payment-method-card.selected {
+                border-color: #4f46e5;
+                background-color: rgba(79, 70, 229, 0.05);
+            }
+
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
+            /* Responsive Adjustments */
+            @media (max-width: 640px) {
+                .max-w-3xl {
+                    margin: 1rem;
+                }
+            }
+
+            /* Input Number Styles */
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                -moz-appearance: textfield;
+            }
+
+            /* Grid Columns Adjustment */
+            .grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.5rem;
+            }
+
+            .grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 1.5rem;
+            }
+
+            /* Button Styles */
+            .btn-primary {
+                background-color: #4f46e5;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.3s ease;
+            }
+
+            .btn-primary:hover {
+                background-color: #3730a3;
+            }
+
+            /* Error Messages */
+            .error-message {
+                color: #dc2626;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen relative" x-data="{ currentStep: 1, totalSteps: 4, paymentMethod: 'cash' }">
@@ -802,48 +996,6 @@
                                                     </table>
                                                 </div>
                                             </div>
-
-                                            <!-- Payment Method and Proof Upload -->
-                                            <div class="mt-8 p-6 bg-white rounded-lg shadow">
-                                                <h4 class="text-lg font-semibold mb-6">Kaedah Pembayaran</h4>
-                                                
-                                                <!-- Payment Method Selection -->
-                                                <div class="grid grid-cols-2 gap-4 mb-6">
-                                                    <div class="relative">
-                                                        <input type="radio" id="payment_cash" name="payment_method" value="cash" 
-                                                            class="peer hidden" x-model="paymentMethod" required>
-                                                        <label for="payment_cash" 
-                                                            class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                    peer-checked:border-green-500 peer-checked:bg-green-50
-                                                                    hover:border-gray-300
-                                                                    relative overflow-hidden">
-                                                            <div class="relative z-10">
-                                                                <i class="fas fa-money-bill-wave text-3xl mb-3" 
-                                                                :class="paymentMethod === 'cash' ? 'text-green-500' : 'text-gray-400'"></i>
-                                                                <div class="font-medium" :class="paymentMethod === 'cash' ? 'text-green-700' : 'text-gray-600'">
-                                                                    Tunai
-                                                                </div>
-                                                            </div>
-                                                            <!-- Selected indicator -->
-                                                            <div class="absolute top-2 right-2" x-show="paymentMethod === 'cash'">
-                                                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    
-                                                    <div class="relative">
-                                                        <input type="radio" id="payment_online" name="payment_method" value="online" 
-                                                            class="peer hidden" x-model="paymentMethod">
-                                                        <label for="payment_online" 
-                                                            class="block p-6 text-center border-2 rounded-lg cursor-pointer transition-all duration-200
-                                                                    peer-checked:border-blue-500 peer-checked:bg-blue-50
-                                                                    hover:border-gray-300
-                                                                    relative overflow-hidden">
-                                                            <div class="relative z-10">
-                                                                <i class="fas fa-credit-card text-3xl mb-3" 
-                                                                :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"></i>
-                                                                <div class="font-medium" :class="paymentMethod === 'online' ? 'text-blue-700' : 'text-gray-600'">
-                                                                    Pembayaran Dalam Talian
                                                                 </div>
                                                             </div>
                                                             <!-- Selected indicator -->
@@ -1018,53 +1170,51 @@
                 function calculateTotal() {
                     let total = 0;
                     feeInputs.forEach(input => {
-                        total += parseFloat(input.value || 0);
+                        // Remove 'RM' and any whitespace before parsing
+                        const value = input.value.replace(/[^0-9.-]+/g, '');
+                        total += parseFloat(value || 0);
                     });
+                    // Format total with 2 decimal places
                     totalInput.value = total.toFixed(2);
                 }
                 
                 feeInputs.forEach(input => {
                     const errorDiv = input.parentElement.querySelector('.error-message');
-                    // Show error div initially but keep it hidden
-                    errorDiv.style.visibility = 'hidden';
-                    errorDiv.style.height = '20px'; // Reserve space for error message
-                    errorDiv.style.margin = '4px 0';
+                    if (errorDiv) {
+                        errorDiv.style.visibility = 'hidden';
+                        errorDiv.style.height = '20px';
+                        errorDiv.style.margin = '4px 0';
+                    }
                     
-                    let validateTimeout;
+                    // Set initial values for fixed amounts
+                    const isFixed = input.dataset.fixed === 'true';
+                    if (isFixed) {
+                        input.value = parseFloat(input.dataset.min).toFixed(2);
+                    }
                     
                     input.addEventListener('input', function() {
                         calculateTotal();
                         
-                        // Clear the previous timeout
-                        clearTimeout(validateTimeout);
+                        const minValue = parseFloat(this.dataset.min);
+                        const isFixed = this.dataset.fixed === 'true';
+                        const value = parseFloat(this.value || 0);
                         
-                        // Set a new timeout for validation
-                        validateTimeout = setTimeout(() => {
-                            const minValue = parseFloat(this.dataset.min);
-                            const isFixed = this.dataset.fixed === 'true';
-                            const value = parseFloat(this.value);
-                            
+                        if (errorDiv) {
                             if (isFixed && value !== minValue) {
-                                errorDiv.textContent = `This amount is fixed at RM${minValue.toFixed(2)}`;
+                                errorDiv.textContent = `Jumlah tetap RM${minValue.toFixed(2)}`;
                                 errorDiv.style.visibility = 'visible';
-                                this.value = minValue;
+                                this.value = minValue.toFixed(2);
                             } else if (!isFixed && value < minValue) {
-                                errorDiv.textContent = `Minimum amount required is RM${minValue.toFixed(2)}`;
+                                errorDiv.textContent = `Jumlah minimum RM${minValue.toFixed(2)}`;
                                 errorDiv.style.visibility = 'visible';
                             } else {
                                 errorDiv.style.visibility = 'hidden';
                             }
-                        }, 300); // Delay of 300ms before showing error
+                        }
                     });
                 });
 
-                // Set initial values for fixed amounts and calculate initial total
-                feeInputs.forEach(input => {
-                    const isFixed = input.dataset.fixed === 'true';
-                    if (isFixed) {
-                        input.value = input.dataset.min;
-                    }
-                });
+                // Calculate initial total
                 calculateTotal();
             });
 

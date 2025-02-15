@@ -11,9 +11,11 @@ class MemberStatusController extends Controller
 {
     public function display()
     {
-        $member = Member::with(['savings', 'workingInfo', 'familymembers'])
-                        ->where('guest_id', auth()->id())
-                        ->first();
+        // Get the latest member record based on updated_at
+        $member = Member::with(['savings', 'workingInfo', 'familyMembers'])
+            ->where('email', auth()->user()->email)
+            ->orderBy('updated_at', 'desc')
+            ->first();
 
         return view('memberStatus.display', compact('member'));
     }

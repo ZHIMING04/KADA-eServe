@@ -395,13 +395,15 @@
                             <!-- Loan Amount -->
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700">Jumlah Pinjaman (RM)</label>
-                                <input type="number" 
-                                       name="loan_amount" 
-                                       x-model="loanData.loan_amount"
-                                       @input="clearError('loan_amount')"
-                                       :class="{'border-red-500': errors.loan_amount}"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                                       required>
+                                <div class="currency-input">
+                                    <input type="number" 
+                                           name="loan_amount" 
+                                           x-model="loanData.loan_amount"
+                                           @input="clearError('loan_amount')"
+                                           :class="{'border-red-500': errors.loan_amount}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                           required>
+                                </div>
                                 <p x-show="errors.loan_amount" 
                                    x-text="errors.loan_amount" 
                                    class="mt-1 text-sm text-red-600"></p>
@@ -428,26 +430,30 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Gaji Kasar Bulanan (RM)</label>
-                                    <input type="number" 
-                                           name="monthly_gross_salary" 
-                                           x-model="loanData.monthly_gross_salary"
-                                           @input="clearError('monthly_gross_salary')"
-                                           :class="{'border-red-500': errors.monthly_gross_salary}"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                                           required>
+                                    <div class="currency-input">
+                                        <input type="number" 
+                                               name="monthly_gross_salary" 
+                                               x-model="loanData.monthly_gross_salary"
+                                               @input="clearError('monthly_gross_salary')"
+                                               :class="{'border-red-500': errors.monthly_gross_salary}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                               required>
+                                    </div>
                                     <p x-show="errors.monthly_gross_salary" 
                                        x-text="errors.monthly_gross_salary" 
                                        class="mt-1 text-sm text-red-600"></p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Gaji Bersih Bulanan (RM)</label>
-                                    <input type="number" 
-                                           name="monthly_net_salary" 
-                                           x-model="loanData.monthly_net_salary"
-                                           @input="clearError('monthly_net_salary')"
-                                           :class="{'border-red-500': errors.monthly_net_salary}"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                                           required>
+                                    <div class="currency-input">
+                                        <input type="number" 
+                                               name="monthly_net_salary" 
+                                               x-model="loanData.monthly_net_salary"
+                                               @input="clearError('monthly_net_salary')"
+                                               :class="{'border-red-500': errors.monthly_net_salary}"
+                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                                               required>
+                                    </div>
                                     <p x-show="errors.monthly_net_salary" 
                                        x-text="errors.monthly_net_salary" 
                                        class="mt-1 text-sm text-red-600"></p>
@@ -963,5 +969,91 @@
     .bg-gray-50:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 30px rgba(0, 102, 204, 0.1);
+    }
+
+    /* Enhanced input field styles */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px 16px;          /* Increased padding */
+        height: 45px;                /* Increased height */
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #4a5568;
+        background-color: #fff;
+        transition: all 0.2s ease;
+    }
+
+    /* Focus state */
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        outline: none;
+    }
+
+    /* Select specific styles */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234a5568'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+        padding-right: 40px;
+    }
+
+    /* Label styles */
+    label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #4a5568;
+        margin-bottom: 6px;
+    }
+
+    /* Form group spacing */
+    .mb-4 {
+        margin-bottom: 20px;
+    }
+
+    /* Error state */
+    input.border-red-500,
+    select.border-red-500 {
+        border-color: #ef4444;
+    }
+
+    /* Error message */
+    .text-red-600 {
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    /* Currency input specific style */
+    input[name="loan_amount"],
+    input[name="monthly_gross_salary"],
+    input[name="monthly_net_salary"] {
+        padding-left: 40px;  /* Make room for the RM prefix */
+    }
+
+    /* Add RM prefix to currency inputs */
+    .currency-input {
+        position: relative;
+    }
+
+    .currency-input::before {
+        content: 'RM';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        font-size: 14px;
+        pointer-events: none;
     }
 </style>

@@ -17,11 +17,41 @@ class MemberController extends Controller
 
     public function create()
     {
+        // Check if user has existing application
+        $existingApplication = Member::where('email', auth()->user()->email)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($existingApplication) {
+            $message = $existingApplication->status === 'pending' 
+                ? 'Anda mempunyai permohonan yang sedang diproses.'
+                : 'Anda telah menjadi ahli yang diluluskan.';
+
+            return redirect()->route('guest.dashboard')
+                ->with('warning', $message);
+        }
+
+        // Continue with existing code for form display
         return view('guest.register');
     }
 
     public function store(Request $request)
     {
+        // Double check for existing application
+        $existingApplication = Member::where('email', $request->email)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($existingApplication) {
+            $message = $existingApplication->status === 'pending' 
+                ? 'Anda mempunyai permohonan yang sedang diproses.'
+                : 'Anda telah menjadi ahli yang diluluskan.';
+
+            return back()
+                ->withInput()
+                ->with('warning', $message);
+        }
+
         // Updated validation rules
         $validated = $request->validate([
             // Personal Information
@@ -81,7 +111,7 @@ class MemberController extends Controller
                 $paymentProofPath = 'uploads/payment_proofs/' . $proofName;
             }
 
-            // 1. Insert member data into member_register table
+            // Insert member data with status
             $member = DB::table('member_register')->insertGetId([
                 'no_anggota' => $request->no_anggota,
                 'name' => $request->name,
@@ -105,6 +135,7 @@ class MemberController extends Controller
                 'guest_id' => auth()->id(),
                 'payment_method' => $request->payment_method,
                 'payment_proof' => $paymentProofPath,
+                'status' => 'pending',
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -165,8 +196,11 @@ class MemberController extends Controller
 
         } catch (\Exception $e) {
             // If there's an error and we uploaded a file, clean it up
-            if (isset($paymentProofPath) && file_exists(public_path($paymentProofPath))) {
-                unlink(public_path($paymentProofPath));
+            if (isset($paymentProofPath)) {
+                $fullPath = 'public/' . $paymentProofPath;
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
             }
             
             DB::rollBack();

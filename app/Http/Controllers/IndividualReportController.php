@@ -14,11 +14,27 @@ class IndividualReportController extends Controller
 {
     public function display(Request $request)
     {
-        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
- 
+        // Get member with latest status based on email
+        $member = DB::table('member_register as m1')
+            ->select('m1.*')
+            ->where('m1.email', auth()->user()->email)
+            ->whereNotExists(function ($query) {
+                $query->from('member_register as m2')
+                      ->whereRaw('m1.email = m2.email')
+                      ->whereRaw('m1.updated_at < m2.updated_at');
+            })
+            ->first();
+
+        // Load the full member model with relationships
+        $member = Member::with(['workingInfo', 'familyMembers', 'savings'])
+            ->where('id', $member->id)
+            ->first();
+
+        // Remove any resignation-related checks or messages here
+
         // Simplified transaction query
         $transactionsQuery = DB::table('transactions')
-            ->select('transactions.*')  // Select all from transactions
+            ->select('transactions.*')
             ->where('transactions.member_id', $member->id);
         
         // Apply sorting based on the request

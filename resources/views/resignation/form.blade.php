@@ -12,6 +12,33 @@
         </div>
     </x-slot>
 
+    <!-- Add required CDN links -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <style>
+        /* Custom styles */
+        .bg-primary {
+            background-color: #4F46E5;
+        }
+        .text-primary {
+            color: #4F46E5;
+        }
+        .hover\:bg-primary-hover:hover {
+            background-color: #4338CA;
+        }
+        [x-cloak] {
+            display: none !important;
+        }
+        .-z-1 {
+            z-index: -1;
+        }
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+    </style>
+
     <div class="min-h-screen relative" x-data="{ currentStep: 1 }">
         <!-- Background Image -->
         <div class="absolute inset-0 z-0">
@@ -183,8 +210,6 @@
         </div>
     </div>
 
-    <!-- Add Alpine.js if not already included in your layout -->
-    @push('scripts')
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    @endpush
+    <!-- Replace Alpine.js script -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </x-app-layout>
