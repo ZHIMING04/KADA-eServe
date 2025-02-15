@@ -33,17 +33,17 @@ class IndividualReportController extends Controller
         // Remove any resignation-related checks or messages here
 
         // Simplified transaction query
-        $transactionsQuery = DB::table('transactions')
-            ->select('transactions.*')
-            ->where('transactions.member_id', $member->id);
+        $transactionsQuery = DB::table('member_transactions')
+            ->select('member_transactions.*')
+            ->where('member_transactions.member_id', $member->id);
         
         // Apply sorting based on the request
         if ($request->filled('month') && $request->filled('year')) {
-            $transactionsQuery->whereMonth('transactions.created_at', $request->month)
-                            ->whereYear('transactions.created_at', $request->year);
+            $transactionsQuery->whereMonth('member_transactions.created_at', $request->month)
+                            ->whereYear('member_transactions.created_at', $request->year);
         }
    
-        $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')
+        $transactions = $transactionsQuery->orderBy('member_transactions.created_at', 'desc')
             ->paginate(7)
             ->through(function ($transaction) {
                 // Transform the transaction type display
@@ -127,17 +127,17 @@ class IndividualReportController extends Controller
         $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
 
         // Simplified transaction query
-        $transactionsQuery = DB::table('transactions')
-            ->select('transactions.*')  // Select all from transactions
-            ->where('transactions.member_id', $member->id);
+        $transactionsQuery = DB::table('member_transactions')
+            ->select('member_transactions.*')  // Select all from transactions
+            ->where('member_transactions.member_id', $member->id);
             
         // Apply sorting based on the request
         if ($request->filled('month') && $request->filled('year')) {
-            $transactionsQuery->whereMonth('transactions.created_at', $request->month)
-                              ->whereYear('transactions.created_at', $request->year);
+            $transactionsQuery->whereMonth('member_transactions.created_at', $request->month)
+                              ->whereYear('member_transactions.created_at', $request->year);
         }
 
-        $transactions = $transactionsQuery->orderBy('transactions.created_at', 'desc')->get();
+        $transactions = $transactionsQuery->orderBy('member_transactions.created_at', 'desc')->get();
 
         $transactions->each(function ($transaction) {
             if ($transaction->type == 'loan') {
@@ -153,7 +153,7 @@ class IndividualReportController extends Controller
         $pdf = PDF::loadView('individualReport.exportTransactions', compact('member', 'transactions'));
 
         // Download PDF file
-        return $pdf->download('Transaction-Report-'.$member->no_anggota.'.pdf');
+        return $pdf->download('Laporanan Transaksi - '.$member->no_anggota.'.pdf');
     }
 
     

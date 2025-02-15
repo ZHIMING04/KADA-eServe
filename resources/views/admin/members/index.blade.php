@@ -15,47 +15,47 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Transaction</h5>
+                <h5 class="modal-title">Tambah Transaksi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="transactionForm">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">Transaction Type</label>
+                        <label class="form-label">Jenis Transaksi</label>
                         <select class="form-select" id="transactionType" name="type" required>
-                            <option value="savings">Savings Deposit</option>
-                            <option value="loan">Loan Repayment</option>
+                            <option value="savings">Deposit Simpanan</option>
+                            <option value="loan">Bayaran Pinjaman</option>
                         </select>
                     </div>
 
                     <div class="mb-3" id="savingsTypeDiv">
-                        <label class="form-label">Savings Type</label>
+                        <label class="form-label">Jenis Simpanan</label>
                         <select class="form-select" name="savings_type">
-                            <option value="share_capital">Share Capital</option>
-                            <option value="subscription_capital">Subscription Capital</option>
-                            <option value="member_deposit">Member Deposit</option>
-                            <option value="welfare_fund">Welfare Fund</option>
-                            <option value="fixed_savings">Fixed Savings</option>
+                            <option value="share_capital">Modal Syer</option>
+                            <option value="subscription_capital">Modal Yuran</option>
+                            <option value="member_deposit">Deposit Ahli</option>
+                            <option value="welfare_fund">Tabung Kebajikan</option>
+                            <option value="fixed_savings">Simpanan Tetap</option>
                         </select>
                     </div>
 
                     <div class="mb-3" id="loanDiv" style="display: none;">
-                        <label class="form-label">Select Loan</label>
+                        <label class="form-label">Pilih Pinjaman</label>
                         <select class="form-select" name="loan_id">
                             <!-- Will be populated dynamically -->
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Amount (RM)</label>
+                        <label class="form-label">Amaun (RM)</label>
                         <input type="number" class="form-control" name="amount" step="0.01" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitTransaction()">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" onclick="submitTransaction()">Hantar</button>
             </div>
         </div>
     </div>

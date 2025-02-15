@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\WorkingInfo;
 use App\Models\Savings;
 use App\Models\Family;
-use App\Models\adminTransaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Silber\Bouncer\BouncerFacade as Bouncer;
@@ -335,14 +335,24 @@ class MemberController extends Controller
                 $loan->loan_balance -= $validated['amount'];
                 $loan->save();
             }
+            
+            $transactionId = 'TRX' . date('YmdHis') . rand(1000, 9999);
+            Log::info('Generated transaction ID: ' . $transactionId);
 
             // Create transaction record
-            $transaction = new adminTransaction();
+
+            $transaction = new Transaction();
+            $transaction->transaction_id = $transactionId;
             $transaction->member_id = $memberId;
             $transaction->type = $validated['type'];
             $transaction->amount = $validated['amount'];
             $transaction->savings_type = $validated['type'] === 'savings' ? $validated['savings_type'] : null;
             $transaction->loan_id = $validated['type'] === 'loan' ? $validated['loan_id'] : null;
+            $transaction->payment_method = null;
+            $transaction->payment_proof = null;
+            $transaction->status = 'approved';
+            $transaction->payment_method = 'online';
+
             $transaction->save();
 
             DB::commit();
@@ -422,12 +432,22 @@ class MemberController extends Controller
                     
                     $savings->save();
 
+
+                    $transactionId = 'TRX' . date('YmdHis') . rand(1000, 9999);
+                    Log::info('Generated transaction ID: ' . $transactionId);
                     // Create transaction record
-                    $transaction = new adminTransaction();
+
+                    $transaction = new Transaction();
+                    $transaction->transaction_id = $transactionId;
                     $transaction->member_id = $memberId;
                     $transaction->type = $validated['type'];
                     $transaction->amount = $validated['amount'];
-                    $transaction->savings_type = $validated['savings_type'];
+                    $transaction->savings_type = $validated['type'] === 'savings' ? $validated['savings_type'] : null;
+                    $transaction->loan_id = $validated['type'] === 'loan' ? $validated['loan_id'] : null;
+                    $transaction->payment_method = null;
+                    $transaction->payment_proof = null;
+                    $transaction->status = 'approved';
+                    $transaction->payment_method = 'online';
                     $transaction->save();
                 }
             }
