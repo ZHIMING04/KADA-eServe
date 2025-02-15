@@ -136,24 +136,31 @@ class DashboardController extends Controller
                  ->join('member_register', 'loans.member_id', '=', 'member_register.id')
                  ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
                  ->where('member_register.status', 'approved')
-                 ->where('loans.status', 'approved')  // Only get approved loans
-                 ->selectRaw('MONTH(loans.created_at) as month, 
-                             COUNT(*) as count,
-                             SUM(loans.loan_amount) as total_amount')
                  ->whereYear('loans.created_at', $year)
-                 ->groupBy('month')
+                 ->selectRaw('
+                     MONTH(loans.created_at) as month,
+                     loans.status,
+                     COUNT(*) as count,
+                     SUM(loans.loan_amount) as total_amount
+                 ')
+                 ->groupBy('month', 'status')
                  ->orderBy('month')
                  ->get();
 
-             // Process loan data (simplified to only show approved loans)
+             // Modify the loan chart data processing
              $loanChartData = collect(range(1, 12))->map(function($month) use ($loanData) {
-                 $monthData = $loanData->where('month', $month)->first();
+                 $monthData = $loanData->where('month', $month);
                  return [
                      'month' => $month,
-                     'approved' => $monthData ? $monthData->count : 0,
-                     'total_amount' => $monthData ? $monthData->total_amount : 0
+                     'approved' => (int)$monthData->where('status', 'approved')->sum('count') ?? 0,
+                     'rejected' => (int)$monthData->where('status', 'rejected')->sum('count') ?? 0,
+                     'total_amount' => (float)$monthData->where('status', 'approved')->sum('total_amount') ?? 0
                  ];
-             });
+             })->values()->all();
+
+             // Add debug logging
+             \Log::info('Loan Data:', ['data' => $loanData]);
+             \Log::info('Processed Loan Chart Data:', ['data' => $loanChartData]);
 
              // Fill in the actual data while preserving zeros for months without data
              $savings = collect($monthlyData)->map(function($default, $month) use ($savingsData) {
@@ -193,14 +200,27 @@ class DashboardController extends Controller
                  ->join('member_register', 'loans.member_id', '=', 'member_register.id')
                  ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
                  ->where('member_register.status', 'approved')
-                 ->where('loans.status', 'approved')  // Only get approved loans
                  ->whereYear('loans.created_at', $year)
-                 ->whereMonth('loans.created_at', $month)
-                 ->select(
-                     DB::raw('COUNT(*) as count'),
-                     DB::raw('SUM(loan_amount) as total_amount')
-                 )
-                 ->first();
+                 ->selectRaw('
+                     MONTH(loans.created_at) as month,
+                     loans.status,
+                     COUNT(*) as count,
+                     SUM(loans.loan_amount) as total_amount
+                 ')
+                 ->groupBy('month', 'status')
+                 ->orderBy('month')
+                 ->get();
+
+             // Modify the loan chart data processing
+             $loanChartData = collect(range(1, 12))->map(function($month) use ($loanData) {
+                 $monthData = $loanData->where('month', $month);
+                 return [
+                     'month' => $month,
+                     'approved' => (int)$monthData->where('status', 'approved')->sum('count') ?? 0,
+                     'rejected' => (int)$monthData->where('status', 'rejected')->sum('count') ?? 0,
+                     'total_amount' => (float)$monthData->where('status', 'approved')->sum('total_amount') ?? 0
+                 ];
+             })->values()->all();
 
              // Prepare data for charts
              $savingsChartData = $period === 'annually' 
@@ -208,10 +228,11 @@ class DashboardController extends Controller
                  : [$savingsData->total ?? 0];
 
              $loanChartData = $period === 'annually'
-                 ? $loanChartData->values()->toArray()
+                 ? $loanChartData
                  : [[
-                     'approved' => $loanData ? $loanData->count : 0,
-                     'total_amount' => $loanData ? $loanData->total_amount : 0
+                     'approved' => (int)$loanData->where('status', 'approved')->sum('count') ?? 0,
+                     'rejected' => (int)$loanData->where('status', 'rejected')->sum('count') ?? 0,
+                     'total_amount' => (float)$loanData->where('status', 'approved')->sum('total_amount') ?? 0
                  ]];
          }
 

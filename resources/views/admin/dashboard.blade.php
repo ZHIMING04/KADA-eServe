@@ -736,142 +736,125 @@
 
 
         <script>
-           const loanApplicationsData = @json($LoanApplications->pluck('total'));
-           const loanApprovalsData = @json($LoanApprovals->pluck('total'));
-           const loanLabels = @json($LoanApplications->map(function($item) {
-               switch($item['month']) {
-                   case 1: return 'Jan ' . date('Y');
-                   case 2: return 'Feb ' . date('Y');
-                   case 3: return 'Mac ' . date('Y');
-                   case 4: return 'Apr ' . date('Y');
-                   case 5: return 'Mei ' . date('Y');
-                   case 6: return 'Jun ' . date('Y');
-                   case 7: return 'Jul ' . date('Y');
-                   case 8: return 'Ogo ' . date('Y');
-                   case 9: return 'Sep ' . date('Y');
-                   case 10: return 'Okt ' . date('Y');
-                   case 11: return 'Nov ' . date('Y');
-                   case 12: return 'Dis ' . date('Y');
-                   default: return '';
-               }
-           }));
-
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug the data
+        console.log('Loan Chart Data:', @json($loanChartData));
+        
+        // Initialize loan chart with proper configuration
         var loanOptions = {
             series: [{
-                name: 'Menunggu',
-                data: {!! json_encode(collect($loanChartData)->pluck('pending')) !!}
-            }, {
                 name: 'Diluluskan',
-                data: {!! json_encode(collect($loanChartData)->pluck('approved')) !!}
+                data: @json(collect($loanChartData)->pluck('approved'))
             }, {
                 name: 'Ditolak',
-                data: {!! json_encode(collect($loanChartData)->pluck('rejected')) !!}
+                data: @json(collect($loanChartData)->pluck('rejected'))
             }],
             chart: {
                 type: 'bar',
                 height: 350,
                 stacked: true,
                 toolbar: {
-                    show: true
+                    show: true,
+                    tools: {
+                        download: true,
+                        selection: false,
+                        zoom: false,
+                        zoomin: false,
+                        zoomout: false,
+                        pan: false,
+                        reset: false
+                    }
+                },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
                 }
             },
             plotOptions: {
                 bar: {
                     horizontal: false,
                     columnWidth: '55%',
-                    endingShape: 'rounded'
+                    endingShape: 'rounded',
+                    borderRadius: 4
                 },
             },
             dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
+                enabled: true,
+                formatter: function(val) {
+                    return val || '0';
+                }
             },
             xaxis: {
-                categories: {!! json_encode($memberChartLabels) !!},
+                categories: @json($memberChartLabels),
+                labels: {
+                    rotate: -45,
+                    rotateAlways: false
+                }
             },
             yaxis: {
                 title: {
                     text: 'Jumlah Pinjaman'
                 }
             },
-            fill: {
-                opacity: 1
-            },
-            colors: ['#FCD34D', '#34D399', '#EF4444'],
+            colors: ['#34D399', '#EF4444'],
             legend: {
                 position: 'bottom'
+            },
+            // Add this to prevent chart from disappearing
+            noData: {
+                text: 'Tiada Data',
+                align: 'center',
+                verticalAlign: 'middle',
+                style: {
+                    fontSize: '16px'
+                }
             }
         };
 
-        // Initialize Loan Chart
+        // Create chart instance and store it
         if (document.querySelector("#loanChart")) {
-            var loanChart = new ApexCharts(document.querySelector("#loanChart"), loanOptions);
-            loanChart.render();
+            window.loanChart = new ApexCharts(document.querySelector("#loanChart"), loanOptions);
+            window.loanChart.render();
         }
 
         // Add event listeners for period changes
-        document.addEventListener('DOMContentLoaded', function() {
-            const periodType = document.getElementById('periodType');
-            const yearSelect = document.getElementById('yearSelect');
-            const monthSelect = document.getElementById('monthSelect');
+        const periodType = document.getElementById('periodType');
+        const yearSelect = document.getElementById('yearSelect');
+        const monthSelect = document.getElementById('monthSelect');
 
-            function updateLoanChart() {
-                const period = periodType.value;
-                const year = yearSelect.value;
-                const month = monthSelect.value;
+        function updateLoanChart() {
+            const period = periodType.value;
+            const year = yearSelect.value;
+            const month = monthSelect.value;
 
-                fetch(`/admin/dashboard-data?period=${period}&year=${year}&month=${month}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.LoanApplications && data.LoanApprovals) {
-                            const applications = data.LoanApplications.map(item => item.total);
-                            const approvals = data.LoanApprovals.map(item => item.total);
-                            const labels = data.LoanApplications.map(item => {
-                                const monthNames = {
-                                    1: 'Jan', 2: 'Feb', 3: 'Mac', 4: 'Apr',
-                                    5: 'Mei', 6: 'Jun', 7: 'Jul', 8: 'Ogo',
-                                    9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Dis'
-                                };
-                                return monthNames[item.month] + ' ' + year;
-                            });
+            fetch(`/admin/dashboard-data?period=${period}&year=${year}&month=${month}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.loanChartData) {
+                        window.loanChart.updateSeries([
+                            {
+                                name: 'Diluluskan',
+                                data: data.loanChartData.map(item => item.approved)
+                            },
+                            {
+                                name: 'Ditolak',
+                                data: data.loanChartData.map(item => item.rejected)
+                            }
+                        ]);
+                    }
+                })
+                .catch(error => console.error('Error updating loan chart:', error));
+        }
 
-                            loanChart.updateOptions({
-                                series: [
-                                    {
-                                        name: 'Menunggu',
-                                        data: applications.map(item => item.pending)
-                                    },
-                                    {
-                                        name: 'Diluluskan',
-                                        data: applications.map(item => item.approved)
-                                    },
-                                    {
-                                        name: 'Ditolak',
-                                        data: applications.map(item => item.rejected)
-                                    }
-                                ],
-                                xaxis: {
-                                    categories: labels
-                                }
-                            });
-                        }
-                    })
-                    .catch(error => console.error('Error fetching loan data:', error));
-            }
-
-            // Add event listeners
+        // Add event listeners
+        if (periodType && yearSelect && monthSelect) {
             periodType.addEventListener('change', updateLoanChart);
             yearSelect.addEventListener('change', updateLoanChart);
             monthSelect.addEventListener('change', updateLoanChart);
-
-            // Initial chart update
-            updateLoanChart();
-        });
-        </script>
+        }
+    });
+</script>
 
 
 
