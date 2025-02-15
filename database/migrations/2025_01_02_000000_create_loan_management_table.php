@@ -42,6 +42,7 @@ class CreateLoanManagementTable extends Migration
             $table->integer('loan_period');
             $table->string('status')->default('pending');
             $table->timestamps();
+            $table->text('rejection_reason')->nullable();
             
 
             // Foreign Key Constraints
