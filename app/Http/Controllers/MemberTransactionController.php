@@ -51,7 +51,7 @@ class MemberTransactionController extends Controller
             $validated = $request->validate([
                 'type' => 'required|in:savings,loan',
                 'amount' => 'required|numeric|min:0',
-                'payment_method' => 'required|in:online,cash',
+                'payment_method' => 'required|in:online,cash,auto_transfer',
             ]);
 
             Log::info('Basic validation passed');

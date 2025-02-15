@@ -276,7 +276,7 @@
         <h1 class="text-xl font-semibold text-blue-600 mb-2">LAPORAN DIMUAT NAIK</h1>
         <div class="overflow-hidden rounded-lg shadow">
             {{-- Debug info - temporary --}}
-            {{ count($reports) }} reports found<br>
+            {{ count($reports) }} laporan dijumpai<br>
             
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-yellow-200">
