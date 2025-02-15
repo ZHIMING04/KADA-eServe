@@ -509,6 +509,11 @@
                     } else {
                         console.log('Validation failed');
                     }
+                },
+
+                resetForm() {
+                    // Implement the reset logic here
+                    console.log('Reset form');
                 }
              }">
             <!-- Add debug elements -->
@@ -1168,6 +1173,7 @@
                                                 <div class="mt-8">
                                                     <h4 class="text-lg font-semibold mb-4">Kaedah Pembayaran</h4>
                                                     <div class="grid grid-cols-2 gap-4">
+                                                        <!-- Cash Payment Option -->
                                                         <div class="relative">
                                                             <input type="radio" 
                                                                    id="payment_cash" 
@@ -1175,16 +1181,34 @@
                                                                    value="cash" 
                                                                    x-model="paymentMethod"
                                                                    @change="clearError('paymentMethod')"
-                                                                   class="peer hidden">
+                                                                   class="sr-only">
                                                             <label for="payment_cash" 
-                                                                   class="block p-4 text-center border-2 rounded-lg cursor-pointer
-                                                                          peer-checked:border-green-500 peer-checked:bg-green-50
-                                                                          hover:border-gray-300">
-                                                                <i class="fas fa-money-bill-wave text-3xl mb-2"></i>
-                                                                <div class="font-medium">Tunai</div>
+                                                                   class="block p-4 border-2 rounded-lg cursor-pointer transition-all duration-200"
+                                                                   :class="paymentMethod === 'cash' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
+                                                                <div class="flex items-center justify-between">
+                                                                    <div class="flex items-center space-x-3">
+                                                                        <svg class="w-8 h-8 transition-colors duration-200" 
+                                                                             :class="paymentMethod === 'cash' ? 'text-blue-500' : 'text-gray-400'"
+                                                                             fill="none" 
+                                                                             stroke="currentColor" 
+                                                                             viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" 
+                                                                                  stroke-linejoin="round" 
+                                                                                  stroke-width="2" 
+                                                                                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                                        </svg>
+                                                                        <span class="text-gray-700 font-medium">Tunai</span>
+                                                                    </div>
+                                                                    <div class="w-6 h-6 border-2 rounded-full flex items-center justify-center"
+                                                                         :class="paymentMethod === 'cash' ? 'border-blue-500' : 'border-gray-400'">
+                                                                        <div class="w-3 h-3 rounded-full bg-blue-500"
+                                                                             x-show="paymentMethod === 'cash'"></div>
+                                                                    </div>
+                                                                </div>
                                                             </label>
                                                         </div>
 
+                                                        <!-- Online Payment Option -->
                                                         <div class="relative">
                                                             <input type="radio" 
                                                                    id="payment_online" 
@@ -1192,54 +1216,144 @@
                                                                    value="online" 
                                                                    x-model="paymentMethod"
                                                                    @change="clearError('paymentMethod')"
-                                                                   class="peer hidden">
+                                                                   class="sr-only">
                                                             <label for="payment_online" 
-                                                                   class="block p-4 text-center border-2 rounded-lg cursor-pointer
-                                                                          peer-checked:border-green-500 peer-checked:bg-green-50
-                                                                          hover:border-gray-300">
-                                                                <i class="fas fa-credit-card text-3xl mb-2"></i>
-                                                                <div class="font-medium">Online</div>
+                                                                   class="block p-4 border-2 rounded-lg cursor-pointer transition-all duration-200"
+                                                                   :class="paymentMethod === 'online' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
+                                                                <div class="flex items-center justify-between">
+                                                                    <div class="flex items-center space-x-3">
+                                                                        <svg class="w-8 h-8 transition-colors duration-200" 
+                                                                             :class="paymentMethod === 'online' ? 'text-blue-500' : 'text-gray-400'"
+                                                                             fill="none" 
+                                                                             stroke="currentColor" 
+                                                                             viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" 
+                                                                                  stroke-linejoin="round" 
+                                                                                  stroke-width="2" 
+                                                                                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                                                        </svg>
+                                                                        <span class="text-gray-700 font-medium">Pembayaran Dalam Talian</span>
+                                                                    </div>
+                                                                    <div class="w-6 h-6 border-2 rounded-full flex items-center justify-center"
+                                                                         :class="paymentMethod === 'online' ? 'border-blue-500' : 'border-gray-400'">
+                                                                        <div class="w-3 h-3 rounded-full bg-blue-500"
+                                                                             x-show="paymentMethod === 'online'"></div>
+                                                                    </div>
+                                                                </div>
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    <p x-show="errors.paymentMethod" 
-                                                       x-text="errors.paymentMethod"
-                                                       class="mt-2 text-sm text-red-600"></p>
                                                 </div>
 
-                                                <!-- Payment Proof Upload (shown only for online payment) -->
-                                                <div x-show="paymentMethod === 'online'" class="mt-6">
-                                                    <x-input-label for="payment_proof" value="Bukti Pembayaran" class="font-semibold text-gray-700" />
-                                                    <input type="file" 
-                                                           id="payment_proof" 
-                                                           name="payment_proof"
-                                                           @change="clearError('payment_proof')"
-                                                           class="mt-1 block w-full"
-                                                           accept="image/*,.pdf">
-                                                    <p x-show="errors.payment_proof" 
-                                                       x-text="errors.payment_proof"
-                                                       class="mt-1 text-sm text-red-600"></p>
+                                                <!-- Cash Payment Message -->
+                                                <div x-show="paymentMethod === 'cash'" 
+                                                     class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                                    <div class="flex items-start space-x-3">
+                                                        <svg class="w-6 h-6 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" 
+                                                                  stroke-linejoin="round" 
+                                                                  stroke-width="2" 
+                                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                        </svg>
+                                                        <p class="text-sm text-blue-800">
+                                                            Sila pergi ke kaunter hadapan untuk membuat pembayaran secara tunai.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <p x-show="errors.paymentMethod" 
+                                                   x-text="errors.paymentMethod"
+                                                   class="mt-2 text-sm text-red-600"></p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Proof Upload (shown only for online payment) -->
+                                        <div x-show="paymentMethod === 'online'" 
+                                             x-data="{ 
+                                                 fileName: null,
+                                                 removeFile() {
+                                                     this.fileName = null;
+                                                     document.getElementById('payment_proof').value = '';
+                                                 }
+                                             }"
+                                             class="mt-6 p-6 border-2 border-dashed border-gray-300 rounded-xl">
+                                            
+                                            <!-- Upload Area -->
+                                            <div x-show="!fileName" class="text-center">
+                                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                                </svg>
+                                                <div class="mt-4 flex flex-col items-center">
+                                                    <label for="payment_proof" class="cursor-pointer">
+                                                        <span class="mt-2 block text-sm font-medium text-gray-900">
+                                                            Bukti Pembayaran
+                                                        </span>
+                                                        <span class="mt-1 block text-sm text-gray-500">
+                                                            PNG, JPG, GIF sehingga 5MB
+                                                        </span>
+                                                    </label>
                                                 </div>
                                             </div>
+
+                                            <!-- File Preview -->
+                                            <div x-show="fileName" class="text-center">
+                                                <div class="flex items-center justify-center space-x-2">
+                                                    <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    <span class="text-sm font-medium text-gray-900" x-text="fileName"></span>
+                                                    <button type="button" 
+                                                            @click="removeFile()"
+                                                            class="p-1 rounded-full hover:bg-gray-100">
+                                                        <svg class="w-5 h-5 text-gray-500 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                  d="M6 18L18 6M6 6l12 12"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <input type="file" 
+                                                   id="payment_proof" 
+                                                   name="payment_proof"
+                                                   @change="fileName = $event.target.files[0]?.name; clearError('payment_proof')"
+                                                   class="hidden"
+                                                   accept="image/*,.pdf">
+                                                   
+                                            <p x-show="errors.payment_proof" 
+                                               x-text="errors.payment_proof"
+                                               class="mt-2 text-sm text-red-600 text-center"></p>
                                         </div>
 
                                         <!-- Navigation Buttons -->
                                         <div class="mt-6 flex justify-between">
-                                            <button type="button" @click="currentStep = 3"
-                                                    class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors duration-200">
-                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <button type="button" 
+                                                    @click="currentStep = 3"
+                                                    class="inline-flex items-center px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                                 </svg>
                                                 Sebelumnya
                                             </button>
-                                            <button type="submit" 
-                                                    @click="validateStep4()"
-                                                    class="inline-flex items-center px-8 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-hover transition-colors duration-200">
-                                                <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                                Hantar
-                                            </button>
+
+                                            <div class="flex gap-3">
+                                                <button type="button"
+                                                        @click="resetForm()"
+                                                        class="inline-flex items-center px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                                                    Set Semula
+                                                </button>
+                                                
+                                                <button type="submit" 
+                                                        @click="validateStep4()"
+                                                        class="inline-flex items-center px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    Hantar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
