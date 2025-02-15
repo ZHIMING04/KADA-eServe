@@ -286,33 +286,42 @@ class MemberController extends Controller
         ]);
 
         DB::beginTransaction();
-        
-        // Find the member
-        $member = Member::findOrFail($id);
-        
-        // Get the user from guest_id
-        $user = User::findOrFail($member->guest_id);
+        try {
+            // Find the member
+            $member = Member::findOrFail($id);
+            
+            // Get the user from guest_id
+            $user = User::findOrFail($member->guest_id);
 
-        // Remove guest role
-        Bouncer::retract('guest')->from($user);
-        
-        // Update member status
-        $member->update([
-            'status' => 'rejected',
-            'rejection_reason' => $request->rejection_reason,
-            'rejected_at' => now()
-        ]);
+            // Update member status
+            $member->update([
+                'status' => 'rejected',
+                'rejection_reason' => $request->rejection_reason,
+                'rejected_at' => now()
+            ]);
 
-        // Force refresh user roles cache
-        Bouncer::refresh();
+            // Ensure user still has guest role
+            if (!$user->isA('guest')) {
+                Bouncer::assign('guest')->to($user);
+            }
 
-        // Send email using the new Mail class
-        $member->notify(new MembershipRejected($request->rejection_reason));
+            // Force refresh user roles cache
+            Bouncer::refresh();
 
-        DB::commit();
+            // Send email using the new Mail class
+            $member->notify(new MembershipRejected($request->rejection_reason));
 
-        return redirect()->route('admin.registrations.pending')
-            ->with('success', 'Pendaftaran ditolak dan e-mel pemberitahuan telah dihantar.');
+            DB::commit();
+
+            return redirect()->route('admin.registrations.pending')
+                ->with('success', 'Pendaftaran ditolak dan e-mel pemberitahuan telah dihantar.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Rejection error: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Ralat: ' . $e->getMessage());
+        }
     }
 
     public function getMemberLoans($memberId)

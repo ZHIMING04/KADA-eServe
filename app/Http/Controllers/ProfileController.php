@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifyNewEmail;
 use App\Service\SmsService;
 use Worksome\VerifyByPhone\Contracts\PhoneVerificationService;
+use App\Models\Resignation;
 
 
 class ProfileController extends Controller
@@ -31,13 +32,25 @@ class ProfileController extends Controller
         return view('profile.show', compact('member','workingInfo'));
     }
 
-    public function edit(Request $request): View
-    {   
-        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
+    public function edit(Request $request)
+    {
+        $member = Auth::user()->member;
+        
+        // Get working info
+        $workingInfo = DB::table('working_info')->where('no_anggota', $member->id)->first();
+        
+        // Get latest resignation
+        $latestResignation = Resignation::where('member_id', $member->id)
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->latest()
+            ->first();
 
-        $workingInfo = WorkingInfo::where('no_anggota', $member->id)->first();
- 
-        return view('profile.edit', compact('member','workingInfo'));
+        return view('profile.edit', [
+            'member' => $member,
+            'workingInfo' => $workingInfo,
+            'latestResignation' => $latestResignation
+        ]);
     }
 
     /**
