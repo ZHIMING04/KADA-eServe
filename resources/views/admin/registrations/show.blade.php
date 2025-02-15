@@ -175,14 +175,51 @@
                     <div class="space-y-1">
                         <p class="text-sm text-gray-600">Bukti Pembayaran</p>
                         <p class="font-medium">
-                            <a href="#" 
-                               class="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                               onclick="showPaymentProof('{{ asset($member->payment_proof) }}'); return false;">
-                                <i class="fas fa-image mr-2"></i>
-                                Lihat Bukti Pembayaran
-                            </a>
+                            @if($member->payment_proof_url)
+                                <a href="#" 
+                                   class="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                                   onclick="showPaymentProof('{{ $member->payment_proof_url }}'); return false;">
+                                    <i class="fas fa-image mr-2"></i>
+                                    Lihat Bukti Pembayaran
+                                </a>
+                            @else
+                                <span class="text-red-500">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Fail tidak dijumpai
+                                </span>
+                            @endif
                         </p>
                     </div>
+
+                    <!-- Payment Proof Modal -->
+                    <div id="paymentProofModal" 
+                         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+                         onclick="this.classList.add('hidden')">
+                        <div class="max-w-3xl w-full bg-white rounded-lg shadow-xl overflow-hidden"
+                             onclick="event.stopPropagation()">
+                            <div class="p-4 bg-gray-100 flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-800">Bukti Pembayaran</h3>
+                                <button onclick="document.getElementById('paymentProofModal').classList.add('hidden')"
+                                        class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="p-4 flex items-center justify-center" style="max-height: 80vh;">
+                                <img id="paymentProofImage" src="" alt="Bukti Pembayaran" 
+                                     class="max-w-full max-h-[70vh] object-contain">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Script -->
+                    <script>
+                    function showPaymentProof(imageUrl) {
+                        const modal = document.getElementById('paymentProofModal');
+                        const image = document.getElementById('paymentProofImage');
+                        image.src = imageUrl;
+                        modal.classList.remove('hidden');
+                    }
+                    </script>
                     @endif
                 </div>
             </div>
@@ -215,41 +252,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Payment Proof Modal -->
-    <div id="paymentProofModal" 
-         class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-         onclick="this.classList.add('hidden')">
-        <div class="max-w-3xl w-full bg-white rounded-lg shadow-xl overflow-hidden"
-             onclick="event.stopPropagation()">
-            <div class="p-4 bg-gray-100 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800">Bukti Pembayaran</h3>
-                <button onclick="document.getElementById('paymentProofModal').classList.add('hidden')"
-                        class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-4 flex items-center justify-center" style="max-height: 80vh;">
-                <img id="paymentProofImage" src="" alt="Bukti Pembayaran" 
-                     class="max-w-full max-h-[70vh] object-contain">
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Script -->
-    <script>
-    function showPaymentProof(imageUrl) {
-        const modal = document.getElementById('paymentProofModal');
-        const image = document.getElementById('paymentProofImage');
-        image.src = imageUrl;
-        modal.classList.remove('hidden');
-    }
-
-    // Close modal when pressing ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            document.getElementById('paymentProofModal').classList.add('hidden');
-        }
-    });
-    </script>
 @endsection 

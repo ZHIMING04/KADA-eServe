@@ -36,48 +36,48 @@
                 <div class="info-card">
                     <div class="rounded-lg justify-center items-center bg-gray-100 dark:bg-gray-800 p-4">
                         <div class="flex items-center mt-4">
-                            <!-- Step 1 -->
+                            <!-- Step 1 - Permohonan Dihantar -->
                             <div class="flex flex-col items-right" style="margin-left: 15%;">
-                                <div class="bg-teal-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                <div style="background-color: #0D9488; color: white;" class="w-10 h-10 rounded-full flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 15l2 2l4 -4" /></svg>
                                 </div>
                             </div>
 
-                            <!-- Line Connector -->
-                            <div class="h-1 bg-teal-500 w-full"></div>
+                            <!-- Line Connector 1 -->
+                            <div style="background-color: #0D9488; height: 4px;" class="w-full"></div>
 
-                            <!-- Step 2 -->
+                            <!-- Step 2 - Sedang Diproses -->
                             <div class="flex flex-col items-center">
-                                <div class="bg-yellow-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                <div style="background-color: #CA8A04; color: white;" class="w-10 h-10 rounded-full flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-clock"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>
                                 </div>
                             </div>
 
-                            <!-- Line Connector -->
+                            <!-- Line Connector 2 -->
                             @if($member->status == 'approved')
-                                <div class="h-1 bg-green-300 w-full"></div> 
+                                <div style="background-color: #16A34A; height: 4px;" class="w-full"></div>
                             @elseif($member->status == 'rejected')
-                                <div class="h-1 bg-red-300 w-full"></div>
+                                <div style="background-color: #DC2626; height: 4px;" class="w-full"></div>
                             @else
-                                <div class="h-1 bg-gray-300 w-full"></div>
+                                <div style="background-color: #D1D5DB; height: 4px;" class="w-full"></div>
                             @endif
 
-                            <!-- Step 3 -->
+                            <!-- Step 3 - Final Status -->
                             <div class="flex flex-col items-center" style="margin-right: 15%;">
                                 @if($member->status == 'approved')
-                                    <div class="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                    <div style="background-color: #16A34A; color: white;" class="w-10 h-10 rounded-full flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
                                 @elseif($member->status == 'rejected')
-                                    <div class="bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                    <div style="background-color: #DC2626; color: white;" class="w-10 h-10 rounded-full flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </div>
                                 @else
-                                    <div class="bg-gray-300 text-white w-10 h-10 rounded-full flex items-center justify-center">
+                                    <div style="background-color: #D1D5DB; color: white;" class="w-10 h-10 rounded-full flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-clock-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.993 11.646a9 9 0 1 0 -9.318 9.348" /><path d="M12 7v5l1 1" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M20.2 20.2l1.8 1.8" /></svg>
                                     </div>
                                 @endif
@@ -85,22 +85,20 @@
                         </div>
                         <!-- status words section -->
 
-                        <!-- step 1 -->
+                        <!-- Status Text -->
                         <div class="flex items-center mt-4">
-                            <span class="flex-1 text-teal-700 text-sm text-center">Permohonan Dihantar</span>
-                            <!-- step 2 -->
+                            <span class="flex-1 text-center" style="color: #0D9488; margin-left: 0%;">Permohonan Dihantar</span>
                             @if($member->status == 'pending')
-                                <span class="flex-1 text-yellow-500 text-sm text-center">Sedang Diproses</span>
+                                <span class="flex-1 text-center" style="color: #CA8A04;">Sedang Diproses</span>
                             @else
-                                <span class="flex-1 text-yellow-500 text-sm text-center">Telah Diproses</span>
+                                <span class="flex-1 text-center" style="color: #CA8A04;">Telah Diproses</span>
                             @endif
-                            <!-- step 3 -->
                             @if($member->status == 'approved')
-                                <span class="flex-1 text-green-500 text-sm text-center">Diluluskan</span>
+                                <span class="flex-1 text-center" style="color: #16A34A; margin-right: 0%;">Diluluskan</span>
                             @elseif($member->status == 'rejected')
-                                <span class="flex-1 text-red-500 text-sm text-center">Ditolak</span>
+                                <span class="flex-1 text-center" style="color: #DC2626; margin-right: 0%;">Ditolak</span>
                             @else
-                                <span class="flex-1 text-gray-500 text-sm text-center">Belum Disahkan</span>
+                                <span class="flex-1 text-center" style="color: #6B7280; margin-right: 0%;">Belum Disahkan</span>
                             @endif
                         </div>
                     </div>

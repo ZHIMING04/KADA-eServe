@@ -17,6 +17,9 @@ use App\Models\Loan;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\MembershipApproved;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\App;
 
 
 class MemberController extends Controller
@@ -180,6 +183,31 @@ class MemberController extends Controller
     public function showRegistration($id)
     {
         $member = Member::findOrFail($id);
+        
+        if ($member->payment_proof) {
+            try {
+                // Get base path based on environment
+                $basePath = App::environment('local') 
+                    ? 'KADA-eServe/public/uploads/payment_proofs/'
+                    : 'public/uploads/payment_proofs/';
+                    
+                $fileName = basename($member->payment_proof);
+                $publicPath = 'uploads/payment_proofs/' . $fileName;
+                
+                // Check both possible paths
+                if (file_exists(public_path($publicPath)) || 
+                    file_exists(base_path('../' . $publicPath))) {
+                    
+                    // Generate URL that works in both environments
+                    $member->payment_proof_url = url($publicPath);
+                } else {
+                    $member->payment_proof_url = null;
+                }
+            } catch (\Exception $e) {
+                $member->payment_proof_url = null;
+            }
+        }
+        
         $workingInfo = WorkingInfo::where('no_anggota', $member->id)->first();
         $savings = Savings::where('no_anggota', $member->id)->first();
         $familyMembers = Family::where('no_anggota', $member->id)->get();
