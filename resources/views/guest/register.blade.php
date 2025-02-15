@@ -1052,17 +1052,26 @@
                                                                            class="mt-1 text-sm text-red-600"></p>
                                                                     </td>
                                                                     <td class="px-4 py-3">
-                                                                        <select :name="'family[' + index + '][relationship]'"
-                                                                                x-model="member.relationship"
-                                                                                @change="clearError(`family.${index}.relationship`)"
-                                                                                class="border-gray-300 rounded-md shadow-sm w-full">
-                                                                            <option value="">Pilih Hubungan</option>
-                                                                            <option value="Suami">Suami</option>
-                                                                            <option value="Isteri">Isteri</option>
-                                                                            <option value="Anak">Anak</option>
-                                                                            <option value="Ibu">Ibu</option>
-                                                                            <option value="Bapa">Bapa</option>
-                                                                        </select>
+                                                                        <div class="relative">
+                                                                            <select :name="'family[' + index + '][relationship]'"
+                                                                                    x-model="member.relationship"
+                                                                                    @change="clearError(`family.${index}.relationship`)"
+                                                                                    class="appearance-none block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                                                                <option value="" class="text-gray-500">Pilih Hubungan</option>
+                                                                                <option value="Isteri" class="py-2">Isteri</option>
+                                                                                <option value="Suami" class="py-2">Suami</option>
+                                                                                <option value="Anak" class="py-2">Anak</option>
+                                                                                <option value="Ibu" class="py-2">Ibu</option>
+                                                                                <option value="Bapa" class="py-2">Bapa</option>
+                                                                                <option value="Adik-beradik" class="py-2">Adik-beradik</option>
+                                                                            </select>
+                                                                            <!-- Custom dropdown arrow -->
+                                                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                                                                </svg>
+                                                                            </div>
+                                                                        </div>
                                                                         <p x-show="errors[`family.${index}.relationship`]" 
                                                                            x-text="errors[`family.${index}.relationship`]"
                                                                            class="mt-1 text-sm text-red-600"></p>
@@ -1385,14 +1394,29 @@
                         <input type="text" name="family[${rowCount}][ic]" class="w-full rounded-md border-gray-300" required>
                     </td>
                     <td class="px-4 py-3">
-                        <select name="family[${rowCount}][relationship]" class="w-full rounded-md border-gray-300" required>
-                            <option value="">Pilih Hubungan</option>
-                            <option value="Suami">Suami</option>
-                            <option value="Isteri">Isteri</option>
-                            <option value="Anak">Anak</option>
-                            <option value="Ibu">Ibu</option>
-                            <option value="Bapa">Bapa</option>
-                        </select>
+                        <div class="relative">
+                            <select :name="'family[' + index + '][relationship]'"
+                                    x-model="member.relationship"
+                                    @change="clearError(`family.${index}.relationship`)"
+                                    class="appearance-none block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" class="text-gray-500">Pilih Hubungan</option>
+                                <option value="Isteri" class="py-2">Isteri</option>
+                                <option value="Suami" class="py-2">Suami</option>
+                                <option value="Anak" class="py-2">Anak</option>
+                                <option value="Ibu" class="py-2">Ibu</option>
+                                <option value="Bapa" class="py-2">Bapa</option>
+                                <option value="Adik-beradik" class="py-2">Adik-beradik</option>
+                            </select>
+                            <!-- Custom dropdown arrow -->
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <p x-show="errors[`family.${index}.relationship`]" 
+                           x-text="errors[`family.${index}.relationship`]"
+                           class="mt-1 text-sm text-red-600"></p>
                     </td>
                     <td class="px-4 py-3">
                         <button type="button" 

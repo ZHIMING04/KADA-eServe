@@ -127,7 +127,7 @@
                             </svg>
                         </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-800">RM {{ number_format($totalSavings->sum('amount') ?? 0, 2) }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800">RM {{ $totalSavings }}</h3>
                     <p class="text-gray-600">Jumlah Simpanan</p>
                 </div>
 
@@ -394,9 +394,8 @@
 
                 var savingsOptions = {
                     series: [{
-                        name: 'Jumlah Simpanan',
-                        data: savingsData,
-                        type: 'bar'
+                        name: 'Total Simpanan',
+                        data: {!! json_encode($savingsChartData) !!}
                     }],
                     chart: {
                         height: 350,
@@ -758,62 +757,33 @@
            }));
 
         var loanOptions = {
-            series: [
-                {
-                    name: 'Permohonan Pinjaman',
-                    data: loanApplicationsData,
-                    type: 'bar'
-                },
-                {
-                    name: 'Kelulusan Pinjaman',
-                    data: loanApprovalsData,
-                    type: 'bar'
-                }
-            ],
+            series: [{
+                name: 'Menunggu',
+                data: {!! json_encode(collect($loanChartData)->pluck('pending')) !!}
+            }, {
+                name: 'Diluluskan',
+                data: {!! json_encode(collect($loanChartData)->pluck('approved')) !!}
+            }, {
+                name: 'Ditolak',
+                data: {!! json_encode(collect($loanChartData)->pluck('rejected')) !!}
+            }],
             chart: {
-                height: 350,
                 type: 'bar',
+                height: 350,
+                stacked: true,
                 toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                        selection: false,
-                        zoom: false,
-                        zoomin: false,
-                        zoomout: false,
-                        pan: false,
-                        reset: false
-                    }
-                },
-                animations: {
-                    enabled: true,
-                    easing: 'easeinout',
-                    speed: 800
+                    show: true
                 }
             },
-            colors: ['#F59E0B', '#10B981'],
             plotOptions: {
                 bar: {
                     horizontal: false,
                     columnWidth: '55%',
-                    endingShape: 'rounded',
-                    borderRadius: 4,
-                    dataLabels: {
-                        position: 'top'
-                    }
-                }
+                    endingShape: 'rounded'
+                },
             },
             dataLabels: {
-                enabled: true,
-                formatter: function(val, { seriesIndex, dataPointIndex, w }) {
-                    // Return empty string if value is 0
-                    return val === 0 ? '' : val;
-                },
-                offsetY: -20,
-                style: {
-                    fontSize: '12px',
-                    colors: ["#304758"]
-                }
+                enabled: false
             },
             stroke: {
                 show: true,
@@ -821,66 +791,27 @@
                 colors: ['transparent']
             },
             xaxis: {
-                categories: loanLabels,
-                labels: {
-                    rotate: -45,
-                    rotateAlways: false,
-                    style: {
-                        fontSize: '12px',
-                        fontWeight: 500
-                    }
-                },
-                title: {
-                    text: 'Bulan',
-                    style: {
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: '#2E3A47'
-                    }
-                }
+                categories: {!! json_encode($memberChartLabels) !!},
             },
             yaxis: {
                 title: {
-                    text: 'Bilangan Permohonan',
-                    style: {
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: '#2E3A47'
-                    }
-                },
-                labels: {
-                    formatter: function(val) {
-                        return Math.round(val);
-                    }
+                    text: 'Jumlah Pinjaman'
                 }
             },
             fill: {
                 opacity: 1
             },
+            colors: ['#FCD34D', '#34D399', '#EF4444'],
             legend: {
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '14px',
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 12
-                },
-                itemMargin: {
-                    horizontal: 25
-                }
-            },
-            tooltip: {
-                y: {
-                    formatter: function(val, { seriesIndex }) {
-                        return val + (seriesIndex === 0 ? ' permohonan' : ' kelulusan');
-                    }
-                }
+                position: 'bottom'
             }
         };
 
-        var loanChart = new ApexCharts(document.querySelector("#loanChart"), loanOptions);
-        loanChart.render();
+        // Initialize Loan Chart
+        if (document.querySelector("#loanChart")) {
+            var loanChart = new ApexCharts(document.querySelector("#loanChart"), loanOptions);
+            loanChart.render();
+        }
 
         // Add event listeners for period changes
         document.addEventListener('DOMContentLoaded', function() {
@@ -911,12 +842,16 @@
                             loanChart.updateOptions({
                                 series: [
                                     {
-                                        name: 'Permohonan Pinjaman',
-                                        data: applications
+                                        name: 'Menunggu',
+                                        data: applications.map(item => item.pending)
                                     },
                                     {
-                                        name: 'Kelulusan Pinjaman',
-                                        data: approvals
+                                        name: 'Diluluskan',
+                                        data: applications.map(item => item.approved)
+                                    },
+                                    {
+                                        name: 'Ditolak',
+                                        data: applications.map(item => item.rejected)
                                     }
                                 ],
                                 xaxis: {
