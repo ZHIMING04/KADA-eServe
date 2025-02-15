@@ -244,7 +244,7 @@
             <table class="table-auto w-full text-left mt-4">
                 <tr class="border-b border-gray-300">
                     <td class="px-6 py-4"><strong>Yuran Masuk</strong></td>
-                    <td class="px-6 py-4">RM {{ number_format($member->savings->entrance, 2) }}</td>
+                    <td class="px-6 py-4">RM {{ number_format($member->savings->entrance_fee, 2) }}</td>
                 </tr>
                 <tr class="border-b border-gray-300">
                     <td class="px-6 py-4"><strong>Modal Syer</strong></td>
