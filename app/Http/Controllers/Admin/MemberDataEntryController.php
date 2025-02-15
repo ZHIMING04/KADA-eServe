@@ -160,6 +160,7 @@ class MemberDataEntryController extends Controller
             $result = DB::transaction(function () use ($request) {
                 $tempPassword = Str::random(8);
 
+                // 1. Create user first
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -169,9 +170,8 @@ class MemberDataEntryController extends Controller
                 // Assign member role using Bouncer
                 Bouncer::assign('member')->to($user);
 
-                // 1. Insert member data into member_register table
-                $member = DB::table('member_register')->insertGetId([
-                    'guest_id' => $user->id,
+                // 2. Insert member data into member_register table
+                $member = Member::create([
                     'no_anggota' => $request->no_anggota,
                     'name' => $request->name,
                     'email' => $request->email,
@@ -191,24 +191,21 @@ class MemberDataEntryController extends Controller
                     'office_city' => $request->office_city,
                     'office_postcode' => $request->office_postcode,
                     'office_state' => $request->office_state,
-                    'status' => 'approved',  // Set status to approved for admin registration
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'guest_id' => $user->id,
+                    'status' => 'approved'
                 ]);
 
-                // 2. Insert working info
-                DB::table('working_info')->insert([
+                // 3. Insert working info
+                WorkingInfo::create([
                     'jawatan' => $request->jawatan,
                     'gred' => $request->gred,
                     'no_pf' => $request->no_pf,
                     'salary' => $request->salary,
-                    'no_anggota' => $member,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'no_anggota' => $member->id,
                 ]);
 
-                // 3. Insert savings/fees
-                DB::table('savings')->insert([
+                // 4. Insert savings data
+                Savings::create([
                     'entrance_fee' => $request->input('fees.entrance'),
                     'share_capital' => $request->input('fees.share_capital'),
                     'subscription_capital' => $request->input('fees.subscription_capital'),
@@ -223,28 +220,26 @@ class MemberDataEntryController extends Controller
                         $request->input('fees.welfare_fund'),
                         $request->input('fees.fixed_savings'),
                     ]),
-                    'no_anggota' => $member,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'no_anggota' => $member->id,
                 ]);
 
-                // 4. Insert family members if any
+                // 5. Insert family members if provided
                 if ($request->has('family')) {
                     foreach ($request->family as $familyMember) {
-                        if (!empty($familyMember['name']) || !empty($familyMember['ic']) || !empty($familyMember['relationship'])) {
+                        if (!empty($familyMember['name']) && !empty($familyMember['ic']) && !empty($familyMember['relationship'])) {
                             DB::table('family')->insert([
-                                'relationship' => $familyMember['relationship'],
                                 'name' => $familyMember['name'],
                                 'ic' => $familyMember['ic'],
-                                'no_anggota' => $member,
+                                'relationship' => $familyMember['relationship'],
+                                'no_anggota' => $member->id,
                                 'created_at' => now(),
-                                'updated_at' => now()
+                                'updated_at' => now(),
                             ]);
                         }
                     }
                 }
 
-                // 5. If has loan, create loan-related records
+                // 6. If has loan, create loan-related records
                 if ($request->boolean('has_loan')) {
                     // Only process loan data if has_loan is true
                     $bank = Bank::firstOrCreate(
@@ -256,11 +251,11 @@ class MemberDataEntryController extends Controller
                         ]
                     );
 
-                    $loanId = 'LOAN-' . time() . '-' . $member;
+                    $loanId = 'LOAN-' . time() . '-' . $member->id;
                     
                     DB::table('loans')->insert([
                         'loan_id' => $loanId,
-                        'member_id' => $member,
+                        'member_id' => $member->id,
                         'loan_type_id' => $request->loan_type_id,
                         'bank_id' => $bank->bank_id,
                         'date_apply' => $request->date_apply,
@@ -294,7 +289,7 @@ class MemberDataEntryController extends Controller
                 }
 
                 return [
-                    'member_id' => $member,
+                    'member_id' => $member->id,
                     'user' => $user,
                     'tempPassword' => $tempPassword
                 ];
