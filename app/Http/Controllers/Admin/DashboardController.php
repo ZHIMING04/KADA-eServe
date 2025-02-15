@@ -39,8 +39,9 @@ class DashboardController extends Controller
             // Initialize array with zeros for all months
             $monthlyData = array_fill(1, 12, 0);
             
-            // Get member data for each month in the selected year
+            // Modified member data query to include only approved members
             $memberData = Member::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                ->where('status', 'approved')
                 ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->orderBy('month')
@@ -66,8 +67,9 @@ class DashboardController extends Controller
                 return $monthNames[$item['month']] . ' ' . date('Y');
             })->toArray();
         } else {
-            // Get monthly data for specific month
-            $total = Member::whereYear('created_at', $year)
+            // Modified for approved members only
+            $total = Member::where('status', 'approved')
+                ->whereYear('created_at', $year)
                 ->whereMonth('created_at', $month)
                 ->count();
 
@@ -91,6 +93,7 @@ class DashboardController extends Controller
          $demographics = Member::whereHas('user', function($query) {
             $query->whereIs('member');
         })
+        ->where('status', 'approved')
         ->select(
             DB::raw('
                 CASE 
@@ -118,20 +121,62 @@ class DashboardController extends Controller
          //*************** Get total savings ****************//
 
          if ($period === 'annually') {
-             // Initialize array with zeros for all months
-             $monthlyData = array_fill(1, 12, 0);
-             
-             // Get savings data for each month in the selected year
-             $savingsData = Savings::join('member_register', 'savings.no_anggota', '=', 'member_register.id')
-                 ->where('member_register.status', 'approved')
-                 ->selectRaw('MONTH(savings.created_at) as month, SUM(savings.total_amount) as amount')
+             // Modified savings data query with proper joins and status filter
+             $savingsData = DB::table('savings')
+                 ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+                 ->where(function($query) {
+                     $query->where('member_register.status', '=', 'approved');
+                 })  // Explicit filter for approved members only
                  ->whereYear('savings.created_at', $year)
+                 ->selectRaw('
+                     MONTH(savings.created_at) as month,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(entrance_fee, 0) ELSE 0 END) as entrance_fee,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(share_capital, 0) ELSE 0 END) as share_capital,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(subscription_capital, 0) ELSE 0 END) as subscription_capital,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(member_deposit, 0) ELSE 0 END) as member_deposit,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(welfare_fund, 0) ELSE 0 END) as welfare_fund,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(fixed_savings, 0) ELSE 0 END) as fixed_savings,
+                     SUM(CASE WHEN member_register.status = "approved" THEN 
+                         COALESCE(entrance_fee, 0) + 
+                         COALESCE(share_capital, 0) + 
+                         COALESCE(subscription_capital, 0) + 
+                         COALESCE(member_deposit, 0) + 
+                         COALESCE(welfare_fund, 0) + 
+                         COALESCE(fixed_savings, 0)
+                     ELSE 0 END) as amount
+                 ')
                  ->groupBy('month')
                  ->orderBy('month')
                  ->get();
 
+             // For Loan Statistics
+             $loanData = DB::table('loans')
+                 ->join('member_register', 'loans.member_id', '=', 'member_register.id')
+                 ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
+                 ->where('member_register.status', 'approved')
+                 ->selectRaw('MONTH(loans.created_at) as month, 
+                             COUNT(*) as count,
+                             SUM(loans.loan_amount) as total_amount,
+                             loans.status')
+                 ->whereYear('loans.created_at', $year)
+                 ->groupBy('month', 'loans.status')
+                 ->orderBy('month')
+                 ->get();
+
+             // Process loan data for different statuses
+             $loanChartData = collect(range(1, 12))->map(function($month) use ($loanData) {
+                 $monthData = $loanData->where('month', $month);
+                 return [
+                     'month' => $month,
+                     'pending' => $monthData->where('status', 'pending')->first()->count ?? 0,
+                     'approved' => $monthData->where('status', 'approved')->first()->count ?? 0,
+                     'rejected' => $monthData->where('status', 'rejected')->first()->count ?? 0,
+                     'total_amount' => $monthData->sum('total_amount') ?? 0
+                 ];
+             });
+
              // Fill in the actual data while preserving zeros for months without data
-             $totalSavings = collect($monthlyData)->map(function($default, $month) use ($savingsData) {
+             $savings = collect($monthlyData)->map(function($default, $month) use ($savingsData) {
                  $monthData = $savingsData->firstWhere('month', $month);
                  return [
                      'month' => (int)$month,
@@ -140,46 +185,74 @@ class DashboardController extends Controller
              })->values();
 
              // Transform the data for the chart
-             $savingsChartData = $totalSavings->pluck('amount')->toArray();
-             $savingsChartLabels = $totalSavings->map(function($item) {
+             $savingsChartData = $savings->pluck('amount')->toArray();
+             $savingsChartLabels = $savings->map(function($item) use ($year) {
                  $monthNames = [
-                     1 => 'Januari', 2 => 'Februari', 3 => 'Mac', 4 => 'April',
-                     5 => 'Mei', 6 => 'Jun', 7 => 'Julai', 8 => 'Ogos',
-                     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Disember'
+                     1 => 'Jan', 2 => 'Feb', 3 => 'Mac', 4 => 'Apr',
+                     5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Ogo',
+                     9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Dis'
                  ];
-                 return $monthNames[$item['month']];
+                 return $monthNames[$item['month']] . ' ' . $year;
              })->toArray();
          } else {
-             // Get monthly data
-             $totalSavingsQuery = Savings::join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+             // Monthly period query with proper joins
+             $savingsData = DB::table('savings')
+                 ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+                 ->where(function($query) {
+                     $query->where('member_register.status', '=', 'approved');
+                 })  // Explicit filter for approved members only
+                 ->whereYear('savings.created_at', $year)
+                 ->whereMonth('savings.created_at', $month)
+                 ->selectRaw('
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(entrance_fee, 0) ELSE 0 END) as entrance_fee,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(share_capital, 0) ELSE 0 END) as share_capital,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(subscription_capital, 0) ELSE 0 END) as subscription_capital,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(member_deposit, 0) ELSE 0 END) as member_deposit,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(welfare_fund, 0) ELSE 0 END) as welfare_fund,
+                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(fixed_savings, 0) ELSE 0 END) as fixed_savings,
+                     SUM(CASE WHEN member_register.status = "approved" THEN 
+                         COALESCE(entrance_fee, 0) + 
+                         COALESCE(share_capital, 0) + 
+                         COALESCE(subscription_capital, 0) + 
+                         COALESCE(member_deposit, 0) + 
+                         COALESCE(welfare_fund, 0) + 
+                         COALESCE(fixed_savings, 0)
+                     ELSE 0 END) as total
+                 ')
+                 ->first();
+
+             $savings = [[
+                 'month' => (int)$month,
+                 'amount' => (float)($savingsData->total ?? 0)
+             ]];
+
+             $loanData = DB::table('loans')
+                 ->join('member_register', 'loans.member_id', '=', 'member_register.id')
+                 ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
                  ->where('member_register.status', 'approved')
-                 ->whereYear('savings.created_at', $year);
-                 
-             if ($period === 'monthly') {
-                 $totalSavingsQuery->whereMonth('savings.created_at', $month);
-             }
-             
-             $amount = $totalSavingsQuery->sum('savings.total_amount');
-             
-             // Only include data if there's a non-zero amount for monthly view
-             if ($amount > 0) {
-                 $savingsChartData = [$amount];
-                 $monthName = [
-                     1 => 'Januari', 2 => 'Februari', 3 => 'Mac', 4 => 'April',
-                     5 => 'Mei', 6 => 'Jun', 7 => 'Julai', 8 => 'Ogos',
-                     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Disember'
-                 ][$month];
-                 $savingsChartLabels = [$monthName . ' ' . $year];
-                 
-                 $totalSavings = [[
-                     'month' => (int)$month,
-                     'amount' => (float)$amount
+                 ->whereYear('loans.created_at', $year)
+                 ->whereMonth('loans.created_at', $month)
+                 ->select(
+                     DB::raw('COUNT(*) as count'),
+                     DB::raw('SUM(loan_amount) as total_amount'),
+                     'loans.status'
+                 )
+                 ->groupBy('loans.status')
+                 ->get();
+
+             // Prepare data for charts
+             $savingsChartData = $period === 'annually' 
+                 ? $savingsData->pluck('total_amount')->toArray()
+                 : [$savingsData->total ?? 0];
+
+             $loanChartData = $period === 'annually'
+                 ? $loanChartData->values()->toArray()
+                 : [[
+                     'pending' => $loanData->where('status', 'pending')->first()->count ?? 0,
+                     'approved' => $loanData->where('status', 'approved')->first()->count ?? 0,
+                     'rejected' => $loanData->where('status', 'rejected')->first()->count ?? 0,
+                     'total_amount' => $loanData->sum('total_amount') ?? 0
                  ]];
-             } else {
-                 $savingsChartData = [];
-                 $savingsChartLabels = [];
-                 $totalSavings = [];
-             }
          }
 
         // Add total for display in stats card
@@ -244,20 +317,164 @@ class DashboardController extends Controller
 
         // **************** Get loan applications and approvals data ****************** //
         if ($period === 'annually') {
-            // Initialize array with zeros for all months
-            $monthlyData = array_fill(1, 12, 0);
-            
-            // Get loan applications data
-            $loanApplicationsData = Loan::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-                ->whereYear('created_at', $year)
+            // Modified loan applications data
+            $loanApplicationsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
+                ->where('member_register.status', 'approved')
+                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
+                ->whereYear('loans.created_at', $year)
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
 
-            // Get loan approvals data
-            $loanApprovalsData = Loan::selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-                ->where('status', 'approved')
+            // Modified loan approvals data
+            $loanApprovalsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
+                ->where('member_register.status', 'approved')
+                ->where('loans.status', 'approved')
+                ->whereYear('loans.created_at', $year)
+                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
+
+            // Fill in the actual data while preserving zeros for months without data
+            $LoanApplications = collect($monthlyData)->map(function($default, $month) use ($loanApplicationsData) {
+                $monthData = $loanApplicationsData->firstWhere('month', $month);
+                return [
+                    'month' => (int)$month,
+                    'total' => $monthData ? (int)$monthData->total : 0
+                ];
+            })->values();
+
+            $LoanApprovals = collect($monthlyData)->map(function($default, $month) use ($loanApprovalsData) {
+                $monthData = $loanApprovalsData->firstWhere('month', $month);
+                return [
+                    'month' => (int)$month,
+                    'total' => $monthData ? (int)$monthData->total : 0
+                ];
+            })->values();
+        } else {
+            // Get monthly data for specific month
+            $totalApplications = Loan::whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            $totalApprovals = Loan::where('status', 'approved')
                 ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            // Create single-item collections for the specific month
+            $monthName = [
+                1 => 'Jan', 2 => 'Feb', 3 => 'Mac', 4 => 'Apr',
+                5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Ogo',
+                9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Dis'
+            ][$month] . ' ' . $year;
+
+            $LoanApplications = collect([
+                [
+                    'month' => (int)$month,
+                    'total' => $totalApplications
+                ]
+            ]);
+
+            $LoanApprovals = collect([
+                [
+                    'month' => (int)$month,
+                    'total' => $totalApprovals
+                ]
+            ]);
+
+            // Update chart data arrays
+            $loanApplicationsData = [$totalApplications];
+            $loanApprovalsData = [$totalApprovals];
+            $loanLabels = [$monthName];
+        }
+
+        // Calculate total savings for display
+        $totalSavings = DB::table('savings')
+            ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+            ->where('member_register.status', 'approved')
+            ->whereYear('savings.created_at', $year)
+            ->sum(DB::raw('
+                COALESCE(entrance_fee, 0) + 
+                COALESCE(share_capital, 0) + 
+                COALESCE(subscription_capital, 0) + 
+                COALESCE(member_deposit, 0) + 
+                COALESCE(welfare_fund, 0) + 
+                COALESCE(fixed_savings, 0)
+            '));
+
+        //****************** Get member registration count ****************//
+
+        $pendingMembers = Member::where('status', 'pending')
+            ->whereYear('created_at', $year)
+            ->count();
+
+       
+        // Calculate member growth percentage
+        $previousMonthApprovedMembers = Member::where('status', 'approved')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', now()->subMonth()->month)
+            ->count();
+
+        $memberGrowthPercentage = $previousMonthApprovedMembers > 0 
+            ? (($totalApprovedMembers - $previousMonthApprovedMembers) / $previousMonthApprovedMembers) * 100 
+            : 0;
+
+       
+        // **************** Get total loan applications (all statuses) ****************** //
+        
+        $LoanApplicationsQuery = Loan::whereYear('created_at', $year);
+        if ($period === 'monthly') {
+            $LoanApplicationsQuery->whereMonth('created_at', $month);
+        }
+        $LoanApplications = $LoanApplicationsQuery
+            ->selectRaw('COUNT(*) as total, MONTH(created_at) as month')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // ***************** Get total approved loan applications ***************** //
+
+        $LoanApprovalsQuery = Loan::where('status', 'approved')->whereYear('created_at', $year);
+        if ($period === 'monthly') {
+            $LoanApprovalsQuery->whereMonth('created_at', $month);
+        }
+        $LoanApprovals = $LoanApprovalsQuery
+            ->selectRaw('COUNT(*) as total, MONTH(created_at) as month')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Fix totalMembers calculation
+        $totalMemberRegis = Member::whereYear('created_at', $year);
+        $totalMembers = $totalMemberRegis->count(); // Define it here first
+        
+        if($period === 'monthly') {
+            $totalMemberRegis->whereMonth('created_at', $month);
+            $totalMembers = $totalMemberRegis->count(); // Update if monthly
+        }
+        
+        // Get recent activities
+        $recentActivities = $this->getRecentActivities($year, $month, $period);
+
+        // **************** Get loan applications and approvals data ****************** //
+        if ($period === 'annually') {
+            // Modified loan applications data
+            $loanApplicationsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
+                ->where('member_register.status', 'approved')
+                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
+                ->whereYear('loans.created_at', $year)
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
+
+            // Modified loan approvals data
+            $loanApprovalsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
+                ->where('member_register.status', 'approved')
+                ->where('loans.status', 'approved')
+                ->whereYear('loans.created_at', $year)
+                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
@@ -330,7 +547,8 @@ class DashboardController extends Controller
             'totalMembers',
             'demographics',
             'memberChartData',
-            'memberChartLabels'
+            'memberChartLabels',
+            'loanChartData'
         );
     }
 
