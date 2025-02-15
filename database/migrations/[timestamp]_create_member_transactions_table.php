@@ -16,7 +16,7 @@ return new class extends Migration
             $table->enum('savings_type', ['share_capital', 'subscription_capital', 'member_deposit', 'welfare_fund', 'fixed_savings'])->nullable();
             $table->string('loan_id', 50)->nullable();
             $table->decimal('amount', 10, 2);
-            $table->enum('payment_method', ['online', 'cash']);
+            $table->enum('payment_method', ['online', 'cash','auto_transfer']);
             $table->string('payment_proof')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->unsignedBigInteger('approved_by')->nullable();

@@ -147,8 +147,26 @@
                         <td>{{ $transaction->transaction_id }}</td>
                         <td>{{ $transaction->member->name }}</td>
                         <td>
-                            @if($transaction->type === 'savings')
-                                {{ ucfirst($transaction->savings_type) }}
+                        @if($transaction->type === 'savings')
+                                @switch($transaction->savings_type)
+                                    @case('share_capital')
+                                        Modal Syer
+                                        @break
+                                    @case('subscription_capital')
+                                        Modal Yuran
+                                        @break
+                                    @case('member_deposit')
+                                        Simpanan Anggota
+                                        @break
+                                    @case('welfare_fund')
+                                        Tabung Anggota
+                                        @break
+                                    @case('fixed_savings')
+                                        Simpanan Tetap
+                                        @break
+                                    @default
+                                        {{ ucfirst($transaction->savings_type) }}
+                                @endswitch
                             @else
                                 Bayaran Pinjaman
                             @endif
@@ -159,7 +177,8 @@
                                 {{ $transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                                    ($transaction->status === 'approved' ? 'bg-green-100 text-green-800' : 
                                     'bg-red-100 text-red-800') }}">
-                                {{ ucfirst($transaction->status) }}
+                                    {{ $transaction->status === 'pending' ? 'Tertunda' : 
+                                        ($transaction->status === 'approved' ? 'Diluluskan' : 'Ditolak') }}
                             </span>
                         </td>
                         <td>{{ $transaction->created_at->format('d/m/Y H:i') }}</td>

@@ -134,7 +134,7 @@
                                         Tunai
                                     @elseif ($transaction->payment_method == 'online')
                                         Bank Dalam Talian
-                                    @elseif ($transaction->payment_method == 'auto_bank_transfer')
+                                    @elseif ($transaction->payment_method == 'auto_transfer')
                                         Pindahan Bank Auto
                                     @endif
                                 </td>

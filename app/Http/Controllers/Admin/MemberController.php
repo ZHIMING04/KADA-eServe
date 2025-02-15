@@ -379,10 +379,9 @@ class MemberController extends Controller
             $transaction->amount = $validated['amount'];
             $transaction->savings_type = $validated['type'] === 'savings' ? $validated['savings_type'] : null;
             $transaction->loan_id = $validated['type'] === 'loan' ? $validated['loan_id'] : null;
-            $transaction->payment_method = null;
             $transaction->payment_proof = null;
             $transaction->status = 'approved';
-            $transaction->payment_method = 'online';
+            $transaction->payment_method = 'auto_transfer';
 
             $transaction->save();
 
@@ -475,10 +474,9 @@ class MemberController extends Controller
                     $transaction->amount = $validated['amount'];
                     $transaction->savings_type = $validated['type'] === 'savings' ? $validated['savings_type'] : null;
                     $transaction->loan_id = $validated['type'] === 'loan' ? $validated['loan_id'] : null;
-                    $transaction->payment_method = null;
                     $transaction->payment_proof = null;
                     $transaction->status = 'approved';
-                    $transaction->payment_method = 'online';
+                    $transaction->payment_method = 'auto_transfer';
                     $transaction->save();
                 }
             }

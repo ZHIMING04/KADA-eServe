@@ -49,14 +49,34 @@
                         {{ $transaction->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
                            ($transaction->status === 'approved' ? 'bg-green-100 text-green-800' : 
                             'bg-red-100 text-red-800') }}">
-                        {{ ucfirst($transaction->status) }}
+                            {{ $transaction->status === 'pending' ? 'Tertunda' : 
+                           ($transaction->status === 'approved' ? 'Diluluskan' : 'Ditolak') }}
+
                     </span>
                 </div>
                 <div class="space-y-1">
                     <p class="text-sm text-gray-600">Jenis Transaksi</p>
                     <p class="font-medium">
                         @if($transaction->type === 'savings')
-                            {{ ucfirst($transaction->savings_type) }}
+                            @switch($transaction->savings_type)
+                                @case('share_capital')
+                                    Modal Syer
+                                    @break
+                                @case('subscription_capital')
+                                    Modal Yuran
+                                    @break
+                                @case('member_deposit')
+                                    Simpanan Anggota
+                                    @break
+                                @case('welfare_fund')
+                                    Tabung Anggota
+                                    @break
+                                @case('fixed_savings')
+                                    Simpanan Tetap
+                                    @break
+                                @default
+                                    Lain-lain
+                            @endswitch
                         @else
                             Bayaran Pinjaman
                         @endif

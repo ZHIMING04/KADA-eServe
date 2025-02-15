@@ -26,9 +26,7 @@ class IndividualReportController extends Controller
             ->first();
 
         // Load the full member model with relationships
-        $member = Member::with(['workingInfo', 'familyMembers', 'savings'])
-            ->where('id', $member->id)
-            ->first();
+        $member = DB::table('member_register')->where('guest_id', auth()->id())->first();
 
         // Remove any resignation-related checks or messages here
 

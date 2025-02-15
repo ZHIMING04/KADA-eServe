@@ -37,7 +37,7 @@ class CreateMemberManagementTable extends Migration
         $table->string('office_state');
         $table->unsignedBigInteger('guest_id');
         $table->foreign('guest_id')->references('id')->on('users')->onDelete('cascade');
-        $table->enum('payment_method', ['cash', 'online'])->default('cash');
+        $table->enum('payment_method', ['cash', 'online','auto_transfer'])->default('cash');
         $table->string('payment_proof')->nullable();
         $table->enum('status', ['pending', 'approved', 'rejected', 'resigned', 'deceased'])
               ->default('pending');

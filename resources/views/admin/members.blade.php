@@ -366,7 +366,7 @@
         <div class="modal-dialog">
             <div class="modal-content rounded-lg shadow-xl">
                 <div class="modal-header bg-gray-50 rounded-t-lg">
-                    <h5 class="modal-title text-lg font-semibold text-gray-800">Select Fields to Export</h5>
+                    <h5 class="modal-title text-lg font-semibold text-gray-800">Pilih Medan untuk Eksport</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-6">
@@ -374,7 +374,7 @@
                         <div class="grid grid-cols-2 gap-6">
                             <!-- Personal Information -->
                             <div>
-                                <h6 class="font-medium text-gray-700 mb-3">Personal Information</h6>
+                                <h6 class="font-medium text-gray-700 mb-3">Maklumat Peribadi</h6>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="no_anggota" class="rounded" checked>
@@ -382,42 +382,42 @@
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="name" class="rounded" checked>
-                                        <label class="ml-2">Name</label>
+                                        <label class="ml-2">Nama</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="email" class="rounded" checked>
-                                        <label class="ml-2">Email</label>
+                                        <label class="ml-2">Emel</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="ic" class="rounded">
-                                        <label class="ml-2">IC Number</label>
+                                        <label class="ml-2">No. KP</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="phone" class="rounded">
-                                        <label class="ml-2">Phone</label>
+                                        <label class="ml-2">Telefon</label>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Address Information -->
                             <div>
-                                <h6 class="font-medium text-gray-700 mb-3">Address Information</h6>
+                                <h6 class="font-medium text-gray-700 mb-3">Maklumat Alamat</h6>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="address" class="rounded">
-                                        <label class="ml-2">Address</label>
+                                        <label class="ml-2">Alamat</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="city" class="rounded">
-                                        <label class="ml-2">City</label>
+                                        <label class="ml-2">Bandar</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="postcode" class="rounded">
-                                        <label class="ml-2">Postcode</label>
+                                        <label class="ml-2">Poskod</label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" name="export_fields[]" value="state" class="rounded">
-                                        <label class="ml-2">State</label>
+                                        <label class="ml-2">Negeri</label>
                                     </div>
                                 </div>
                             </div>
@@ -425,8 +425,8 @@
                     </form>
                 </div>
                 <div class="modal-footer bg-gray-50 rounded-b-lg">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="exportPDF()">Export PDF</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="exportPDF()">Eksport PDF</button>
                 </div>
             </div>
         </div>
