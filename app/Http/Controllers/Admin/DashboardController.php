@@ -122,8 +122,10 @@ class DashboardController extends Controller
              $monthlyData = array_fill(1, 12, 0);
              
              // Get savings data for each month in the selected year
-             $savingsData = Savings::selectRaw('MONTH(created_at) as month, SUM(total_amount) as amount')
-                 ->whereYear('created_at', $year)
+             $savingsData = Savings::join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+                 ->where('member_register.status', 'approved')
+                 ->selectRaw('MONTH(savings.created_at) as month, SUM(savings.total_amount) as amount')
+                 ->whereYear('savings.created_at', $year)
                  ->groupBy('month')
                  ->orderBy('month')
                  ->get();
@@ -148,12 +150,16 @@ class DashboardController extends Controller
                  return $monthNames[$item['month']];
              })->toArray();
          } else {
-             // Get total savings for specific month
-             $totalSavingsQuery = Savings::whereYear('created_at', $year);
+             // Get monthly data
+             $totalSavingsQuery = Savings::join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+                 ->where('member_register.status', 'approved')
+                 ->whereYear('savings.created_at', $year);
+                 
              if ($period === 'monthly') {
-                 $totalSavingsQuery->whereMonth('created_at', $month);
+                 $totalSavingsQuery->whereMonth('savings.created_at', $month);
              }
-             $amount = $totalSavingsQuery->sum('total_amount');
+             
+             $amount = $totalSavingsQuery->sum('savings.total_amount');
              
              // Only include data if there's a non-zero amount for monthly view
              if ($amount > 0) {
@@ -177,7 +183,10 @@ class DashboardController extends Controller
          }
 
         // Add total for display in stats card
-        $totalSavingsDisplay = collect($totalSavings)->sum('amount');
+        $totalSavingsDisplay = Savings::join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+            ->where('member_register.status', 'approved')
+            ->whereYear('savings.created_at', $year)
+            ->sum('savings.total_amount');
 
         //****************** Get member registration count ****************//
 
