@@ -29,6 +29,7 @@ use App\Http\Controllers\ResignationController;
 use App\Models\Resignation;
 use App\Service\SmsService;
 use App\Http\Controllers\Admin\MemberDataEntryController;
+use Illuminate\Mail\Message;
 
 
 
@@ -299,6 +300,28 @@ Route::post('/check-member-role', [App\Http\Controllers\LoanController::class, '
     ->name('check.member.role');
 
 Route::get('/loan/validate-guarantor-pf/{pf}', [LoanController::class, 'validateGuarantorPF'])->name('loan.validate-guarantor-pf');
+
+Route::get('/test-email', function() {
+    try {
+        \Log::info('Testing email configuration', [
+            'host' => config('mail.mailers.smtp.host'),
+            'port' => config('mail.mailers.smtp.port'),
+            'username' => config('mail.mailers.smtp.username'),
+            'encryption' => config('mail.mailers.smtp.encryption'),
+            'from_address' => config('mail.from.address'),
+        ]);
+
+        Mail::raw('Test email from Laravel', function(Message $message) {
+            $message->to('yan04@graduate.utm.my')
+                   ->subject('Test Email');
+        });
+
+        return 'Email sent successfully! Check your inbox.';
+    } catch (\Exception $e) {
+        \Log::error('Email test failed: ' . $e->getMessage());
+        return 'Email failed: ' . $e->getMessage();
+    }
+});
 
 
 

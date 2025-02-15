@@ -20,6 +20,9 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\App;
+use App\Notifications\MembershipRejected;
+use App\Mail\RegistrationRejected;
+use Illuminate\Support\Facades\Mail;
 
 
 class MemberController extends Controller
@@ -272,25 +275,44 @@ class MemberController extends Controller
         }
     }
 
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
-        try {
-            DB::transaction(function () use ($id) {
-                // Find the member
-                $member = Member::findOrFail($id);
-                
-                // Update member status
-                $member->update([
-                    'status' => 'rejected'
-                ]);
-            });
+        // Validate the request
+        $request->validate([
+            'rejection_reason' => 'required|string|min:10',
+        ], [
+            'rejection_reason.required' => 'Sila nyatakan sebab penolakan.',
+            'rejection_reason.min' => 'Sebab penolakan mestilah sekurang-kurangnya 10 aksara.',
+        ]);
 
-            return redirect()->route('admin.registrations.pending')
-                ->with('success', 'Pendaftaran telah ditolak.');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Ralat semasa menolak pendaftaran: ' . $e->getMessage());
-        }
+        DB::beginTransaction();
+        
+        // Find the member
+        $member = Member::findOrFail($id);
+        
+        // Get the user from guest_id
+        $user = User::findOrFail($member->guest_id);
+
+        // Remove guest role
+        Bouncer::retract('guest')->from($user);
+        
+        // Update member status
+        $member->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+            'rejected_at' => now()
+        ]);
+
+        // Force refresh user roles cache
+        Bouncer::refresh();
+
+        // Send email using the new Mail class
+        $member->notify(new MembershipRejected($request->rejection_reason));
+
+        DB::commit();
+
+        return redirect()->route('admin.registrations.pending')
+            ->with('success', 'Pendaftaran ditolak dan e-mel pemberitahuan telah dihantar.');
     }
 
     public function getMemberLoans($memberId)
