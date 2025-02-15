@@ -88,7 +88,7 @@ class DashboardController extends Controller
         }
     
     
-            //************* Get member demographics by age *************//
+            //***** Get member demographics by age *****//
             
          $demographics = Member::whereHas('user', function($query) {
             $query->whereIs('member');
@@ -108,7 +108,7 @@ class DashboardController extends Controller
         ->groupBy('age_group')
         ->get();
 
-        //**************** member demographics ****************//
+        //****** member demographics ******//
 
         //Get total approved members count
 
@@ -118,21 +118,14 @@ class DashboardController extends Controller
 
         //end of total approved members count
 
-         //*************** Get total savings ****************//
+         //***** Get total savings ******//
 
          if ($period === 'annually') {
              // Modified savings data query with proper joins and status filter
              $savingsData = DB::table('savings')
                  ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
                  ->where('member_register.status', 'approved')  // Filter for approved members only
-                 ->selectRaw('MONTH(savings.created_at) as month, 
-                             SUM(savings.entrance_fee) as entrance_fee,
-                             SUM(savings.share_capital) as share_capital,
-                             SUM(savings.subscription_capital) as subscription_capital,
-                             SUM(savings.member_deposit) as member_deposit,
-                             SUM(savings.welfare_fund) as welfare_fund,
-                             SUM(savings.fixed_savings) as fixed_savings,
-                             SUM(savings.total_amount) as amount')
+                 ->selectRaw('MONTH(savings.created_at) as month, SUM(savings.total_amount) as amount')
                  ->whereYear('savings.created_at', $year)
                  ->groupBy('month')
                  ->orderBy('month')
@@ -143,24 +136,22 @@ class DashboardController extends Controller
                  ->join('member_register', 'loans.member_id', '=', 'member_register.id')
                  ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
                  ->where('member_register.status', 'approved')
+                 ->where('loans.status', 'approved')  // Only get approved loans
                  ->selectRaw('MONTH(loans.created_at) as month, 
                              COUNT(*) as count,
-                             SUM(loans.loan_amount) as total_amount,
-                             loans.status')
+                             SUM(loans.loan_amount) as total_amount')
                  ->whereYear('loans.created_at', $year)
-                 ->groupBy('month', 'loans.status')
+                 ->groupBy('month')
                  ->orderBy('month')
                  ->get();
 
-             // Process loan data for different statuses
+             // Process loan data (simplified to only show approved loans)
              $loanChartData = collect(range(1, 12))->map(function($month) use ($loanData) {
-                 $monthData = $loanData->where('month', $month);
+                 $monthData = $loanData->where('month', $month)->first();
                  return [
                      'month' => $month,
-                     'pending' => $monthData->where('status', 'pending')->first()->count ?? 0,
-                     'approved' => $monthData->where('status', 'approved')->first()->count ?? 0,
-                     'rejected' => $monthData->where('status', 'rejected')->first()->count ?? 0,
-                     'total_amount' => $monthData->sum('total_amount') ?? 0
+                     'approved' => $monthData ? $monthData->count : 0,
+                     'total_amount' => $monthData ? $monthData->total_amount : 0
                  ];
              });
 
@@ -202,15 +193,14 @@ class DashboardController extends Controller
                  ->join('member_register', 'loans.member_id', '=', 'member_register.id')
                  ->join('loan_types', 'loans.loan_type_id', '=', 'loan_types.loan_type_id')
                  ->where('member_register.status', 'approved')
+                 ->where('loans.status', 'approved')  // Only get approved loans
                  ->whereYear('loans.created_at', $year)
                  ->whereMonth('loans.created_at', $month)
                  ->select(
                      DB::raw('COUNT(*) as count'),
-                     DB::raw('SUM(loan_amount) as total_amount'),
-                     'loans.status'
+                     DB::raw('SUM(loan_amount) as total_amount')
                  )
-                 ->groupBy('loans.status')
-                 ->get();
+                 ->first();
 
              // Prepare data for charts
              $savingsChartData = $period === 'annually' 
@@ -220,10 +210,8 @@ class DashboardController extends Controller
              $loanChartData = $period === 'annually'
                  ? $loanChartData->values()->toArray()
                  : [[
-                     'pending' => $loanData->where('status', 'pending')->first()->count ?? 0,
-                     'approved' => $loanData->where('status', 'approved')->first()->count ?? 0,
-                     'rejected' => $loanData->where('status', 'rejected')->first()->count ?? 0,
-                     'total_amount' => $loanData->sum('total_amount') ?? 0
+                     'approved' => $loanData ? $loanData->count : 0,
+                     'total_amount' => $loanData ? $loanData->total_amount : 0
                  ]];
          }
 
@@ -233,7 +221,7 @@ class DashboardController extends Controller
             ->whereYear('savings.created_at', $year)
             ->sum('savings.total_amount');
 
-        //****************** Get member registration count ****************//
+        //****** Get member registration count ******//
 
         $pendingMembers = Member::where('status', 'pending')
             ->whereYear('created_at', $year)
@@ -251,7 +239,7 @@ class DashboardController extends Controller
             : 0;
 
        
-        // **************** Get total loan applications (all statuses) ****************** //
+        // ****** Get total loan applications (all statuses) ****** //
         
         $LoanApplicationsQuery = Loan::whereYear('created_at', $year);
         if ($period === 'monthly') {
@@ -263,7 +251,7 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
-        // ***************** Get total approved loan applications ***************** //
+        // ****** Get total approved loan applications ****** //
 
         $LoanApprovalsQuery = Loan::where('status', 'approved')->whereYear('created_at', $year);
         if ($period === 'monthly') {
@@ -287,7 +275,7 @@ class DashboardController extends Controller
         // Get recent activities
         $recentActivities = $this->getRecentActivities($year, $month, $period);
 
-        // **************** Get loan applications and approvals data ****************** //
+        // ****** Get loan applications and approvals data ****** //
         if ($period === 'annually') {
             // Modified loan applications data
             $loanApplicationsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
@@ -439,8 +427,11 @@ class DashboardController extends Controller
             // Get annual data
             $monthlyData = array_fill(1, 12, 0);
             
-            $savingsData = Savings::selectRaw('MONTH(created_at) as month, SUM(total_amount) as amount')
-                ->whereYear('created_at', $year)
+            $savingsData = DB::table('savings')
+                ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
+                ->where('member_register.status', 'approved')  // Filter for approved members only
+                ->selectRaw('MONTH(savings.created_at) as month, SUM(savings.total_amount) as amount')
+                ->whereYear('savings.created_at', $year)
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get();
@@ -465,7 +456,3 @@ class DashboardController extends Controller
     }
 
 }
-
-
-
-
