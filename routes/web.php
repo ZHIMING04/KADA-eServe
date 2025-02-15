@@ -30,6 +30,8 @@ use App\Models\Resignation;
 use App\Service\SmsService;
 use App\Http\Controllers\Admin\MemberDataEntryController;
 use Illuminate\Mail\Message;
+use App\Mail\MailLoanReject;
+use App\Models\Loan;
 
 
 
@@ -311,16 +313,29 @@ Route::get('/test-email', function() {
             'from_address' => config('mail.from.address'),
         ]);
 
-        Mail::raw('Test email from Laravel', function(Message $message) {
-            $message->to('yan04@graduate.utm.my')
-                   ->subject('Test Email');
-        });
+        // Assuming you have a Loan instance for testing
+        $loan = Loan::first(); // Get the first loan for testing
+        $rejection_reason = 'Your loan application has been rejected due to insufficient credit score.';
 
-        return 'Email sent successfully! Check your inbox.';
+        // Send the custom email
+        Mail::to('test@example.com')->send(new MailLoanReject($loan, $rejection_reason));
+
+        return 'Custom email sent successfully! Check your inbox.';
     } catch (\Exception $e) {
         \Log::error('Email test failed: ' . $e->getMessage());
         return 'Email failed: ' . $e->getMessage();
     }
+});
+
+Route::get('/send-test-email', function () {
+    // Assuming you have a Loan instance for testing
+    $loan = Loan::first(); // Get the first loan for testing
+    $rejection_reason = 'Your loan application has been rejected due to insufficient credit score.';
+
+    // Send the test email
+    Mail::to('sabrinaheng115@gmail.com')->send(new MailLoanReject($loan, $rejection_reason));
+
+    return 'Test email sent!';
 });
 
 

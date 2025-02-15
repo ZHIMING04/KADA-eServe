@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Loan extends Model
 {
+    use Notifiable;
+
     protected $primaryKey = 'loan_id';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -17,14 +20,29 @@ class Loan extends Model
         'bank_id',
         'date_apply',
         'loan_amount',
+        'loan_total_repayment',
+        'loan_balance',
         'interest_rate',
         'monthly_repayment',
         'monthly_gross_salary',
         'monthly_net_salary',
         'loan_period',
         'status',
-        'loan_balance',
-        'loan_total_repayment'
+        'rejection_reason',
+        'rejected_at',
+        'rejected_by'
+    ];
+
+    protected $casts = [
+        'date_apply' => 'date',
+        'loan_amount' => 'float',
+        'loan_total_repayment' => 'float',
+        'loan_balance' => 'float',
+        'interest_rate' => 'float',
+        'monthly_repayment' => 'float',
+        'monthly_gross_salary' => 'float',
+        'monthly_net_salary' => 'float',
+        'rejected_at' => 'datetime'
     ];
 
     public const STATUS_PENDING = 'pending';
@@ -50,5 +68,32 @@ class Loan extends Model
     public function guarantors()
     {
         return $this->hasMany(Guarantor::class, 'loan_id', 'loan_id');
+    }
+
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
+    // Route notifications to the member's email
+    public function routeNotificationForMail()
+    {
+        return $this->member->email;
+    }
+
+    // Helper methods
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isApproved()
+    {
+        return $this->status === 'approved';
+    }
+
+    public function isRejected()
+    {
+        return $this->status === 'rejected';
     }
 } 
