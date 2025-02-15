@@ -34,7 +34,9 @@ class Member extends Model
         'office_postcode',
         'office_state',
         'guest_id',
-        'status'
+        'status',
+        'rejection_reason',
+        'rejected_at',
     ];
 
     public function workingInfo()
@@ -70,6 +72,11 @@ class Member extends Model
     public function isActive()
     {
         return $this->status === 'approved';
+    }
+
+    public function routeNotificationForMail($notification)
+    {
+        return $this->email;
     }
 }
 
