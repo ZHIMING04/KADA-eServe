@@ -12,7 +12,9 @@ class MemberStatusController extends Controller
     public function display()
     {
         // Get the latest member record based on updated_at
-        $member = Member::with(['savings', 'workingInfo', 'familyMembers'])
+        $member = Member::with(['savings' => function($query) {
+            $query->latest(); // This ensures we get the latest savings record
+        }, 'workingInfo', 'familyMembers'])
             ->where('email', auth()->user()->email)
             ->orderBy('updated_at', 'desc')
             ->first();

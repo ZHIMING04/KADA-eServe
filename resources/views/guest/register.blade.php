@@ -1031,6 +1031,7 @@
                                                                     <td class="px-4 py-3" x-text="index + 1"></td>
                                                                     <td class="px-4 py-3">
                                                                         <input type="text" 
+                                                                               :name="'family[' + index + '][name]'"
                                                                                x-model="member.name"
                                                                                @input="clearError(`family.${index}.name`)"
                                                                                class="border-gray-300 rounded-md shadow-sm w-full"
@@ -1041,6 +1042,7 @@
                                                                     </td>
                                                                     <td class="px-4 py-3">
                                                                         <input type="text" 
+                                                                               :name="'family[' + index + '][ic]'"
                                                                                x-model="member.ic"
                                                                                @input="clearError(`family.${index}.ic`)"
                                                                                class="border-gray-300 rounded-md shadow-sm w-full"
@@ -1050,7 +1052,8 @@
                                                                            class="mt-1 text-sm text-red-600"></p>
                                                                     </td>
                                                                     <td class="px-4 py-3">
-                                                                        <select x-model="member.relationship"
+                                                                        <select :name="'family[' + index + '][relationship]'"
+                                                                                x-model="member.relationship"
                                                                                 @change="clearError(`family.${index}.relationship`)"
                                                                                 class="border-gray-300 rounded-md shadow-sm w-full">
                                                                             <option value="">Pilih Hubungan</option>
@@ -1384,8 +1387,8 @@
                     <td class="px-4 py-3">
                         <select name="family[${rowCount}][relationship]" class="w-full rounded-md border-gray-300" required>
                             <option value="">Pilih Hubungan</option>
-                            <option value="Isteri">Isteri</option>
                             <option value="Suami">Suami</option>
+                            <option value="Isteri">Isteri</option>
                             <option value="Anak">Anak</option>
                             <option value="Ibu">Ibu</option>
                             <option value="Bapa">Bapa</option>

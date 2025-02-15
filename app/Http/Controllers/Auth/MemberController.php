@@ -238,6 +238,9 @@ class MemberController extends Controller
                 'updated_at' => now(),
             ]);
 
+            // Add this before processing family members
+            Log::info('Family data:', ['family' => $request->family]);
+
             // 4. Insert family members if any
             if ($request->has('family')) {
                 foreach ($request->family as $familyMember) {
