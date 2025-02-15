@@ -152,10 +152,41 @@ class MemberTransactionController extends Controller
 
     public function getMemberLoans()
     {
-        $loans = Loan::where('member_id', Auth::id())
-            ->where('status', 'approved')
-            ->get();
+        try {
+            Log::info('getMemberLoans started');
+            
+            $member = Member::where('guest_id', Auth::id())->first();
+            Log::info('Auth ID:', ['id' => Auth::id()]);
+            Log::info('Member lookup result:', ['member' => $member]);
+            
+            if (!$member) {
+                Log::warning('Member not found for user', ['user_id' => Auth::id()]);
+                return response()->json([
+                    'error' => 'Member not found'
+                ], 404);
+            }
 
-        return response()->json($loans);
+            $loans = Loan::where('member_id', $member->id)
+                ->where('status', 'approved')
+                ->select('loan_id', 'loan_amount', 'loan_balance')
+                ->get();
+
+            Log::info('Loans query result:', [
+                'member_id' => $member->id,
+                'loans_count' => $loans->count(),
+                'loans' => $loans->toArray()
+            ]);
+
+            return response()->json($loans);
+        } catch (\Exception $e) {
+            Log::error('Error in getMemberLoans:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to fetch loans: ' . $e->getMessage()
+            ], 500);
+        }
     }
 } 

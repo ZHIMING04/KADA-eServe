@@ -179,115 +179,116 @@
     </div>
 
     @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Toggle between savings and loan options
-        $('#transactionType').change(function() {
-            if (this.value === 'savings') {
-                $('#savingsTypeDiv').removeClass('hidden').addClass('block');
-                $('#loanDiv').removeClass('block').addClass('hidden');
-            } else {
-                $('#savingsTypeDiv').removeClass('block').addClass('hidden');
-                $('#loanDiv').removeClass('hidden').addClass('block');
+        // Essential functions only
+        $(document).ready(function() {
+            // Initialize transaction type handling
+            $('#transactionType').change(function() {
+                const type = $(this).val();
+                if (type === 'savings') {
+                    $('#savingsTypeDiv').removeClass('hidden').addClass('block');
+                    $('#loanDiv').removeClass('block').addClass('hidden');
+                } else {
+                    $('#savingsTypeDiv').removeClass('block').addClass('hidden');
+                    $('#loanDiv').removeClass('hidden').addClass('block');
+                    fetchMemberLoans();
+                }
+            });
+
+            // Payment method handling
+            $('input[name="payment_method"]').change(function() {
+                const proofUploadDiv = $('#proofUploadDiv');
+                const proofInput = $('input[name="payment_proof"]');
+                
+                if (this.value === 'online') {
+                    proofUploadDiv.removeClass('hidden');
+                    proofInput.prop('required', true);
+                } else {
+                    proofUploadDiv.addClass('hidden');
+                    proofInput.prop('required', false);
+                }
+            });
+
+            // Fetch loans function with better error handling
+            function fetchMemberLoans() {
+                const loanSelect = $('select[name="loan_id"]');
+                loanSelect.prop('disabled', true);
+                loanSelect.html('<option value="">Memuat...</option>');
+
+                $.ajax({
+                    url: '/member/loans/active',
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(data) {
+                        loanSelect.empty();
+                        
+                        if (data.length > 0) {
+                            loanSelect.append('<option value="">-- Pilih Pinjaman --</option>');
+                            data.forEach(loan => {
+                                loanSelect.append(`
+                                    <option value="${loan.loan_id}">
+                                        Pinjaman #${loan.loan_id} - Baki: RM${loan.loan_balance.toFixed(2)}
+                                    </option>
+                                `);
+                            });
+                        } else {
+                            loanSelect.append('<option value="">Tiada rekod pinjaman aktif</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching loans:', error);
+                        loanSelect.html('<option value="">Ralat memuat pinjaman. Sila cuba lagi.</option>');
+                    },
+                    complete: function() {
+                        loanSelect.prop('disabled', false);
+                    }
+                });
+            }
+
+            // File upload preview
+            $('#payment_proof').change(function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#preview').attr('src', e.target.result);
+                        $('#fileName').text(file.name);
+                        $('#imagePreview').removeClass('hidden');
+                        $('#uploadPrompt').addClass('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove image function
+            window.removeImage = function() {
+                $('#payment_proof').val('');
+                $('#imagePreview').addClass('hidden');
+                $('#uploadPrompt').removeClass('hidden');
+                $('#preview').attr('src', '');
+                $('#fileName').text('');
+            }
+
+            // Form submission handling
+            $('#transactionForm').submit(function() {
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true);
+                submitBtn.html(`
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Menghantar...
+                `);
+            });
+
+            // Initialize if loan type is selected
+            if ($('#transactionType').val() === 'loan') {
                 fetchMemberLoans();
             }
-        });
-
-        // Toggle payment proof upload based on payment method
-        $('input[name="payment_method"]').change(function() {
-            const proofUploadDiv = $('#proofUploadDiv');
-            const proofInput = $('input[name="payment_proof"]');
-            
-            if (this.value === 'online') {
-                proofUploadDiv.removeClass('hidden').addClass('block');
-                proofInput.prop('required', true);
-            } else {
-                proofUploadDiv.removeClass('block').addClass('hidden');
-                proofInput.prop('required', false);
-            }
-        });
-
-        // Fetch member's loans
-        function fetchMemberLoans() {
-            fetch('/member/loans')
-                .then(response => response.json())
-                .then(loans => {
-                    const loanSelect = $('select[name="loan_id"]');
-                    loanSelect.empty();
-                    
-                    if (loans.length > 0) {
-                        loanSelect.append('<option value="">-- Pilih Pinjaman --</option>');
-                        loans.forEach(loan => {
-                            loanSelect.append(`<option value="${loan.id}">Pinjaman #${loan.loan_id} (RM${loan.loan_amount})</option>`);
-                        });
-                    } else {
-                        loanSelect.append('<option value="">Tiada rekod pinjaman</option>');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching loans:', error);
-                });
-        }
-
-        // File upload preview
-        document.getElementById('payment_proof').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Show preview
-                    document.getElementById('preview').src = e.target.result;
-                    document.getElementById('fileName').textContent = file.name;
-                    document.getElementById('imagePreview').classList.remove('hidden');
-                    // Hide upload prompt
-                    document.getElementById('uploadPrompt').classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Remove image function
-        function removeImage() {
-            // Clear the file input
-            const fileInput = document.getElementById('payment_proof');
-            fileInput.value = '';
-            
-            // Hide preview and show upload prompt
-            document.getElementById('imagePreview').classList.add('hidden');
-            document.getElementById('uploadPrompt').classList.remove('hidden');
-            
-            // Clear preview image and filename
-            document.getElementById('preview').src = '';
-            document.getElementById('fileName').textContent = '';
-        }
-
-        // Add this new code for the notification
-        document.addEventListener('DOMContentLoaded', function() {
-            const notification = document.getElementById('successNotification');
-            if (notification) {
-                // Show notification
-                setTimeout(() => {
-                    notification.classList.remove('translate-x-full');
-                }, 100);
-
-                // Hide notification after 5 seconds
-                setTimeout(() => {
-                    notification.classList.add('translate-x-full');
-                }, 5000);
-            }
-        });
-
-        // Your existing form submission handling...
-        document.getElementById('transactionForm').addEventListener('submit', function() {
-            // Show loading state
-            const submitButton = this.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-            submitButton.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Menghantar...
-            `;
         });
     </script>
     @endpush

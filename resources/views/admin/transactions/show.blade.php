@@ -131,6 +131,29 @@
                 </div>
             </div>
         @endif
+
+        <!-- Loan Information -->
+        @if($transaction->type === 'loan' && $transaction->loan_id)
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Maklumat Pinjaman</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">ID Pinjaman</p>
+                        <p class="font-medium">{{ $transaction->loan_id }}</p>
+                    </div>
+                    @if($transaction->loan)
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">Baki Pinjaman</p>
+                        <p class="font-medium">RM {{ number_format($transaction->loan->loan_balance, 2) }}</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">Jumlah Pinjaman Asal</p>
+                        <p class="font-medium">RM {{ number_format($transaction->loan->loan_amount, 2) }}</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection 

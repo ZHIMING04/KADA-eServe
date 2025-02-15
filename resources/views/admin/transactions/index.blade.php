@@ -147,7 +147,7 @@
                         <td>{{ $transaction->transaction_id }}</td>
                         <td>{{ $transaction->member->name }}</td>
                         <td>
-                        @if($transaction->type === 'savings')
+                            @if($transaction->type === 'savings')
                                 @switch($transaction->savings_type)
                                     @case('share_capital')
                                         Modal Syer
