@@ -40,13 +40,12 @@ class TransactionController extends Controller
             $transaction->approved_at = now();
             $transaction->save();
 
-            // Update member's savings based on transaction type
+            // Handle different transaction types
             if ($transaction->type === 'savings') {
-                // Get the savings record instead of member
+                // Handle savings transaction
                 $savings = Savings::where('no_anggota', $transaction->member_id)->firstOrFail();
                 $savingsType = $transaction->savings_type;
                 
-                // Update the specific savings type
                 if (isset($savings->$savingsType)) {
                     $savings->$savingsType += $transaction->amount;
                     
@@ -58,6 +57,34 @@ class TransactionController extends Controller
                         $savings->fixed_savings;
                         
                     $savings->save();
+                }
+            } elseif ($transaction->type === 'loan') {
+                // Handle loan payment transaction
+                $loan = DB::table('loans')
+                    ->where('loan_id', $transaction->loan_id)
+                    ->first();
+
+                if ($loan) {
+                    // Calculate new loan balance
+                    $newBalance = $loan->loan_balance - $transaction->amount;
+                    
+                    // Update loan balance
+                    DB::table('loans')
+                        ->where('loan_id', $transaction->loan_id)
+                        ->update([
+                            'loan_balance' => $newBalance,
+                            'updated_at' => now()
+                        ]);
+
+                    // If loan is fully paid
+                    if ($newBalance <= 0) {
+                        DB::table('loans')
+                            ->where('loan_id', $transaction->loan_id)
+                            ->update([
+                                'status' => 'completed',
+                                'updated_at' => now()
+                            ]);
+                    }
                 }
             }
 

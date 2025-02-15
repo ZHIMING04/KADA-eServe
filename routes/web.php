@@ -106,7 +106,9 @@ Route::middleware(['auth', 'can:apply-loan'])->group(function () {
         Route::get('/member/transactions/create', 'create')->name('member.transactions.create');
         Route::post('/member/transactions/store', 'store')->name('member.transactions.store');
         Route::get('/member/transactions', 'index')->name('member.transactions.index');
-        Route::get('/member/loans', 'getMemberLoans')->name('member.loans');
+        Route::get('/member/loans/active', 'getMemberLoans')
+            ->name('member.loans')
+            ->middleware(['auth', 'can:apply-loan']);
     });
 
     Route::middleware(['auth'])->group(function () {
