@@ -50,10 +50,10 @@ class AuthenticatedSessionController extends Controller
             if ($user->isAn('admin')) {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->isA('member')) {
-                if ($latestMember && $latestMember->status === 'approved') {
+                if ($latestMember && in_array($latestMember->status, ['approved', 'resigned', 'deceased'])) {
                     return redirect()->route('member.dashboard');
                 } else {
-                    // If latest application is not approved, treat as guest
+                    // If latest application is not in allowed statuses, treat as guest
                     Bouncer::retract('member')->from($user);
                     Bouncer::assign('guest')->to($user);
                     Bouncer::refresh();

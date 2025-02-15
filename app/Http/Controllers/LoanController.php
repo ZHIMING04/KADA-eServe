@@ -25,9 +25,16 @@ class LoanController extends Controller
     {
         $member = Auth::user()->member;
 
+        // Check if member has active resignation
+        if ($member->hasActiveResignation()) {
+            return redirect()->route('profile.edit')
+                ->with('warning', $member->getResignationWarningMessage());
+        }
+
         // Check if the member is active
         if (!$member->isActive()) {
-            return redirect()->route('profile.edit')->with('error', 'Anda tidak boleh memohon pinjaman kerana permohonan berhenti anda telah diluluskan.');
+            return redirect()->route('profile.edit')
+                ->with('error', 'Akaun anda tidak aktif.');
         }
 
         // Ensure loan types exist
@@ -54,6 +61,20 @@ class LoanController extends Controller
 
     public function store(Request $request)
     {
+        $member = Auth::user()->member;
+
+        // Check for active resignation before processing
+        if ($member->hasActiveResignation()) {
+            return redirect()->route('profile.edit')
+                ->with('warning', $member->getResignationWarningMessage());
+        }
+
+        // Check if member is active
+        if (!$member->isActive()) {
+            return redirect()->route('profile.edit')
+                ->with('error', 'Akaun anda tidak aktif.');
+        }
+
         // Add dd() to debug the incoming request
         // dd($request->all());
 
@@ -399,13 +420,11 @@ class LoanController extends Controller
 
     public function validateGuarantorPF($pf)
     {
-        // Get current user's PF number
-        $currentUserPF = DB::table('member_register')
-            ->where('guest_id', auth()->id())
-            ->value('no_pf');
+        // Get current user's member record
+        $currentMember = Auth::user()->member;
 
         // Check if guarantor is using their own PF
-        if ($pf === $currentUserPF) {
+        if ($pf === $currentMember->no_pf) {
             return response()->json([
                 'valid' => false,
                 'message' => 'Anda tidak boleh menggunakan No. PF anda sendiri sebagai penjamin.'
@@ -413,9 +432,7 @@ class LoanController extends Controller
         }
 
         // Check if PF exists in member_register and is a member
-        $guarantor = DB::table('member_register')
-            ->where('no_pf', $pf)
-            ->first();
+        $guarantor = Member::where('no_pf', $pf)->first();
 
         if (!$guarantor) {
             return response()->json([
@@ -424,12 +441,29 @@ class LoanController extends Controller
             ]);
         }
 
-        // Check if guarantor is a registered member
-        $user = User::find($guarantor->guest_id);
-        if (!$user || !$user->isA('member')) {
+        // Check latest resignation status
+        $latestResignation = $guarantor->resignations()
+            ->latest()
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($latestResignation) {
+            $message = $latestResignation->status === 'pending'
+                ? 'Penjamin tidak layak kerana sedang dalam proses permohonan berhenti.'
+                : 'Penjamin tidak layak kerana telah memohon untuk berhenti.';
+            
             return response()->json([
                 'valid' => false,
-                'message' => 'Penjamin mestilah ahli yang berdaftar.'
+                'message' => $message
+            ]);
+        }
+
+        // Check if guarantor is a registered member and active
+        if (!$guarantor->user || !$guarantor->user->isA('member') || !$guarantor->isActive()) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Penjamin mestilah ahli yang berdaftar dan aktif.'
             ]);
         }
 

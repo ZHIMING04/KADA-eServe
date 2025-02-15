@@ -16,34 +16,46 @@ class ResignationController extends Controller
 {
     public function showForm()
     {
-        $member = Auth::user()->member;
-
-        // Check for pending resignation
-        $pendingResignation = Resignation::where('member_id', $member->id)
-            ->whereIn('status', ['pending', 'diluluskan'])
+        // Get latest member record
+        $latestMember = Member::where('guest_id', Auth::user()->member->guest_id)
+            ->latest()
             ->first();
 
-        if ($pendingResignation) {
+        // Only check active resignations for the latest member record
+        $activeResignation = Resignation::where('member_id', $latestMember->id)
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($activeResignation) {
+            $message = $activeResignation->status === 'pending' 
+                ? 'Permohonan anda sedang diproses. Sila tunggu sehingga keputusan dimaklumkan.'
+                : 'Permohonan berhenti anda telah diluluskan.';
+            
             return redirect()->route('profile.edit')
-                ->withErrors(['warning' => 'Permohonan anda sedang diproses. Sila tunggu sehingga keputusan dimaklumkan.']);
+                ->withErrors(['warning' => $message]);
         }
 
-        $workingInfo = DB::table('working_info')->where('no_anggota', $member->id)->first();
-        $member->working_info = $workingInfo;
+        $workingInfo = DB::table('working_info')->where('no_anggota', $latestMember->id)->first();
+        $latestMember->working_info = $workingInfo;
         
-        return view('resignation.form', compact('member', 'workingInfo'));
+        return view('resignation.form', ['member' => $latestMember, 'workingInfo' => $workingInfo]);
     }
 
     public function submit(Request $request)
     {
-        $member = Auth::user()->member;
-
-        // Double check for pending resignation before submitting
-        $pendingResignation = Resignation::where('member_id', $member->id)
-            ->whereIn('status', ['pending', 'diluluskan'])
+        // Get latest member record
+        $latestMember = Member::where('guest_id', Auth::user()->member->guest_id)
+            ->latest()
             ->first();
 
-        if ($pendingResignation) {
+        // Check for active resignations for the latest member record
+        $activeResignation = Resignation::where('member_id', $latestMember->id)
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($activeResignation) {
             return redirect()->route('profile.edit')
                 ->withErrors(['warning' => 'Permohonan anda sedang diproses. Sila tunggu sehingga keputusan dimaklumkan.']);
         }
@@ -57,13 +69,14 @@ class ResignationController extends Controller
         ]);
         
         $resignation = new Resignation();
-        $resignation->member_id = $member->id;
+        $resignation->member_id = $latestMember->id; // Use latest member's ID
         $resignation->reason1 = $request->reason1;
         $resignation->reason2 = $request->reason2;
         $resignation->reason3 = $request->reason3;
         $resignation->reason4 = $request->reason4;
         $resignation->reason5 = $request->reason5;
         $resignation->status = 'pending';
+        $resignation->is_active = true;
         $resignation->save();
 
         return redirect()->route('profile.edit')->with('success', 'Permohonan berhenti telah berjaya dihantar.');
@@ -109,11 +122,16 @@ class ResignationController extends Controller
     public function reject(Request $request, $id)
     {
         try {
+            DB::beginTransaction();
+            
             $resignation = Resignation::findOrFail($id);
             $member = Member::find($resignation->member_id);
             
-            // Update resignation status
-            $resignation->update(['status' => 'rejected']);
+            // Update resignation status and set is_active to false
+            $resignation->update([
+                'status' => 'rejected',
+                'is_active' => false  // Set to false when rejected
+            ]);
             
             // Send email notification
             $user = $member->user;
@@ -121,10 +139,14 @@ class ResignationController extends Controller
                 $user->notify(new ResignationRejectedNotification());
             }
             
+            DB::commit();
+            
             return redirect()->route('admin.list.lists')
                 ->with('success', 'Permohonan berhenti telah ditolak dan email pemberitahuan telah dihantar.');
                 
         } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Resignation rejection error: ' . $e->getMessage());
             return redirect()->route('admin.list.lists')
                 ->with('error', 'Ralat semasa memproses permohonan. Sila cuba lagi.');
         }

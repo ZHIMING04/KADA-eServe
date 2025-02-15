@@ -124,27 +124,16 @@ class DashboardController extends Controller
              // Modified savings data query with proper joins and status filter
              $savingsData = DB::table('savings')
                  ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
-                 ->where(function($query) {
-                     $query->where('member_register.status', '=', 'approved');
-                 })  // Explicit filter for approved members only
+                 ->where('member_register.status', 'approved')  // Filter for approved members only
+                 ->selectRaw('MONTH(savings.created_at) as month, 
+                             SUM(savings.entrance_fee) as entrance_fee,
+                             SUM(savings.share_capital) as share_capital,
+                             SUM(savings.subscription_capital) as subscription_capital,
+                             SUM(savings.member_deposit) as member_deposit,
+                             SUM(savings.welfare_fund) as welfare_fund,
+                             SUM(savings.fixed_savings) as fixed_savings,
+                             SUM(savings.total_amount) as amount')
                  ->whereYear('savings.created_at', $year)
-                 ->selectRaw('
-                     MONTH(savings.created_at) as month,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(entrance_fee, 0) ELSE 0 END) as entrance_fee,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(share_capital, 0) ELSE 0 END) as share_capital,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(subscription_capital, 0) ELSE 0 END) as subscription_capital,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(member_deposit, 0) ELSE 0 END) as member_deposit,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(welfare_fund, 0) ELSE 0 END) as welfare_fund,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(fixed_savings, 0) ELSE 0 END) as fixed_savings,
-                     SUM(CASE WHEN member_register.status = "approved" THEN 
-                         COALESCE(entrance_fee, 0) + 
-                         COALESCE(share_capital, 0) + 
-                         COALESCE(subscription_capital, 0) + 
-                         COALESCE(member_deposit, 0) + 
-                         COALESCE(welfare_fund, 0) + 
-                         COALESCE(fixed_savings, 0)
-                     ELSE 0 END) as amount
-                 ')
                  ->groupBy('month')
                  ->orderBy('month')
                  ->get();
@@ -195,30 +184,13 @@ class DashboardController extends Controller
                  return $monthNames[$item['month']] . ' ' . $year;
              })->toArray();
          } else {
-             // Monthly period query with proper joins
+             // Monthly period query
              $savingsData = DB::table('savings')
                  ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
-                 ->where(function($query) {
-                     $query->where('member_register.status', '=', 'approved');
-                 })  // Explicit filter for approved members only
+                 ->where('member_register.status', 'approved')  // Filter for approved members only
                  ->whereYear('savings.created_at', $year)
                  ->whereMonth('savings.created_at', $month)
-                 ->selectRaw('
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(entrance_fee, 0) ELSE 0 END) as entrance_fee,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(share_capital, 0) ELSE 0 END) as share_capital,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(subscription_capital, 0) ELSE 0 END) as subscription_capital,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(member_deposit, 0) ELSE 0 END) as member_deposit,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(welfare_fund, 0) ELSE 0 END) as welfare_fund,
-                     SUM(CASE WHEN member_register.status = "approved" THEN COALESCE(fixed_savings, 0) ELSE 0 END) as fixed_savings,
-                     SUM(CASE WHEN member_register.status = "approved" THEN 
-                         COALESCE(entrance_fee, 0) + 
-                         COALESCE(share_capital, 0) + 
-                         COALESCE(subscription_capital, 0) + 
-                         COALESCE(member_deposit, 0) + 
-                         COALESCE(welfare_fund, 0) + 
-                         COALESCE(fixed_savings, 0)
-                     ELSE 0 END) as total
-                 ')
+                 ->select(DB::raw('SUM(total_amount) as total'))
                  ->first();
 
              $savings = [[
@@ -395,143 +367,7 @@ class DashboardController extends Controller
             ->join('member_register', 'savings.no_anggota', '=', 'member_register.id')
             ->where('member_register.status', 'approved')
             ->whereYear('savings.created_at', $year)
-            ->sum(DB::raw('
-                COALESCE(entrance_fee, 0) + 
-                COALESCE(share_capital, 0) + 
-                COALESCE(subscription_capital, 0) + 
-                COALESCE(member_deposit, 0) + 
-                COALESCE(welfare_fund, 0) + 
-                COALESCE(fixed_savings, 0)
-            '));
-
-        //****************** Get member registration count ****************//
-
-        $pendingMembers = Member::where('status', 'pending')
-            ->whereYear('created_at', $year)
-            ->count();
-
-       
-        // Calculate member growth percentage
-        $previousMonthApprovedMembers = Member::where('status', 'approved')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', now()->subMonth()->month)
-            ->count();
-
-        $memberGrowthPercentage = $previousMonthApprovedMembers > 0 
-            ? (($totalApprovedMembers - $previousMonthApprovedMembers) / $previousMonthApprovedMembers) * 100 
-            : 0;
-
-       
-        // **************** Get total loan applications (all statuses) ****************** //
-        
-        $LoanApplicationsQuery = Loan::whereYear('created_at', $year);
-        if ($period === 'monthly') {
-            $LoanApplicationsQuery->whereMonth('created_at', $month);
-        }
-        $LoanApplications = $LoanApplicationsQuery
-            ->selectRaw('COUNT(*) as total, MONTH(created_at) as month')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
-
-        // ***************** Get total approved loan applications ***************** //
-
-        $LoanApprovalsQuery = Loan::where('status', 'approved')->whereYear('created_at', $year);
-        if ($period === 'monthly') {
-            $LoanApprovalsQuery->whereMonth('created_at', $month);
-        }
-        $LoanApprovals = $LoanApprovalsQuery
-            ->selectRaw('COUNT(*) as total, MONTH(created_at) as month')
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
-
-        // Fix totalMembers calculation
-        $totalMemberRegis = Member::whereYear('created_at', $year);
-        $totalMembers = $totalMemberRegis->count(); // Define it here first
-        
-        if($period === 'monthly') {
-            $totalMemberRegis->whereMonth('created_at', $month);
-            $totalMembers = $totalMemberRegis->count(); // Update if monthly
-        }
-        
-        // Get recent activities
-        $recentActivities = $this->getRecentActivities($year, $month, $period);
-
-        // **************** Get loan applications and approvals data ****************** //
-        if ($period === 'annually') {
-            // Modified loan applications data
-            $loanApplicationsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
-                ->where('member_register.status', 'approved')
-                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
-                ->whereYear('loans.created_at', $year)
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-            // Modified loan approvals data
-            $loanApprovalsData = Loan::join('member_register', 'loans.member_id', '=', 'member_register.id')
-                ->where('member_register.status', 'approved')
-                ->where('loans.status', 'approved')
-                ->whereYear('loans.created_at', $year)
-                ->selectRaw('MONTH(loans.created_at) as month, COUNT(*) as total')
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get();
-
-            // Fill in the actual data while preserving zeros for months without data
-            $LoanApplications = collect($monthlyData)->map(function($default, $month) use ($loanApplicationsData) {
-                $monthData = $loanApplicationsData->firstWhere('month', $month);
-                return [
-                    'month' => (int)$month,
-                    'total' => $monthData ? (int)$monthData->total : 0
-                ];
-            })->values();
-
-            $LoanApprovals = collect($monthlyData)->map(function($default, $month) use ($loanApprovalsData) {
-                $monthData = $loanApprovalsData->firstWhere('month', $month);
-                return [
-                    'month' => (int)$month,
-                    'total' => $monthData ? (int)$monthData->total : 0
-                ];
-            })->values();
-        } else {
-            // Get monthly data for specific month
-            $totalApplications = Loan::whereYear('created_at', $year)
-                ->whereMonth('created_at', $month)
-                ->count();
-
-            $totalApprovals = Loan::where('status', 'approved')
-                ->whereYear('created_at', $year)
-                ->whereMonth('created_at', $month)
-                ->count();
-
-            // Create single-item collections for the specific month
-            $monthName = [
-                1 => 'Jan', 2 => 'Feb', 3 => 'Mac', 4 => 'Apr',
-                5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Ogo',
-                9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Dis'
-            ][$month] . ' ' . $year;
-
-            $LoanApplications = collect([
-                [
-                    'month' => (int)$month,
-                    'total' => $totalApplications
-                ]
-            ]);
-
-            $LoanApprovals = collect([
-                [
-                    'month' => (int)$month,
-                    'total' => $totalApprovals
-                ]
-            ]);
-
-            // Update chart data arrays
-            $loanApplicationsData = [$totalApplications];
-            $loanApprovalsData = [$totalApprovals];
-            $loanLabels = [$monthName];
-        }
+            ->sum('savings.total_amount');
 
         return compact(
             'totalApprovedMembers',

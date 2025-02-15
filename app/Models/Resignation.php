@@ -24,11 +24,12 @@ class Resignation extends Model
     ];
 
     protected $casts = [
+        'is_active' => 'boolean',
         'submission_date' => 'datetime',
         'processed_at' => 'datetime'
     ];
 
-    public function member(): BelongsTo
+    public function member()
     {
         return $this->belongsTo(Member::class, 'member_id');
     }

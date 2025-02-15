@@ -4,11 +4,29 @@
             <h3 class="text-xl font-semibold text-white flex items-center">
                 <i class="fas fa-user mr-2"></i> Maklumat Peribadi
             </h3>
-                                <div class="ml-4">
-                                    <span class="status-badge inline-block px-3 py-1 rounded-full text-sm font-semibold bg-{{ $member->status == 'pending' ? 'yellow' : ($member->status == 'rejected' ? 'red' : ($member->status == 'resigned' ? 'orange' : ($member->status == 'deceased' ? 'gray' : 'green'))) }}-100 text-{{ $member->status == 'pending' ? 'yellow' : ($member->status == 'rejected' ? 'red' : ($member->status == 'resigned' ? 'orange' : ($member->status == 'deceased' ? 'gray' : 'green'))) }}-800">
-                                        {{ $member->status == 'pending' ? 'SEDANG DIPROSES' : ($member->status == 'rejected' ? 'DITOLAK' : ($member->status == 'resigned' ? 'BERHENTI' : ($member->status == 'deceased' ? 'WAFAT' : 'AHLI'))) }}
-                                    </span>
-                                </div>
+            <div class="ml-4">
+                @php
+                    // Get latest member record using guest_id
+                    $latestMember = App\Models\Member::where('guest_id', $member->guest_id)
+                        ->latest()
+                        ->first();
+                    
+                    $statusClass = $latestMember->status == 'pending' ? 'yellow' : 
+                        ($latestMember->status == 'rejected' ? 'red' : 
+                        ($latestMember->status == 'resigned' ? 'orange' : 
+                        ($latestMember->status == 'deceased' ? 'gray' : 
+                        ($latestMember->isActive() ? 'green' : 'red'))));
+                    
+                    $statusText = $latestMember->status == 'pending' ? 'SEDANG DIPROSES' : 
+                        ($latestMember->status == 'rejected' ? 'DITOLAK' : 
+                        ($latestMember->status == 'resigned' ? 'BERHENTI' : 
+                        ($latestMember->status == 'deceased' ? 'WAFAT' : 
+                        ($latestMember->isActive() ? 'AHLI' : 'TIDAK AKTIF'))));
+                @endphp
+                <span class="status-badge inline-block px-3 py-1 rounded-full text-sm font-semibold bg-{{ $statusClass }}-100 text-{{ $statusClass }}-800">
+                    {{ $statusText }}
+                </span>
+            </div>
         </div>
     </header>
 

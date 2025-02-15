@@ -410,9 +410,9 @@
     </style>
 </head>
 <body>
-@if (!Auth::user()->member->isActive())
+@if (Auth::user()->member->hasActiveResignation())
     <div class="alert alert-warning">
-        <strong>Amaran!</strong> Anda tidak boleh memohon pinjaman atau menambah simpanan kerana permohonan berhenti anda telah diluluskan.
+        <strong>Amaran!</strong> {{ Auth::user()->member->getResignationWarningMessage() }}
     </div>
 @endif
 

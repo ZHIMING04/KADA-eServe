@@ -66,12 +66,49 @@ class Member extends Model
 
     public function resignations()
     {
-        return $this->hasMany(Resignation::class);
+        return $this->hasMany(Resignation::class, 'member_id');
+    }
+
+    public function latestResignation()
+    {
+        return $this->hasOne(Resignation::class, 'member_id')->latest();
     }
 
     public function isActive()
     {
-        return $this->status === 'approved';
+        // Get the latest member record using guest_id
+        $latestMember = Member::where('guest_id', $this->guest_id)
+            ->latest()
+            ->first();
+
+        // Check the status of the latest record
+        return $latestMember && $latestMember->status === 'approved';
+    }
+
+    public function hasActiveResignation()
+    {
+        return $this->resignations()
+            ->latest()
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->exists();
+    }
+
+    public function getResignationWarningMessage()
+    {
+        $latestResignation = $this->resignations()
+            ->latest()
+            ->where('is_active', true)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if (!$latestResignation) {
+            return null;
+        }
+
+        return $latestResignation->status === 'pending'
+            ? 'Permohonan anda sedang diproses. Sila tunggu sehingga keputusan dimaklumkan.'
+            : 'Anda tidak boleh memohon pinjaman atau menambah simpanan kerana permohonan berhenti anda telah diluluskan.';
     }
 
     public function routeNotificationForMail($notification)
